@@ -24,13 +24,14 @@ export const useMarketListStore = defineStore('marketLists', () => {
     unsubscribe = onValue(listsRef, (snapshot) => {
       const data = snapshot.val()
       if (data) {
-        lists.value = Object.entries(data).map(([id, val]) => {
-          // Convert items object to array
-          const items = val.items
-            ? Object.entries(val.items).map(([itemId, itemVal]) => ({ id: itemId, ...itemVal }))
-            : []
-          return { id, name: val.name, date: val.date, items }
-        })
+        lists.value = Object.entries(data)
+          .map(([id, val]) => {
+            const items = val.items
+              ? Object.entries(val.items).map(([itemId, itemVal]) => ({ id: itemId, ...itemVal }))
+              : []
+            return { id, name: val.name, date: val.date, createdAt: val.createdAt || 0, items }
+          })
+          .sort((a, b) => b.createdAt - a.createdAt)
       } else {
         lists.value = []
       }
@@ -45,6 +46,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
     await set(newRef, {
       name: data.name,
       date: new Date().toISOString().slice(0, 10),
+      createdAt: Date.now(),
     })
   }
 
