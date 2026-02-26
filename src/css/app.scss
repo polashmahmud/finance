@@ -1,1 +1,113 @@
-// app global css in SCSS form
+// =============================================
+// Personal Finance Manager – Global Styles
+// =============================================
+
+// ---------- Body ----------
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ---------- Helper classes ----------
+.text-weight-semibold {
+  font-weight: 600;
+}
+
+// ---------- Cards ----------
+.finance-card {
+  border-radius: 16px !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+  transition: box-shadow 0.25s ease;
+
+  &:active {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) !important;
+  }
+}
+
+// ---------- Bottom nav ----------
+.finance-bottom-nav {
+  .q-tab {
+    min-height: 56px;
+  }
+}
+
+// ---------- FAB ----------
+.finance-fab {
+  bottom: 68px !important;
+}
+
+// ---------- Section titles ----------
+.section-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.54);
+  padding: 16px 16px 4px;
+}
+
+.body--dark .section-title {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+// ---------- Overview stat cards ----------
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+// ---------- Transaction list ----------
+.transaction-amount {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.amount-income {
+  color: #4caf50;
+}
+
+.amount-expense {
+  color: #e53935;
+}
+
+.amount-transfer {
+  color: #2196f3;
+}
+
+// ---------- Smooth page transitions ----------
+.q-page {
+  padding-bottom: 80px; // room for bottom navigation + fab
+}
+
+// ---------- Rounded inputs ----------
+.q-field--outlined .q-field__control {
+  border-radius: 12px;
+}
+
+// ---------- Large touch targets ----------
+.touch-target {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+// ---------- Swipe hint ----------
+.swipe-hint {
+  font-size: 0.72rem;
+  opacity: 0.5;
+  text-align: center;
+  padding: 4px 0;
+}
+
+// ---------- Dark mode overrides ----------
+.body--dark {
+  .finance-card {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25) !important;
+  }
+}
