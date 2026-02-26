@@ -172,6 +172,20 @@
       </q-list>
     </q-card>
 
+    <!-- Logout -->
+    <q-card class="finance-card q-mb-md cursor-pointer" @click="onLogout" v-ripple>
+      <q-list>
+        <q-item class="touch-target">
+          <q-item-section avatar>
+            <q-icon name="logout" color="negative" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="text-weight-medium text-negative">লগআউট</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-card>
+
     <!-- Set PIN Dialog -->
     <q-dialog v-model="showPinDialog">
       <q-card style="min-width: 300px; border-radius: 16px">
@@ -204,10 +218,14 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useSettingsStore } from 'stores/settingsStore'
+import { useAuthStore } from 'stores/authStore'
 import { Notify } from 'quasar'
 
+const router = useRouter()
 const settings = useSettingsStore()
+const authStore = useAuthStore()
 
 const selectedCurrency = ref(settings.currencyCode)
 const selectedLang = ref(settings.language)
@@ -237,5 +255,13 @@ function savePin() {
   newPin.value = ''
   showPinDialog.value = false
   Notify.create({ type: 'positive', message: 'পিন সফলভাবে সেট হয়েছে' })
+}
+
+async function onLogout() {
+  const result = await authStore.logout()
+  if (result.success) {
+    Notify.create({ type: 'positive', icon: 'check_circle', message: 'লগআউট সফল হয়েছে', position: 'top' })
+    router.push('/login')
+  }
 }
 </script>
