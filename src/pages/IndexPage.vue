@@ -6,8 +6,24 @@
         <div class="text-caption text-grey">{{ greeting }} 👋</div>
         <div class="text-h5 text-weight-bold">আমার ফাইন্যান্স</div>
       </div>
-      <q-avatar color="secondary" text-color="white" size="42px">
+      <q-avatar color="secondary" text-color="white" size="42px" class="cursor-pointer">
         <q-icon name="person" />
+        <q-menu>
+          <q-list style="min-width: 150px">
+            <q-item>
+              <q-item-section>
+                <div class="text-caption text-grey">{{ authStore.user?.email }}</div>
+              </q-item-section>
+            </q-item>
+            <q-separator />
+            <q-item clickable v-close-popup @click="onLogout">
+              <q-item-section avatar>
+                <q-icon name="logout" color="negative" />
+              </q-item-section>
+              <q-item-section class="text-negative">লগআউট</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
       </q-avatar>
     </div>
 
@@ -126,15 +142,42 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
 import { useAccountStore } from 'stores/accountStore'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
+import { useAuthStore } from 'stores/authStore'
+
+const router = useRouter()
+const $q = useQuasar()
 
 const accounts = useAccountStore()
 const transactions = useTransactionStore()
 const categories = useCategoryStore()
 const settings = useSettingsStore()
+const authStore = useAuthStore()
+
+async function onLogout() {
+  const result = await authStore.logout()
+  if (result.success) {
+    $q.notify({
+      color: 'positive',
+      icon: 'check_circle',
+      message: 'লগআউট সফল হয়েছে',
+      position: 'top',
+    })
+    router.push('/login')
+  } else {
+    $q.notify({
+      color: 'negative',
+      icon: 'warning',
+      message: 'লগআউট ব্যর্থ হয়েছে: ' + result.error,
+      position: 'top',
+    })
+  }
+}
 
 const hour = new Date().getHours()
 const greeting = computed(() => {

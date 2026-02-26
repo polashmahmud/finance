@@ -1,9 +1,13 @@
 const routes = [
   // Splash / Auth
   {
-    path: '/splash',
+    path: '/',
     component: () => import('layouts/AuthLayout.vue'),
-    children: [{ path: '', component: () => import('pages/SplashPage.vue') }],
+    children: [
+      { path: 'splash', component: () => import('pages/SplashPage.vue') },
+      { path: 'login', component: () => import('pages/auth/LoginPage.vue') },
+      { path: 'register', component: () => import('pages/auth/RegisterPage.vue') },
+    ],
   },
 
   // Main app routes
