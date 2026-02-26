@@ -48,7 +48,7 @@
         style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; padding: 12px 16px 32px; background: white;">
         <!-- Header -->
         <q-card-section class="row items-center justify-between no-wrap q-pb-md">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">Quick Add</div>
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">দ্রুত যোগ করুন</div>
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
 
@@ -104,11 +104,11 @@ const showFab = computed(() => !noFabPages.includes(route.path))
 const showBottomNav = computed(() => !noBottomNavPages.includes(route.path))
 
 const quickAddActions = [
-  { label: 'Income', icon: 'trending_up', color: '#22c55e', bgColor: '#f0fdf4', route: '/add-income' },
-  { label: 'Expense', icon: 'trending_down', color: '#ef4444', bgColor: '#fef2f2', route: '/add-expense' },
-  { label: 'Transfer', icon: 'sync_alt', color: '#3b82f6', bgColor: '#eff6ff', route: '/transfer' },
-  { label: 'Market List', icon: 'shopping_cart', color: '#22c55e', bgColor: '#f0fdf4', route: '/market-lists' },
-  { label: 'Note', icon: 'description', color: '#0f172a', bgColor: '#fffbeb', route: '/notes' }
+  { label: 'আয়', icon: 'trending_up', color: '#22c55e', bgColor: '#f0fdf4', route: '/add-income' },
+  { label: 'ব্যয়', icon: 'trending_down', color: '#ef4444', bgColor: '#fef2f2', route: '/add-expense' },
+  { label: 'ট্রান্সফার', icon: 'sync_alt', color: '#3b82f6', bgColor: '#eff6ff', route: '/transfer' },
+  { label: 'বাজার তালিকা', icon: 'shopping_cart', color: '#22c55e', bgColor: '#f0fdf4', route: '/market-lists' },
+  { label: 'নোট', icon: 'description', color: '#0f172a', bgColor: '#fffbeb', route: '/notes' }
 ]
 
 function navigateTo(path) {
