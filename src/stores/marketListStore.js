@@ -1,62 +1,108 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { ref as dbRef, onValue, push, set, remove, update } from 'firebase/database'
+import { database, auth } from 'boot/firebase'
 
 export const useMarketListStore = defineStore('marketLists', () => {
-  const lists = ref([
-    {
-      id: 1,
-      name: 'সাপ্তাহিক বাজার',
-      date: '2026-02-26',
-      items: [
-        { id: 1, name: 'চাল (৫ কেজি)', quantity: 1, price: 350, bought: false },
-        { id: 2, name: 'মুরগি (১ কেজি)', quantity: 2, price: 280, bought: true },
-        { id: 3, name: 'সবজি', quantity: 1, price: 200, bought: false },
-        { id: 4, name: 'তেল', quantity: 1, price: 180, bought: false },
-        { id: 5, name: 'ডিম (১২টি)', quantity: 1, price: 150, bought: true },
-      ],
-    },
-  ])
+  const lists = ref([])
+  const loading = ref(false)
+  let unsubscribe = null
 
-  function addList(list) {
-    lists.value.push({
-      ...list,
-      id: Date.now(),
-      date: new Date().toISOString().slice(0, 10),
-      items: list.items || [],
+  function getUserListsRef() {
+    const uid = auth.currentUser?.uid
+    if (!uid) return null
+    return dbRef(database, `finance/users/${uid}/marketLists`)
+  }
+
+  function listenLists() {
+    const listsRef = getUserListsRef()
+    if (!listsRef) return
+
+    loading.value = true
+    if (unsubscribe) unsubscribe()
+
+    unsubscribe = onValue(listsRef, (snapshot) => {
+      const data = snapshot.val()
+      if (data) {
+        lists.value = Object.entries(data).map(([id, val]) => {
+          // Convert items object to array
+          const items = val.items
+            ? Object.entries(val.items).map(([itemId, itemVal]) => ({ id: itemId, ...itemVal }))
+            : []
+          return { id, name: val.name, date: val.date, items }
+        })
+      } else {
+        lists.value = []
+      }
+      loading.value = false
     })
   }
 
-  function deleteList(id) {
-    lists.value = lists.value.filter((l) => l.id !== id)
+  async function addList(data) {
+    const listsRef = getUserListsRef()
+    if (!listsRef) return
+    const newRef = push(listsRef)
+    await set(newRef, {
+      name: data.name,
+      date: new Date().toISOString().slice(0, 10),
+    })
   }
 
-  function addItem(listId, item) {
-    const list = lists.value.find((l) => l.id === listId)
-    if (list) {
-      list.items.push({ ...item, id: Date.now(), bought: false })
-    }
+  async function deleteList(id) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    await remove(dbRef(database, `finance/users/${uid}/marketLists/${id}`))
   }
 
-  function toggleBought(listId, itemId) {
-    const list = lists.value.find((l) => l.id === listId)
-    if (list) {
-      const item = list.items.find((i) => i.id === itemId)
-      if (item) item.bought = !item.bought
-    }
+  async function addItem(listId, item) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const itemsRef = dbRef(database, `finance/users/${uid}/marketLists/${listId}/items`)
+    const newRef = push(itemsRef)
+    await set(newRef, {
+      name: item.name,
+      quantity: item.quantity || 1,
+      price: item.price || 0,
+      bought: false,
+    })
   }
 
-  function removeItem(listId, itemId) {
-    const list = lists.value.find((l) => l.id === listId)
-    if (list) {
-      list.items = list.items.filter((i) => i.id !== itemId)
-    }
+  async function toggleBought(listId, itemId, currentValue) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const itemRef = dbRef(database, `finance/users/${uid}/marketLists/${listId}/items/${itemId}`)
+    await update(itemRef, { bought: !currentValue })
+  }
+
+  async function removeItem(listId, itemId) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    await remove(dbRef(database, `finance/users/${uid}/marketLists/${listId}/items/${itemId}`))
   }
 
   function getListTotal(listId) {
     const list = lists.value.find((l) => l.id === listId)
     if (!list) return 0
-    return list.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    return list.items.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0)
   }
 
-  return { lists, addList, deleteList, addItem, toggleBought, removeItem, getListTotal }
+  function stopListening() {
+    if (unsubscribe) {
+      unsubscribe()
+      unsubscribe = null
+    }
+  }
+
+  return {
+    lists,
+    loading,
+    listenLists,
+    addList,
+    deleteList,
+    addItem,
+    toggleBought,
+    removeItem,
+    getListTotal,
+    stopListening,
+  }
 })
