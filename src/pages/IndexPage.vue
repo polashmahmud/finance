@@ -13,7 +13,7 @@
 
     <!-- Total Balance Card -->
     <q-card class="finance-card q-mb-md cursor-pointer" @click="$router.push('/accounts')">
-      <q-card-section class="bg-green-gradient" style="border-radius: 16px">
+      <q-card-section class="bg-primary-gradient" style="border-radius: 16px">
         <div class="q-mb-sm">
           <div class="text-body2" style="opacity: 0.9">মোট ব্যালেন্স</div>
           <div class="stat-value text-white" style="font-size: 2rem">{{ settings.currency }}{{ formatNumber(accounts.totalBalance) }}</div>

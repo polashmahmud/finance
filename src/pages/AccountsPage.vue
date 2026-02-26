@@ -11,7 +11,7 @@
 
     <!-- Total Balance Banner -->
     <q-card class="finance-card q-mb-lg">
-      <q-card-section class="bg-green-gradient" style="border-radius: 16px">
+      <q-card-section class="bg-primary-gradient" style="border-radius: 16px">
         <div class="text-center">
           <div class="text-body2" style="opacity: 0.9">মোট সম্পদ</div>
           <div class="stat-value text-white">{{ settings.currency }}{{ formatNumber(accounts.totalBalance) }}</div>
