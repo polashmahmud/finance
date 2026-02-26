@@ -1,30 +1,9 @@
 <template>
   <q-page class="q-pa-md">
     <!-- Greeting -->
-    <div class="row items-center justify-between q-mb-md">
-      <div>
-        <div class="text-caption text-grey">{{ greeting }} 👋</div>
-        <div class="text-h5 text-weight-bold">আমার ফাইন্যান্স</div>
-      </div>
-      <q-avatar color="secondary" text-color="white" size="42px" class="cursor-pointer">
-        <q-icon name="person" />
-        <q-menu>
-          <q-list style="min-width: 150px">
-            <q-item>
-              <q-item-section>
-                <div class="text-caption text-grey">{{ authStore.user?.email }}</div>
-              </q-item-section>
-            </q-item>
-            <q-separator />
-            <q-item clickable v-close-popup @click="onLogout">
-              <q-item-section avatar>
-                <q-icon name="logout" color="negative" />
-              </q-item-section>
-              <q-item-section class="text-negative">লগআউট</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-      </q-avatar>
+    <div class="q-mb-md">
+      <div class="text-caption text-grey">{{ greeting }} 👋</div>
+      <div class="text-h5 text-weight-bold">আমার ফাইন্যান্স</div>
     </div>
 
     <!-- Total Balance Card -->
@@ -32,21 +11,24 @@
       <q-card-section class="bg-primary-gradient" style="border-radius: 16px">
         <div class="q-mb-sm">
           <div class="text-body2" style="opacity: 0.9">মোট ব্যালেন্স</div>
-          <div class="stat-value text-white" style="font-size: 2rem">{{ settings.currency }}{{ formatNumber(accounts.totalBalance) }}</div>
+          <div class="stat-value text-white" style="font-size: 2rem">{{ settings.currency }}{{
+            formatNumber(accounts.totalBalance) }}</div>
         </div>
         <div class="row q-gutter-md q-mt-xs">
           <div class="row items-center q-gutter-xs">
             <q-icon name="trending_up" size="18px" style="opacity: 0.85" />
             <div>
               <div style="font-size: 0.7rem; opacity: 0.85">আয়</div>
-              <div class="text-weight-bold" style="font-size: 0.9rem">{{ settings.currency }}{{ formatNumber(transactions.totalIncome) }}</div>
+              <div class="text-weight-bold" style="font-size: 0.9rem">{{ settings.currency }}{{
+                formatNumber(transactions.totalIncome) }}</div>
             </div>
           </div>
           <div class="row items-center q-gutter-xs">
             <q-icon name="trending_down" size="18px" style="opacity: 0.85" />
             <div>
               <div style="font-size: 0.7rem; opacity: 0.85">ব্যয়</div>
-              <div class="text-weight-bold" style="font-size: 0.9rem">{{ settings.currency }}{{ formatNumber(transactions.totalExpense) }}</div>
+              <div class="text-weight-bold" style="font-size: 0.9rem">{{ settings.currency }}{{
+                formatNumber(transactions.totalExpense) }}</div>
             </div>
           </div>
         </div>
@@ -56,16 +38,13 @@
     <!-- Accounts Horizontal Scroll -->
     <div class="section-title">অ্যাকাউন্ট</div>
     <div class="row q-gutter-md q-mb-md" style="overflow-x: auto; flex-wrap: nowrap; padding-bottom: 8px">
-      <q-card
-        v-for="account in accounts.accounts"
-        :key="account.id"
-        class="finance-card"
-        style="min-width: 160px; flex-shrink: 0"
-      >
+      <q-card v-for="account in accounts.accounts" :key="account.id" class="finance-card"
+        style="min-width: 160px; flex-shrink: 0">
         <q-card-section class="q-pa-md">
           <div class="row items-center q-gutter-sm q-mb-sm">
             <q-icon :name="account.icon" :style="{ color: account.color }" size="20px" />
-            <span class="text-caption text-grey">{{ account.type === 'Cash' ? 'নগদ' : account.type === 'Bank' ? 'ব্যাংক' : 'মোবাইল' }}</span>
+            <span class="text-caption text-grey">{{ account.type === 'Cash' ? 'নগদ' : account.type === 'Bank' ? 'ব্যাংক'
+              : 'মোবাইল' }}</span>
           </div>
           <div class="text-body2 text-weight-medium">{{ account.name }}</div>
           <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{ formatNumber(account.balance) }}</div>
@@ -84,16 +63,13 @@
               <span class="text-body2 text-weight-medium">{{ cat.name }}</span>
             </div>
             <span class="text-caption text-grey">
-              {{ settings.currency }}{{ formatNumber(getCategorySpent(cat.name)) }} / {{ settings.currency }}{{ formatNumber(cat.budget) }}
+              {{ settings.currency }}{{ formatNumber(getCategorySpent(cat.name)) }} / {{ settings.currency }}{{
+                formatNumber(cat.budget) }}
             </span>
           </div>
-          <q-linear-progress
-            :value="Math.min(getCategorySpent(cat.name) / cat.budget, 1)"
-            :color="getCategorySpent(cat.name) > cat.budget ? 'negative' : 'positive'"
-            rounded
-            size="8px"
-            track-color="grey-3"
-          />
+          <q-linear-progress :value="Math.min(getCategorySpent(cat.name) / cat.budget, 1)"
+            :color="getCategorySpent(cat.name) > cat.budget ? 'negative' : 'positive'" rounded size="8px"
+            track-color="grey-3" />
         </q-card-section>
       </q-card>
     </div>
@@ -102,11 +78,8 @@
     <div class="section-title">সাম্প্রতিক লেনদেন</div>
     <q-card class="finance-card">
       <q-list separator>
-        <q-slide-item
-          v-for="tx in transactions.recentTransactions"
-          :key="tx.id"
-          @right="({ reset }) => onDeleteTx(tx.id, reset)"
-        >
+        <q-slide-item v-for="tx in transactions.recentTransactions" :key="tx.id"
+          @right="({ reset }) => onDeleteTx(tx.id, reset)">
           <template v-slot:right>
             <div class="row items-center">
               <q-icon name="delete" color="negative" />
@@ -116,7 +89,8 @@
           <q-item class="touch-target">
             <q-item-section avatar>
               <q-avatar :style="{ background: getCategoryColor(tx.category) + '20' }" size="40px">
-                <q-icon :name="getCategoryIcon(tx.category)" :style="{ color: getCategoryColor(tx.category) }" size="20px" />
+                <q-icon :name="getCategoryIcon(tx.category)" :style="{ color: getCategoryColor(tx.category) }"
+                  size="20px" />
               </q-avatar>
             </q-item-section>
             <q-item-section>
@@ -124,7 +98,8 @@
               <q-item-label caption>{{ tx.notes }} &middot; {{ tx.date }}</q-item-label>
             </q-item-section>
             <q-item-section side>
-              <q-item-label :class="tx.type === 'income' ? 'amount-income' : 'amount-expense'" class="transaction-amount">
+              <q-item-label :class="tx.type === 'income' ? 'amount-income' : 'amount-expense'"
+                class="transaction-amount">
                 {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ formatNumber(tx.amount) }}
               </q-item-label>
             </q-item-section>
@@ -142,42 +117,15 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useQuasar } from 'quasar'
 import { useAccountStore } from 'stores/accountStore'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
-import { useAuthStore } from 'stores/authStore'
-
-const router = useRouter()
-const $q = useQuasar()
 
 const accounts = useAccountStore()
 const transactions = useTransactionStore()
 const categories = useCategoryStore()
 const settings = useSettingsStore()
-const authStore = useAuthStore()
-
-async function onLogout() {
-  const result = await authStore.logout()
-  if (result.success) {
-    $q.notify({
-      color: 'positive',
-      icon: 'check_circle',
-      message: 'লগআউট সফল হয়েছে',
-      position: 'top',
-    })
-    router.push('/login')
-  } else {
-    $q.notify({
-      color: 'negative',
-      icon: 'warning',
-      message: 'লগআউট ব্যর্থ হয়েছে: ' + result.error,
-      position: 'top',
-    })
-  }
-}
 
 const hour = new Date().getHours()
 const greeting = computed(() => {

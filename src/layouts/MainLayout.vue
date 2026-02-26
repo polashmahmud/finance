@@ -1,11 +1,36 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <!-- Header - only on certain pages -->
-    <q-header v-if="showHeader" class="bg-primary-gradient text-white">
-      <q-toolbar>
-        <q-btn v-if="showBack" flat dense round icon="arrow_back" @click="$router.back()" />
-        <q-toolbar-title class="text-weight-semibold">{{ pageTitle }}</q-toolbar-title>
-        <q-btn flat dense round icon="search" @click="$router.push('/search')" />
+    <!-- Global Header -->
+    <q-header class="bg-white text-dark" bordered style="border-bottom: 1px solid #d4d4d4;">
+      <q-toolbar style="min-height: 56px;">
+        <!-- Left: Logo + Name -->
+        <div class="row items-center q-gutter-sm cursor-pointer" @click="$router.push('/')">
+          <q-icon name="account_balance_wallet" size="28px" color="dark" />
+          <span class="text-weight-bold" style="font-size: 1.1rem; letter-spacing: -0.02em;">ফাইন্যান্স ম্যানেজার</span>
+        </div>
+
+        <q-space />
+
+        <!-- Right: User Avatar -->
+        <q-avatar color="dark" text-color="white" size="36px" class="cursor-pointer">
+          <q-icon name="person" size="20px" />
+          <q-menu>
+            <q-list style="min-width: 180px">
+              <q-item>
+                <q-item-section>
+                  <div class="text-caption text-grey">{{ authStore.user?.email }}</div>
+                </q-item-section>
+              </q-item>
+              <q-separator />
+              <q-item clickable v-close-popup @click="onLogout">
+                <q-item-section avatar>
+                  <q-icon name="logout" color="negative" />
+                </q-item-section>
+                <q-item-section class="text-negative">লগআউট</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-avatar>
       </q-toolbar>
     </q-header>
 
@@ -14,7 +39,7 @@
     </q-page-container>
 
     <!-- Floating Action Button -->
-    <q-btn v-if="showFab" class="finance-fab shadow-4" icon="add" color="secondary" text-color="white" round size="lg"
+    <q-btn v-if="showFab" class="finance-fab shadow-4" icon="add" color="dark" text-color="white" round size="lg"
       style="position: fixed; right: 16px; z-index: 100" @click="quickAddOpen = true" />
 
     <!-- Quick Add Dialog / Bottom Sheet -->
@@ -46,7 +71,7 @@
 
     <!-- Bottom Navigation -->
     <q-footer v-if="showBottomNav" class="bg-white text-grey-8 finance-bottom-nav" bordered>
-      <q-tabs v-model="currentTab" dense active-color="primary" indicator-color="primary" class="text-grey-6"
+      <q-tabs v-model="currentTab" dense active-color="dark" indicator-color="dark" class="text-grey-6"
         narrow-indicator>
         <q-route-tab name="home" icon="home" label="হোম" to="/" exact />
         <q-route-tab name="accounts" icon="account_balance_wallet" label="অ্যাকাউন্ট" to="/accounts" />
@@ -61,30 +86,22 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
+import { useAuthStore } from 'stores/authStore'
 
 const route = useRoute()
 const router = useRouter()
+const $q = useQuasar()
+const authStore = useAuthStore()
+
 const currentTab = ref('home')
 const quickAddOpen = ref(false)
 
-const noHeaderPages = ['/', '/splash', '/accounts', '/reports', '/market-lists', '/settings', '/search', '/categories']
-const noFabPages = ['/splash', '/add-income', '/add-expense', '/transfer', '/search']
+const noFabPages = ['/splash', '/add-income', '/add-expense', '/transfer', '/search', '/categories']
 const noBottomNavPages = ['/splash']
 
-const showHeader = computed(() => !noHeaderPages.includes(route.path))
-const showBack = computed(() => route.path !== '/')
 const showFab = computed(() => !noFabPages.includes(route.path))
 const showBottomNav = computed(() => !noBottomNavPages.includes(route.path))
-
-const pageTitles = {
-  '/add-income': 'আয় যোগ করুন',
-  '/add-expense': 'ব্যয় যোগ করুন',
-  '/transfer': 'ট্রান্সফার',
-  '/categories': 'ক্যাটাগরি ও বাজেট',
-  '/notes': 'নোটস',
-}
-
-const pageTitle = computed(() => pageTitles[route.path] || 'ফাইন্যান্স ম্যানেজার')
 
 const quickAddActions = [
   { label: 'Income', icon: 'trending_up', color: '#22c55e', bgColor: '#f0fdf4', route: '/add-income' },
@@ -97,5 +114,13 @@ const quickAddActions = [
 function navigateTo(path) {
   quickAddOpen.value = false
   router.push(path)
+}
+
+async function onLogout() {
+  const result = await authStore.logout()
+  if (result.success) {
+    $q.notify({ type: 'positive', icon: 'check_circle', message: 'লগআউট সফল হয়েছে', position: 'top' })
+    router.push('/login')
+  }
 }
 </script>
