@@ -1,56 +1,89 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { ref as dbRef, onValue, push, set, remove, update } from 'firebase/database'
+import { database, auth } from 'boot/firebase'
 
 export const useNoteStore = defineStore('notes', () => {
-  const notes = ref([
-    {
-      id: 1,
-      title: 'বাজেট পরিকল্পনা',
-      description: 'মাসিক বাজেট বরাদ্দ পর্যালোচনা এবং পরবর্তী মাসের জন্য সমন্বয় করুন।',
-      pinned: true,
-      transactionId: null,
-      createdAt: '2026-02-20',
-    },
-    {
-      id: 2,
-      title: 'বিনিয়োগের ধারণা',
-      description: 'সঞ্চয়ের জন্য ইনডেক্স ফান্ড এবং ফিক্সড ডিপোজিট দেখুন।',
-      pinned: false,
-      transactionId: null,
-      createdAt: '2026-02-22',
-    },
-    {
-      id: 3,
-      title: 'বেতন আলোচনা',
-      description: 'মার্চ মিটিংয়ে বেতন সংশোধন নিয়ে আলোচনা করুন।',
-      pinned: false,
-      transactionId: 1,
-      createdAt: '2026-02-25',
-    },
-  ])
+  const notes = ref([])
+  const loading = ref(false)
+  let unsubscribe = null
 
-  function addNote(note) {
-    notes.value.push({
-      ...note,
-      id: Date.now(),
-      pinned: false,
-      createdAt: new Date().toISOString().slice(0, 10),
+  function getUserNotesRef() {
+    const uid = auth.currentUser?.uid
+    if (!uid) return null
+    return dbRef(database, `finance/users/${uid}/notes`)
+  }
+
+  function listenNotes() {
+    const notesRef = getUserNotesRef()
+    if (!notesRef) return
+
+    loading.value = true
+    if (unsubscribe) unsubscribe()
+
+    unsubscribe = onValue(notesRef, (snapshot) => {
+      const data = snapshot.val()
+      if (data) {
+        notes.value = Object.entries(data)
+          .map(([id, val]) => ({ id, ...val }))
+          .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+      } else {
+        notes.value = []
+      }
+      loading.value = false
     })
   }
 
-  function deleteNote(id) {
-    notes.value = notes.value.filter((n) => n.id !== id)
+  async function addNote(note) {
+    const notesRef = getUserNotesRef()
+    if (!notesRef) return
+    const newRef = push(notesRef)
+    await set(newRef, {
+      title: note.title,
+      description: note.description || '',
+      pinned: false,
+      createdAt: Date.now(),
+    })
   }
 
-  function togglePin(id) {
-    const note = notes.value.find((n) => n.id === id)
-    if (note) note.pinned = !note.pinned
+  async function updateNote(id, data) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const noteRef = dbRef(database, `finance/users/${uid}/notes/${id}`)
+    await update(noteRef, {
+      title: data.title,
+      description: data.description || '',
+    })
   }
 
-  function updateNote(id, updates) {
-    const note = notes.value.find((n) => n.id === id)
-    if (note) Object.assign(note, updates)
+  async function deleteNote(id) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    await remove(dbRef(database, `finance/users/${uid}/notes/${id}`))
   }
 
-  return { notes, addNote, deleteNote, togglePin, updateNote }
+  async function togglePin(id, currentValue) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const noteRef = dbRef(database, `finance/users/${uid}/notes/${id}`)
+    await update(noteRef, { pinned: !currentValue })
+  }
+
+  function stopListening() {
+    if (unsubscribe) {
+      unsubscribe()
+      unsubscribe = null
+    }
+  }
+
+  return {
+    notes,
+    loading,
+    listenNotes,
+    addNote,
+    updateNote,
+    deleteNote,
+    togglePin,
+    stopListening,
+  }
 })
