@@ -1,58 +1,91 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { ref as dbRef, onValue, push, set, remove, update } from 'firebase/database'
+import { database, auth } from 'boot/firebase'
 
 export const useAccountStore = defineStore('accounts', () => {
-  const accounts = ref([
-    {
-      id: 1,
-      name: 'নগদ',
-      type: 'Cash',
-      balance: 5000,
-      icon: 'account_balance_wallet',
-      color: '#4CAF50',
-      lastActivity: '2026-02-25',
-    },
-    {
-      id: 2,
-      name: 'ব্যাংক অ্যাকাউন্ট',
-      type: 'Bank',
-      balance: 25000,
-      icon: 'account_balance',
-      color: '#1976D2',
-      lastActivity: '2026-02-24',
-    },
-    {
-      id: 3,
-      name: 'বিকাশ',
-      type: 'Mobile Banking',
-      balance: 3500,
-      icon: 'phone_android',
-      color: '#E91E63',
-      lastActivity: '2026-02-26',
-    },
-  ])
+  const accounts = ref([])
+  const loading = ref(false)
+  let unsubscribe = null
 
-  const totalBalance = computed(() => accounts.value.reduce((sum, a) => sum + a.balance, 0))
+  const totalBalance = computed(() => accounts.value.reduce((sum, a) => sum + (a.balance || 0), 0))
 
-  function addAccount(account) {
-    accounts.value.push({
-      ...account,
-      id: Date.now(),
-      lastActivity: new Date().toISOString().slice(0, 10),
+  function getUserAccountsRef() {
+    const uid = auth.currentUser?.uid
+    if (!uid) return null
+    return dbRef(database, `finance/users/${uid}/accounts`)
+  }
+
+  function listenAccounts() {
+    const accountsRef = getUserAccountsRef()
+    if (!accountsRef) return
+
+    loading.value = true
+    if (unsubscribe) unsubscribe()
+
+    unsubscribe = onValue(accountsRef, (snapshot) => {
+      const data = snapshot.val()
+      if (data) {
+        accounts.value = Object.entries(data).map(([id, val]) => ({ id, ...val }))
+      } else {
+        accounts.value = []
+      }
+      loading.value = false
     })
   }
 
-  function updateBalance(accountId, amount) {
+  async function addAccount(account) {
+    const accountsRef = getUserAccountsRef()
+    if (!accountsRef) return
+    const newRef = push(accountsRef)
+    await set(newRef, {
+      name: account.name,
+      type: account.type,
+      balance: account.balance || 0,
+      icon: account.icon || 'account_balance_wallet',
+      color: account.color || '#111111',
+      createdAt: Date.now(),
+    })
+  }
+
+  async function updateAccount(id, data) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const accRef = dbRef(database, `finance/users/${uid}/accounts/${id}`)
+    await update(accRef, data)
+  }
+
+  async function updateBalance(accountId, amount) {
     const acc = accounts.value.find((a) => a.id === accountId)
-    if (acc) {
-      acc.balance += amount
-      acc.lastActivity = new Date().toISOString().slice(0, 10)
+    if (!acc) return
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const accRef = dbRef(database, `finance/users/${uid}/accounts/${accountId}`)
+    await update(accRef, { balance: (acc.balance || 0) + amount })
+  }
+
+  async function deleteAccount(id) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    await remove(dbRef(database, `finance/users/${uid}/accounts/${id}`))
+  }
+
+  function stopListening() {
+    if (unsubscribe) {
+      unsubscribe()
+      unsubscribe = null
     }
   }
 
-  function deleteAccount(accountId) {
-    accounts.value = accounts.value.filter((a) => a.id !== accountId)
+  return {
+    accounts,
+    totalBalance,
+    loading,
+    listenAccounts,
+    addAccount,
+    updateAccount,
+    updateBalance,
+    deleteAccount,
+    stopListening,
   }
-
-  return { accounts, totalBalance, addAccount, updateBalance, deleteAccount }
 })

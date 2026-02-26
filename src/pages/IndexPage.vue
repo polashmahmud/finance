@@ -116,7 +116,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useAccountStore } from 'stores/accountStore'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
@@ -126,6 +126,16 @@ const accounts = useAccountStore()
 const transactions = useTransactionStore()
 const categories = useCategoryStore()
 const settings = useSettingsStore()
+
+onMounted(() => {
+  accounts.listenAccounts()
+  categories.listenCategories()
+})
+
+onUnmounted(() => {
+  accounts.stopListening()
+  categories.stopListening()
+})
 
 const hour = new Date().getHours()
 const greeting = computed(() => {
