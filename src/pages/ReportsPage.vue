@@ -12,16 +12,22 @@
 
     <template v-else>
       <!-- Summary Chips -->
-      <div class="row q-gutter-sm q-mb-md">
-        <q-chip color="green-1" text-color="positive" icon="trending_up">
-          আয় {{ settings.currency }}{{ formatShort(transactions.totalIncome) }}
-        </q-chip>
-        <q-chip color="red-1" text-color="negative" icon="trending_down">
-          ব্যয় {{ settings.currency }}{{ formatShort(transactions.totalExpense) }}
-        </q-chip>
-        <q-chip color="grey-2" text-color="dark" icon="savings" outline>
-          সঞ্চয় {{ settings.currency }}{{ formatShort(netSavings) }}
-        </q-chip>
+      <div class="row q-col-gutter-sm q-mb-md">
+        <div class="col-auto">
+          <q-chip color="dark" text-color="white" icon="trending_up" class="q-ma-none shadow-1">
+            আয় {{ settings.currency }}{{ formatShort(transactions.totalIncome) }}
+          </q-chip>
+        </div>
+        <div class="col-auto">
+          <q-chip color="dark" text-color="white" icon="trending_down" class="q-ma-none shadow-1">
+            ব্যয় {{ settings.currency }}{{ formatShort(transactions.totalExpense) }}
+          </q-chip>
+        </div>
+        <div class="col-auto">
+          <q-chip color="dark" text-color="white" icon="savings" class="q-ma-none shadow-1">
+            সঞ্চয় {{ settings.currency }}{{ formatShort(netSavings) }}
+          </q-chip>
+        </div>
       </div>
 
       <!-- Report Tabs -->
@@ -118,7 +124,7 @@
                   <span class="text-body2 text-weight-medium">{{ cat.name }}</span>
                   <span class="text-caption" :class="cat.over ? 'text-negative' : 'text-grey'">
                     {{ settings.currency }}{{ formatNumber(cat.spent) }} / {{ settings.currency }}{{
-                    formatNumber(cat.budget) }}
+                      formatNumber(cat.budget) }}
                   </span>
                 </div>
                 <q-linear-progress :value="Math.min(cat.usage, 1)"
@@ -136,32 +142,9 @@
         <q-tab-panel name="trend" class="q-pa-none">
           <q-card class="finance-card q-mb-md">
             <q-card-section>
-              <div class="text-subtitle2 text-weight-bold q-mb-md">ব্যয়ের প্রবণতা (গত ৭ দিন)</div>
-              <div class="row items-end q-gutter-xs" style="height: 160px">
-                <div v-for="day in dailyTrend" :key="day.date" class="col text-center">
-                  <div
-                    style="border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s ease; background: #111;"
-                    :style="{ height: day.height + 'px' }"></div>
-                  <div class="text-caption q-mt-xs" style="font-size: 0.65rem">{{ day.label }}</div>
-                  <div class="text-caption text-grey" style="font-size: 0.6rem">{{ settings.currency }}{{ day.amount }}
-                  </div>
-                </div>
-              </div>
-            </q-card-section>
-          </q-card>
-
-          <q-card class="finance-card">
-            <q-card-section>
-              <div class="text-subtitle2 text-weight-bold q-mb-md">আয়ের প্রবণতা (গত ৭ দিন)</div>
-              <div class="row items-end q-gutter-xs" style="height: 160px">
-                <div v-for="day in dailyIncomeTrend" :key="day.date" class="col text-center">
-                  <div class="bg-positive"
-                    style="border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s ease;"
-                    :style="{ height: day.height + 'px' }"></div>
-                  <div class="text-caption q-mt-xs" style="font-size: 0.65rem">{{ day.label }}</div>
-                  <div class="text-caption text-grey" style="font-size: 0.6rem">{{ settings.currency }}{{ day.amount }}
-                  </div>
-                </div>
+              <div class="text-subtitle2 text-weight-bold q-mb-md">আয় বনাম ব্যয়ের প্রবণতা (গত ৭ দিন)</div>
+              <div style="min-height: 250px">
+                <vue-apex-charts type="area" height="250" :options="chartOptions" :series="chartSeries" />
               </div>
             </q-card-section>
           </q-card>
@@ -176,6 +159,7 @@ import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
+import VueApexCharts from 'vue3-apexcharts'
 
 const transactions = useTransactionStore()
 const categories = useCategoryStore()
@@ -238,30 +222,72 @@ const budgetComparison = computed(() =>
     }),
 )
 
-// Daily trend helpers
+// Chart Data Helpers
 const dayNamesBn = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি']
 
-function getDailyData(type) {
-  const days = []
+const chartData = computed(() => {
+  const categories = []
+  const incomeData = []
+  const expenseData = []
+
+  // Ensure transactions are loaded
+  if (transactions.loading) return { categories, incomeData, expenseData }
+
   for (let i = 6; i >= 0; i--) {
     const d = new Date()
     d.setDate(d.getDate() - i)
     const dateStr = d.toISOString().slice(0, 10)
-    const amount = transactions.transactions
-      .filter((t) => t.type === type && t.date === dateStr)
-      .reduce((sum, t) => sum + (t.amount || 0), 0)
-    days.push({
-      date: dateStr,
-      label: dayNamesBn[d.getDay()],
-      amount,
-    })
-  }
-  const max = Math.max(...days.map((d) => d.amount), 1)
-  return days.map((d) => ({ ...d, height: Math.round((d.amount / max) * 140) }))
-}
 
-const dailyTrend = computed(() => getDailyData('expense'))
-const dailyIncomeTrend = computed(() => getDailyData('income'))
+    const dailyIncome = transactions.transactions
+      .filter((t) => t.type === 'income' && t.date === dateStr)
+      .reduce((sum, t) => sum + (t.amount || 0), 0)
+
+    const dailyExpense = transactions.transactions
+      .filter((t) => t.type === 'expense' && t.date === dateStr)
+      .reduce((sum, t) => sum + (t.amount || 0), 0)
+
+    categories.push(dayNamesBn[d.getDay()])
+    incomeData.push(dailyIncome)
+    expenseData.push(dailyExpense)
+  }
+
+  return { categories, incomeData, expenseData }
+})
+
+const chartSeries = computed(() => [
+  { name: 'আয়', data: chartData.value.incomeData },
+  { name: 'ব্যয়', data: chartData.value.expenseData }
+])
+
+const chartOptions = computed(() => ({
+  chart: {
+    type: 'area',
+    toolbar: { show: false },
+    fontFamily: 'Tiro Bangla, sans-serif'
+  },
+  colors: ['#21BA45', '#C10015'], // positive and negative quasar colors
+  dataLabels: { enabled: false },
+  stroke: { curve: 'smooth', width: 2 },
+  xaxis: {
+    categories: chartData.value.categories,
+    tooltip: { enabled: false }
+  },
+  yaxis: {
+    labels: {
+      formatter: (value) => settings.currency + value.toLocaleString()
+    }
+  },
+  legend: { position: 'top', horizontalAlign: 'left' },
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shadeIntensity: 1,
+      opacityFrom: 0.4,
+      opacityTo: 0.05,
+      stops: [0, 90, 100]
+    }
+  }
+}))
 
 function formatNumber(n) {
   return Number(n || 0).toLocaleString()
