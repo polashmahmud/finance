@@ -100,9 +100,9 @@
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
         <q-card-section>
-          <q-form @submit.prevent="createList" class="q-gutter-md">
+          <q-form @submit.prevent="createList">
             <q-input v-model="newListName" label="তালিকার নাম" outlined dense autofocus color="dark"
-              :rules="[(val) => (val && val.length > 0) || 'নাম আবশ্যক']" />
+              :rules="[(val) => (val && val.length > 0) || 'নাম আবশ্যক']" style="margin-bottom: 10px;" />
             <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
               label="তৈরি করুন" :loading="saving" />
           </q-form>
@@ -119,10 +119,10 @@
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
         <q-card-section>
-          <q-form @submit.prevent="addItem" class="q-gutter-md">
+          <q-form @submit.prevent="addItem">
             <q-input v-model="newItem.name" label="আইটেমের নাম" outlined dense autofocus color="dark"
-              :rules="[(val) => (val && val.length > 0) || 'নাম আবশ্যক']" />
-            <div class="row q-col-gutter-md">
+              :rules="[(val) => (val && val.length > 0) || 'নাম আবশ্যক']" style="margin-bottom: 10px;" />
+            <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
               <div class="col-6">
                 <q-input v-model="newItem.quantity" label="পরিমাণ" outlined dense color="dark"
                   hint="যেমন: ২ কেজি, ১ প্যাকেট" />
