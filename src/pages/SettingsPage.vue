@@ -4,172 +4,173 @@
       <div class="text-h5 text-weight-bold">সেটিংস</div>
     </div>
 
-    <q-list>
-      <!-- Profile -->
-      <q-item-label header class="text-weight-bold">প্রোফাইল</q-item-label>
-      <q-item class="touch-target">
-        <q-item-section avatar>
-          <q-avatar color="secondary" text-color="white" size="48px">
-            <q-icon name="person" />
-          </q-avatar>
-        </q-item-section>
-        <q-item-section>
-          <q-item-label class="text-weight-medium">ব্যবহারকারী</q-item-label>
-          <q-item-label caption>আপনার প্রোফাইল পরিচালনা করুন</q-item-label>
-        </q-item-section>
-      </q-item>
+    <!-- Profile Section -->
+    <q-card class="finance-card q-mb-md">
+      <q-list>
+        <q-item class="touch-target">
+          <q-item-section avatar>
+            <q-avatar color="dark" text-color="white" size="48px">
+              <q-icon name="person" />
+            </q-avatar>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="text-weight-medium">ব্যবহারকারী</q-item-label>
+            <q-item-label caption>আপনার প্রোফাইল পরিচালনা করুন</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-card>
 
-      <q-separator spaced />
+    <!-- Preferences Section -->
+    <div class="section-title">পছন্দসমূহ</div>
+    <q-card class="finance-card q-mb-md">
+      <q-list separator>
+        <!-- Currency -->
+        <q-item class="touch-target">
+          <q-item-section avatar>
+            <q-icon name="payments" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>মুদ্রা</q-item-label>
+            <q-item-label caption>{{ settings.currencyCode }} ({{ settings.currency }})</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-select
+              v-model="selectedCurrency"
+              :options="currencyOptions"
+              dense
+              borderless
+              emit-value
+              map-options
+              @update:model-value="onCurrencyChange"
+              style="min-width: 100px"
+            />
+          </q-item-section>
+        </q-item>
 
-      <!-- Preferences -->
-      <q-item-label header class="text-weight-bold">পছন্দসমূহ</q-item-label>
+        <!-- Language -->
+        <q-item class="touch-target">
+          <q-item-section avatar>
+            <q-icon name="language" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>ভাষা</q-item-label>
+            <q-item-label caption>{{ settings.language === 'en' ? 'English' : 'বাংলা' }}</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-select
+              v-model="selectedLang"
+              :options="[
+                { label: 'English', value: 'en' },
+                { label: 'বাংলা', value: 'bn' },
+              ]"
+              dense
+              borderless
+              emit-value
+              map-options
+              @update:model-value="settings.setLanguage($event)"
+              style="min-width: 100px"
+            />
+          </q-item-section>
+        </q-item>
 
-      <!-- Currency -->
-      <q-item class="touch-target">
-        <q-item-section avatar>
-          <q-icon name="payments" color="primary" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>মুদ্রা</q-item-label>
-          <q-item-label caption>{{ settings.currencyCode }} ({{ settings.currency }})</q-item-label>
-        </q-item-section>
-        <q-item-section side>
-          <q-select
-            v-model="selectedCurrency"
-            :options="currencyOptions"
-            dense
-            borderless
-            emit-value
-            map-options
-            @update:model-value="onCurrencyChange"
-            style="min-width: 100px"
-          />
-        </q-item-section>
-      </q-item>
+        <!-- Dark Mode -->
+        <q-item class="touch-target">
+          <q-item-section avatar>
+            <q-icon name="dark_mode" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>ডার্ক মোড</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-toggle
+              :model-value="settings.darkMode"
+              color="dark"
+              @update:model-value="settings.toggleDarkMode()"
+            />
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-card>
 
-      <!-- Language -->
-      <q-item class="touch-target">
-        <q-item-section avatar>
-          <q-icon name="language" color="primary" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>ভাষা</q-item-label>
-          <q-item-label caption>{{ settings.language === 'en' ? 'English' : 'বাংলা' }}</q-item-label>
-        </q-item-section>
-        <q-item-section side>
-          <q-select
-            v-model="selectedLang"
-            :options="[
-              { label: 'English', value: 'en' },
-              { label: 'বাংলা', value: 'bn' },
-            ]"
-            dense
-            borderless
-            emit-value
-            map-options
-            @update:model-value="settings.setLanguage($event)"
-            style="min-width: 100px"
-          />
-        </q-item-section>
-      </q-item>
+    <!-- Security Section -->
+    <div class="section-title">নিরাপত্তা</div>
+    <q-card class="finance-card q-mb-md">
+      <q-list>
+        <q-item class="touch-target">
+          <q-item-section avatar>
+            <q-icon name="lock" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>অ্যাপ লক (পিন)</q-item-label>
+            <q-item-label caption>{{ settings.appLock ? 'সক্রিয়' : 'নিষ্ক্রিয়' }}</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-btn
+              flat
+              dense
+              :label="settings.appLock ? 'পরিবর্তন' : 'পিন সেট করুন'"
+              color="dark"
+              @click="showPinDialog = true"
+            />
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-card>
 
-      <!-- Dark Mode -->
-      <q-item class="touch-target">
-        <q-item-section avatar>
-          <q-icon name="dark_mode" color="primary" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>ডার্ক মোড</q-item-label>
-        </q-item-section>
-        <q-item-section side>
-          <q-toggle
-            :model-value="settings.darkMode"
-            color="primary"
-            @update:model-value="settings.toggleDarkMode()"
-          />
-        </q-item-section>
-      </q-item>
+    <!-- Data Section -->
+    <div class="section-title">ডেটা</div>
+    <q-card class="finance-card q-mb-md">
+      <q-list separator>
+        <q-item clickable class="touch-target">
+          <q-item-section avatar>
+            <q-icon name="backup" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>ব্যাকআপ</q-item-label>
+            <q-item-label caption>লোকাল ব্যাকআপ</q-item-label>
+          </q-item-section>
+        </q-item>
 
-      <q-separator spaced />
+        <q-item clickable class="touch-target">
+          <q-item-section avatar>
+            <q-icon name="file_download" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>ডেটা এক্সপোর্ট</q-item-label>
+            <q-item-label caption>CSV / PDF</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-card>
 
-      <!-- Security -->
-      <q-item-label header class="text-weight-bold">নিরাপত্তা</q-item-label>
+    <!-- Category & About -->
+    <q-card class="finance-card q-mb-md">
+      <q-list separator>
+        <q-item clickable class="touch-target" @click="$router.push('/categories')">
+          <q-item-section avatar>
+            <q-icon name="category" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>ক্যাটাগরি ও বাজেট</q-item-label>
+            <q-item-label caption>ক্যাটাগরি ও বাজেট পরিচালনা</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-icon name="chevron_right" />
+          </q-item-section>
+        </q-item>
 
-      <!-- App Lock -->
-      <q-item class="touch-target">
-        <q-item-section avatar>
-          <q-icon name="lock" color="primary" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>অ্যাপ লক (পিন)</q-item-label>
-          <q-item-label caption>{{ settings.appLock ? 'সক্রিয়' : 'নিষ্ক্রিয়' }}</q-item-label>
-        </q-item-section>
-        <q-item-section side>
-          <q-btn
-            flat
-            dense
-            :label="settings.appLock ? 'পরিবর্তন' : 'পিন সেট করুন'"
-            color="primary"
-            @click="showPinDialog = true"
-          />
-        </q-item-section>
-      </q-item>
-
-      <q-separator spaced />
-
-      <!-- Data -->
-      <q-item-label header class="text-weight-bold">ডেটা</q-item-label>
-
-      <q-item clickable class="touch-target">
-        <q-item-section avatar>
-          <q-icon name="backup" color="primary" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>ব্যাকআপ</q-item-label>
-          <q-item-label caption>লোকাল ব্যাকআপ</q-item-label>
-        </q-item-section>
-      </q-item>
-
-      <q-item clickable class="touch-target">
-        <q-item-section avatar>
-          <q-icon name="file_download" color="primary" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>ডেটা এক্সপোর্ট</q-item-label>
-          <q-item-label caption>CSV / PDF</q-item-label>
-        </q-item-section>
-      </q-item>
-
-      <q-separator spaced />
-
-      <!-- Categories Link -->
-      <q-item clickable class="touch-target" @click="$router.push('/categories')">
-        <q-item-section avatar>
-          <q-icon name="category" color="primary" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>ক্যাটাগরি ও বাজেট</q-item-label>
-          <q-item-label caption>ক্যাটাগরি ও বাজেট পরিচালনা</q-item-label>
-        </q-item-section>
-        <q-item-section side>
-          <q-icon name="chevron_right" />
-        </q-item-section>
-      </q-item>
-
-      <q-separator spaced />
-
-      <!-- About -->
-      <q-item-label header class="text-weight-bold">সম্পর্কে</q-item-label>
-      <q-item class="touch-target">
-        <q-item-section avatar>
-          <q-icon name="info" color="grey" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>ব্যক্তিগত ফাইন্যান্স ম্যানেজার</q-item-label>
-          <q-item-label caption>সংস্করণ ১.০.০</q-item-label>
-        </q-item-section>
-      </q-item>
-    </q-list>
+        <q-item class="touch-target">
+          <q-item-section avatar>
+            <q-icon name="info" color="grey" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>ব্যক্তিগত ফাইন্যান্স ম্যানেজার</q-item-label>
+            <q-item-label caption>সংস্করণ ১.০.০</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-card>
 
     <!-- Set PIN Dialog -->
     <q-dialog v-model="showPinDialog">
@@ -191,7 +192,7 @@
           <q-btn flat label="বাতিল" v-close-popup />
           <q-btn
             unelevated
-            color="primary"
+            color="dark"
             label="সংরক্ষণ করুন"
             @click="savePin"
           />
