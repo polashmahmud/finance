@@ -5,7 +5,6 @@ import {
   createWebHistory,
   createWebHashHistory,
 } from 'vue-router'
-import { watch } from 'vue'
 import routes from './routes'
 
 /*
@@ -34,44 +33,25 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   })
 
-  Router.beforeEach(async (to, from, next) => {
-    // We import authStore dynamically here to avoid initialization order issues
+  Router.beforeEach(async (to) => {
     const authStoreModule = await import('src/stores/authStore')
     const authStore = authStoreModule.useAuthStore()
 
     const publicPages = ['/login', '/register', '/splash']
     const authRequired = !publicPages.includes(to.path)
 
-    // Wait for the auth to be ready before making routing decisions
-    if (!authStore.isAuthReady) {
-      // The boot file should ideally resolve this, but just in case:
-      const stopWatch = watch(
-        () => authStore.isAuthReady,
-        (ready) => {
-          if (ready) {
-            stopWatch()
-            handleNavigation()
-          }
-        },
-      )
-    } else {
-      handleNavigation()
+    if (authRequired && !authStore.isAuthenticated) {
+      // User is not authenticated, redirect to login
+      return '/login'
     }
 
-    function handleNavigation() {
-      if (authRequired && !authStore.isAuthenticated) {
-        // User is not authenticated, trying to access a protected page
-        return next('/login')
-      } else if (!authRequired && authStore.isAuthenticated) {
-        // User is authenticated, trying to access login/register
-        if (to.path !== '/splash') {
-          return next('/')
-        }
-        return next()
-      } else {
-        return next()
-      }
+    if (!authRequired && authStore.isAuthenticated && to.path !== '/splash') {
+      // User is already authenticated, redirect to home
+      return '/'
     }
+
+    // Allow navigation
+    return true
   })
 
   return Router
