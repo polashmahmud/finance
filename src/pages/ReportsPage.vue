@@ -5,214 +5,174 @@
       <div class="text-caption text-grey">বিশ্লেষণ ও পরিসংখ্যান</div>
     </div>
 
-    <!-- Summary Chips -->
-    <div class="row q-gutter-sm q-mb-md">
-      <q-chip color="green-1" text-color="positive" icon="trending_up">
-        আয় {{ settings.currency }}{{ formatShort(transactions.totalIncome) }}
-      </q-chip>
-      <q-chip color="red-1" text-color="negative" icon="trending_down">
-        ব্যয় {{ settings.currency }}{{ formatShort(transactions.totalExpense) }}
-      </q-chip>
-      <q-chip color="grey-2" text-color="dark" icon="savings" outline>
-        সঞ্চয় {{ settings.currency }}{{ formatShort(netSavings) }}
-      </q-chip>
+    <!-- Loading -->
+    <div v-if="transactions.loading" class="text-center q-pa-xl">
+      <q-spinner-dots size="40px" color="dark" />
     </div>
 
-    <!-- Report Tabs -->
-    <q-tabs v-model="reportTab" dense active-color="primary" indicator-color="primary" class="q-mb-md" align="justify">
-      <q-tab name="overview" label="সারসংক্ষেপ" />
-      <q-tab name="category" label="ক্যাটাগরি" />
-      <q-tab name="budget" label="বাজেট" />
-      <q-tab name="trend" label="প্রবণতা" />
-    </q-tabs>
+    <template v-else>
+      <!-- Summary Chips -->
+      <div class="row q-gutter-sm q-mb-md">
+        <q-chip color="green-1" text-color="positive" icon="trending_up">
+          আয় {{ settings.currency }}{{ formatShort(transactions.totalIncome) }}
+        </q-chip>
+        <q-chip color="red-1" text-color="negative" icon="trending_down">
+          ব্যয় {{ settings.currency }}{{ formatShort(transactions.totalExpense) }}
+        </q-chip>
+        <q-chip color="grey-2" text-color="dark" icon="savings" outline>
+          সঞ্চয় {{ settings.currency }}{{ formatShort(netSavings) }}
+        </q-chip>
+      </div>
 
-    <q-tab-panels v-model="reportTab" animated>
-      <!-- Overview -->
-      <q-tab-panel name="overview" class="q-pa-none">
-        <!-- Income vs Expense -->
-        <q-card class="finance-card q-mb-md">
-          <q-card-section>
-            <div class="text-subtitle2 text-weight-bold q-mb-md">মাসিক আয় বনাম ব্যয়</div>
-            <div class="row q-gutter-md q-mb-md">
-              <div class="col">
-                <div class="text-center">
-                  <q-circular-progress
-                    :value="incomePercent"
-                    size="90px"
-                    :thickness="0.2"
-                    color="positive"
-                    track-color="grey-3"
-                    show-value
-                  >
-                    <span class="text-weight-bold text-positive">{{ incomePercent }}%</span>
-                  </q-circular-progress>
-                  <div class="text-caption q-mt-sm">আয়</div>
-                  <div class="text-weight-bold text-positive">{{ settings.currency }}{{ formatNumber(transactions.totalIncome) }}</div>
+      <!-- Report Tabs -->
+      <q-card class="finance-card q-mb-md">
+        <q-tabs v-model="reportTab" dense active-color="dark" indicator-color="dark" class="text-grey-6"
+          align="justify">
+          <q-tab name="overview" label="সারসংক্ষেপ" />
+          <q-tab name="category" label="ক্যাটাগরি" />
+          <q-tab name="budget" label="বাজেট" />
+          <q-tab name="trend" label="প্রবণতা" />
+        </q-tabs>
+      </q-card>
+
+      <q-tab-panels v-model="reportTab" animated class="bg-transparent">
+        <!-- Overview -->
+        <q-tab-panel name="overview" class="q-pa-none">
+          <q-card class="finance-card q-mb-md">
+            <q-card-section>
+              <div class="text-subtitle2 text-weight-bold q-mb-md">মাসিক আয় বনাম ব্যয়</div>
+              <div class="row q-gutter-md q-mb-md">
+                <div class="col">
+                  <div class="text-center">
+                    <q-circular-progress :value="incomePercent" size="90px" :thickness="0.2" color="positive"
+                      track-color="grey-3" show-value>
+                      <span class="text-weight-bold text-positive">{{ incomePercent }}%</span>
+                    </q-circular-progress>
+                    <div class="text-caption q-mt-sm">আয়</div>
+                    <div class="text-weight-bold text-positive">{{ settings.currency }}{{
+                      formatNumber(transactions.totalIncome) }}</div>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="text-center">
+                    <q-circular-progress :value="expensePercent" size="90px" :thickness="0.2" color="negative"
+                      track-color="grey-3" show-value>
+                      <span class="text-weight-bold text-negative">{{ expensePercent }}%</span>
+                    </q-circular-progress>
+                    <div class="text-caption q-mt-sm">ব্যয়</div>
+                    <div class="text-weight-bold text-negative">{{ settings.currency }}{{
+                      formatNumber(transactions.totalExpense) }}</div>
+                  </div>
                 </div>
               </div>
-              <div class="col">
-                <div class="text-center">
-                  <q-circular-progress
-                    :value="expensePercent"
-                    size="90px"
-                    :thickness="0.2"
-                    color="negative"
-                    track-color="grey-3"
-                    show-value
-                  >
-                    <span class="text-weight-bold text-negative">{{ expensePercent }}%</span>
-                  </q-circular-progress>
-                  <div class="text-caption q-mt-sm">ব্যয়</div>
-                  <div class="text-weight-bold text-negative">{{ settings.currency }}{{ formatNumber(transactions.totalExpense) }}</div>
-                </div>
-              </div>
-            </div>
-            <q-separator class="q-mb-md" />
-            <div class="row justify-between">
-              <span class="text-weight-medium">নিট সঞ্চয়</span>
-              <span :class="netSavings >= 0 ? 'text-positive' : 'text-negative'" class="text-weight-bold">
-                {{ settings.currency }}{{ formatNumber(netSavings) }}
-              </span>
-            </div>
-          </q-card-section>
-        </q-card>
-
-        <!-- Smart Insights -->
-        <q-card class="finance-card insights-card q-mb-md">
-          <q-card-section>
-            <div class="text-subtitle2 text-weight-bold q-mb-md">
-              <q-icon name="lightbulb" color="accent" class="q-mr-sm" />
-              💡 অন্তর্দৃষ্টি
-            </div>
-            <q-list dense>
-              <q-item v-for="(insight, index) in insights" :key="index">
-                <q-item-section avatar>
-                  <q-icon :name="insight.icon" :color="insight.color" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label class="text-body2">{{ insight.text }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-card-section>
-        </q-card>
-      </q-tab-panel>
-
-      <!-- Category Breakdown -->
-      <q-tab-panel name="category" class="q-pa-none">
-        <q-card class="finance-card q-mb-md">
-          <q-card-section>
-            <div class="text-subtitle2 text-weight-bold q-mb-md">ক্যাটাগরি অনুযায়ী ব্যয়</div>
-            <div v-for="cat in categoryBreakdown" :key="cat.name" class="q-mb-md">
-              <div class="row justify-between items-center q-mb-xs">
-                <div class="row items-center q-gutter-sm">
-                  <q-avatar :style="{ background: cat.color + '20' }" size="32px">
-                    <q-icon :name="cat.icon" :style="{ color: cat.color }" size="16px" />
-                  </q-avatar>
-                  <span class="text-body2 text-weight-medium">{{ cat.name }}</span>
-                </div>
-                <div class="text-right">
-                  <span class="text-weight-bold">{{ settings.currency }}{{ formatNumber(cat.spent) }}</span>
-                  <q-badge :color="cat.percentColor" class="q-ml-sm">{{ cat.percent }}%</q-badge>
-                </div>
-              </div>
-              <q-linear-progress
-                :value="cat.percent / 100"
-                :color="cat.barColor"
-                rounded
-                size="6px"
-                track-color="grey-3"
-              />
-            </div>
-          </q-card-section>
-        </q-card>
-      </q-tab-panel>
-
-      <!-- Budget vs Actual -->
-      <q-tab-panel name="budget" class="q-pa-none">
-        <q-card class="finance-card q-mb-md">
-          <q-card-section>
-            <div class="text-subtitle2 text-weight-bold q-mb-md">বাজেট বনাম প্রকৃত ব্যয়</div>
-            <div v-for="cat in budgetComparison" :key="cat.name" class="q-mb-lg">
-              <div class="row justify-between items-center q-mb-xs">
-                <span class="text-body2 text-weight-medium">{{ cat.name }}</span>
-                <span class="text-caption" :class="cat.over ? 'text-negative' : 'text-grey'">
-                  {{ settings.currency }}{{ formatNumber(cat.spent) }} / {{ settings.currency }}{{ formatNumber(cat.budget) }}
+              <q-separator class="q-mb-md" />
+              <div class="row justify-between">
+                <span class="text-weight-medium">নিট সঞ্চয়</span>
+                <span :class="netSavings >= 0 ? 'text-positive' : 'text-negative'" class="text-weight-bold">
+                  {{ settings.currency }}{{ formatNumber(netSavings) }}
                 </span>
               </div>
-              <q-linear-progress
-                :value="Math.min(cat.usage, 1)"
-                :color="cat.over ? 'negative' : cat.usage > 0.8 ? 'warning' : 'positive'"
-                rounded
-                size="10px"
-                track-color="grey-3"
-              />
-              <div v-if="cat.over" class="text-caption text-negative q-mt-xs">
-                বাজেটের চেয়ে {{ settings.currency }}{{ formatNumber(cat.spent - cat.budget) }} বেশি খরচ
-              </div>
-            </div>
-          </q-card-section>
-        </q-card>
-      </q-tab-panel>
+            </q-card-section>
+          </q-card>
+        </q-tab-panel>
 
-      <!-- Trend -->
-      <q-tab-panel name="trend" class="q-pa-none">
-        <q-card class="finance-card q-mb-md">
-          <q-card-section>
-            <div class="text-subtitle2 text-weight-bold q-mb-md">ব্যয়ের প্রবণতা (গত ৭ দিন)</div>
-            <div class="row items-end q-gutter-xs" style="height: 160px">
-              <div
-                v-for="day in dailyTrend"
-                :key="day.date"
-                class="col text-center"
-              >
-                <div
-                  class="bg-negative"
-                  :style="{
-                    height: day.height + 'px',
-                    borderRadius: '4px 4px 0 0',
-                    minHeight: '4px',
-                    transition: 'height 0.3s ease'
-                  }"
-                ></div>
-                <div class="text-caption q-mt-xs" style="font-size: 0.65rem">{{ day.label }}</div>
-                <div class="text-caption text-grey" style="font-size: 0.6rem">{{ settings.currency }}{{ day.amount }}</div>
+        <!-- Category Breakdown -->
+        <q-tab-panel name="category" class="q-pa-none">
+          <q-card class="finance-card q-mb-md">
+            <q-card-section>
+              <div class="text-subtitle2 text-weight-bold q-mb-md">ক্যাটাগরি অনুযায়ী ব্যয়</div>
+              <div v-if="!categoryBreakdown.length" class="text-center text-grey q-pa-md">
+                <q-icon name="pie_chart" size="40px" class="q-mb-sm" />
+                <div>কোনো ব্যয়ের ডাটা নেই</div>
               </div>
-            </div>
-          </q-card-section>
-        </q-card>
+              <div v-for="cat in categoryBreakdown" :key="cat.name" class="q-mb-md">
+                <div class="row justify-between items-center q-mb-xs">
+                  <div class="row items-center q-gutter-sm">
+                    <q-avatar :style="{ background: cat.color + '18' }" size="32px">
+                      <q-icon :name="cat.icon" :style="{ color: cat.color }" size="16px" />
+                    </q-avatar>
+                    <span class="text-body2 text-weight-medium">{{ cat.name }}</span>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-weight-bold">{{ settings.currency }}{{ formatNumber(cat.spent) }}</span>
+                    <q-badge color="dark" class="q-ml-sm">{{ cat.percent }}%</q-badge>
+                  </div>
+                </div>
+                <q-linear-progress :value="cat.percent / 100" color="dark" rounded size="6px" track-color="grey-3" />
+              </div>
+            </q-card-section>
+          </q-card>
+        </q-tab-panel>
 
-        <q-card class="finance-card">
-          <q-card-section>
-            <div class="text-subtitle2 text-weight-bold q-mb-md">আয়ের প্রবণতা (গত ৭ দিন)</div>
-            <div class="row items-end q-gutter-xs" style="height: 160px">
-              <div
-                v-for="day in dailyIncomeTrend"
-                :key="day.date"
-                class="col text-center"
-              >
-                <div
-                  class="bg-positive"
-                  :style="{
-                    height: day.height + 'px',
-                    borderRadius: '4px 4px 0 0',
-                    minHeight: '4px',
-                    transition: 'height 0.3s ease'
-                  }"
-                ></div>
-                <div class="text-caption q-mt-xs" style="font-size: 0.65rem">{{ day.label }}</div>
-                <div class="text-caption text-grey" style="font-size: 0.6rem">{{ settings.currency }}{{ day.amount }}</div>
+        <!-- Budget vs Actual -->
+        <q-tab-panel name="budget" class="q-pa-none">
+          <q-card class="finance-card q-mb-md">
+            <q-card-section>
+              <div class="text-subtitle2 text-weight-bold q-mb-md">বাজেট বনাম প্রকৃত ব্যয়</div>
+              <div v-if="!budgetComparison.length" class="text-center text-grey q-pa-md">
+                <q-icon name="account_balance_wallet" size="40px" class="q-mb-sm" />
+                <div>কোনো বাজেট সেট করা হয়নি</div>
               </div>
-            </div>
-          </q-card-section>
-        </q-card>
-      </q-tab-panel>
-    </q-tab-panels>
+              <div v-for="cat in budgetComparison" :key="cat.name" class="q-mb-lg">
+                <div class="row justify-between items-center q-mb-xs">
+                  <span class="text-body2 text-weight-medium">{{ cat.name }}</span>
+                  <span class="text-caption" :class="cat.over ? 'text-negative' : 'text-grey'">
+                    {{ settings.currency }}{{ formatNumber(cat.spent) }} / {{ settings.currency }}{{
+                    formatNumber(cat.budget) }}
+                  </span>
+                </div>
+                <q-linear-progress :value="Math.min(cat.usage, 1)"
+                  :color="cat.over ? 'negative' : cat.usage > 0.8 ? 'warning' : 'dark'" rounded size="10px"
+                  track-color="grey-3" />
+                <div v-if="cat.over" class="text-caption text-negative q-mt-xs">
+                  বাজেটের চেয়ে {{ settings.currency }}{{ formatNumber(cat.spent - cat.budget) }} বেশি খরচ
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+        </q-tab-panel>
+
+        <!-- Trend -->
+        <q-tab-panel name="trend" class="q-pa-none">
+          <q-card class="finance-card q-mb-md">
+            <q-card-section>
+              <div class="text-subtitle2 text-weight-bold q-mb-md">ব্যয়ের প্রবণতা (গত ৭ দিন)</div>
+              <div class="row items-end q-gutter-xs" style="height: 160px">
+                <div v-for="day in dailyTrend" :key="day.date" class="col text-center">
+                  <div
+                    style="border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s ease; background: #111;"
+                    :style="{ height: day.height + 'px' }"></div>
+                  <div class="text-caption q-mt-xs" style="font-size: 0.65rem">{{ day.label }}</div>
+                  <div class="text-caption text-grey" style="font-size: 0.6rem">{{ settings.currency }}{{ day.amount }}
+                  </div>
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+
+          <q-card class="finance-card">
+            <q-card-section>
+              <div class="text-subtitle2 text-weight-bold q-mb-md">আয়ের প্রবণতা (গত ৭ দিন)</div>
+              <div class="row items-end q-gutter-xs" style="height: 160px">
+                <div v-for="day in dailyIncomeTrend" :key="day.date" class="col text-center">
+                  <div class="bg-positive"
+                    style="border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s ease;"
+                    :style="{ height: day.height + 'px' }"></div>
+                  <div class="text-caption q-mt-xs" style="font-size: 0.65rem">{{ day.label }}</div>
+                  <div class="text-caption text-grey" style="font-size: 0.6rem">{{ settings.currency }}{{ day.amount }}
+                  </div>
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+        </q-tab-panel>
+      </q-tab-panels>
+    </template>
   </q-page>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
@@ -253,9 +213,7 @@ const categoryBreakdown = computed(() => {
         spent,
         percent,
         icon: cat?.icon || 'category',
-        color: cat?.color || '#757575',
-        barColor: percent > 40 ? 'negative' : percent > 20 ? 'warning' : 'primary',
-        percentColor: percent > 40 ? 'negative' : percent > 20 ? 'warning' : 'primary',
+        color: cat?.color || '#111111',
       }
     })
     .sort((a, b) => b.spent - a.spent)
@@ -268,7 +226,7 @@ const budgetComparison = computed(() =>
     .map((cat) => {
       const spent = transactions.transactions
         .filter((t) => t.type === 'expense' && t.category === cat.name)
-        .reduce((sum, t) => sum + t.amount, 0)
+        .reduce((sum, t) => sum + (t.amount || 0), 0)
       const usage = spent / cat.budget
       return {
         name: cat.name,
@@ -291,7 +249,7 @@ function getDailyData(type) {
     const dateStr = d.toISOString().slice(0, 10)
     const amount = transactions.transactions
       .filter((t) => t.type === type && t.date === dateStr)
-      .reduce((sum, t) => sum + t.amount, 0)
+      .reduce((sum, t) => sum + (t.amount || 0), 0)
     days.push({
       date: dateStr,
       label: dayNamesBn[d.getDay()],
@@ -305,44 +263,17 @@ function getDailyData(type) {
 const dailyTrend = computed(() => getDailyData('expense'))
 const dailyIncomeTrend = computed(() => getDailyData('income'))
 
-// Smart insights
-const insights = computed(() => {
-  const list = []
-  const savingsRate = transactions.totalIncome ? Math.round(((transactions.totalIncome - transactions.totalExpense) / transactions.totalIncome) * 100) : 0
+function formatNumber(n) {
+  return Number(n || 0).toLocaleString()
+}
 
-  if (savingsRate > 30) {
-    list.push({ icon: 'thumb_up', color: 'positive', text: `দারুণ! আপনি আয়ের ${savingsRate}% সঞ্চয় করছেন।` })
-  } else if (savingsRate > 0) {
-    list.push({ icon: 'info', color: 'warning', text: `আপনি আয়ের ${savingsRate}% সঞ্চয় করছেন। ৩০% লক্ষ্য করুন।` })
-  } else {
-    list.push({ icon: 'warning', color: 'negative', text: 'আপনি আয়ের চেয়ে বেশি খরচ করছেন!' })
-  }
-
-  // Overspending categories
-  budgetComparison.value
-    .filter((c) => c.over)
-    .forEach((c) => {
-      list.push({
-        icon: 'trending_up',
-        color: 'negative',
-        text: `${c.name} বাজেটের চেয়ে ${settings.currency}${(c.spent - c.budget).toLocaleString()} বেশি।`,
-      })
-    })
-
-  // Highest expense category
-  if (categoryBreakdown.value.length) {
-    const top = categoryBreakdown.value[0]
-    list.push({
-      icon: 'analytics',
-      color: 'info',
-      text: `আপনার সর্বোচ্চ ব্যয়ের ক্যাটাগরি হলো "${top.name}" (মোট ব্যয়ের ${top.percent}%)।`,
-    })
-  }
-
-  return list
+onMounted(() => {
+  transactions.listenTransactions()
+  categories.listenCategories()
 })
 
-function formatNumber(n) {
-  return Number(n).toLocaleString()
-}
+onUnmounted(() => {
+  transactions.stopListening()
+  categories.stopListening()
+})
 </script>
