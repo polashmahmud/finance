@@ -2,13 +2,13 @@
   <q-page class="q-pa-md">
     <div class="row items-center q-mb-md">
       <q-btn flat round icon="arrow_back" @click="$router.back()" />
-      <div class="text-h6 text-weight-bold q-ml-sm">Categories & Budget</div>
+      <div class="text-h6 text-weight-bold q-ml-sm">ক্যাটাগরি ও বাজেট</div>
     </div>
 
     <!-- Tabs -->
     <q-tabs v-model="tab" dense active-color="primary" indicator-color="primary" class="q-mb-md" align="justify">
-      <q-tab name="expense" label="Expense" />
-      <q-tab name="income" label="Income" />
+      <q-tab name="expense" label="ব্যয়" />
+      <q-tab name="income" label="আয়" />
     </q-tabs>
 
     <q-tab-panels v-model="tab" animated>
@@ -34,14 +34,14 @@
               </q-item-section>
               <q-item-section>
                 <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
-                <q-item-label caption>{{ cat.subcategories.join(', ') || 'No subcategories' }}</q-item-label>
+                <q-item-label caption>{{ cat.subcategories.join(', ') || 'কোনো সাব-ক্যাটাগরি নেই' }}</q-item-label>
               </q-item-section>
               <q-item-section side>
                 <div class="text-right">
                   <q-item-label class="text-weight-bold text-primary">
-                    {{ settings.currency }}{{ cat.budget?.toLocaleString() || '0' }}
+                    {{ settings.currency }}{{ cat.budget?.toLocaleString() || '০' }}
                   </q-item-label>
-                  <q-item-label caption>{{ cat.recurring || 'monthly' }}</q-item-label>
+                  <q-item-label caption>{{ getRecurringLabel(cat.recurring) }}</q-item-label>
                 </div>
               </q-item-section>
             </q-item>
@@ -71,7 +71,7 @@
               </q-item-section>
               <q-item-section>
                 <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
-                <q-item-label caption>{{ cat.subcategories.join(', ') || 'No subcategories' }}</q-item-label>
+                <q-item-label caption>{{ cat.subcategories.join(', ') || 'কোনো সাব-ক্যাটাগরি নেই' }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-slide-item>
@@ -79,7 +79,7 @@
       </q-tab-panel>
     </q-tab-panels>
 
-    <div class="swipe-hint q-mt-sm">Swipe left to delete</div>
+    <div class="swipe-hint q-mt-sm">বামে সোয়াইপ করে মুছুন</div>
 
     <!-- Add Category FAB -->
     <q-page-sticky position="bottom-right" :offset="[16, 80]">
@@ -90,7 +90,7 @@
     <q-dialog v-model="showAddDialog" position="bottom">
       <q-card style="width: 100%; max-width: 500px; border-radius: 16px 16px 0 0">
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6 text-weight-bold">New Category</div>
+          <div class="text-h6 text-weight-bold">নতুন ক্যাটাগরি</div>
           <q-space />
           <q-btn flat round icon="close" v-close-popup />
         </q-card-section>
@@ -98,19 +98,24 @@
           <q-form @submit.prevent="addCategory" class="q-gutter-md">
             <q-select
               v-model="newCat.type"
-              :options="['expense', 'income']"
-              label="Type"
+              :options="[
+                { label: 'ব্যয়', value: 'expense' },
+                { label: 'আয়', value: 'income' },
+              ]"
+              label="ধরন"
               outlined
               dense
+              emit-value
+              map-options
             />
-            <q-input v-model="newCat.name" label="Category Name" outlined dense />
-            <q-input v-model="newCat.icon" label="Material Icon Name" outlined dense hint="e.g. restaurant, shopping_bag" />
-            <q-input v-model="newCat.color" label="Color (hex)" outlined dense placeholder="#FF5722" />
-            <q-input v-model="newCat.subcategoriesStr" label="Subcategories (comma-separated)" outlined dense />
+            <q-input v-model="newCat.name" label="ক্যাটাগরির নাম" outlined dense />
+            <q-input v-model="newCat.icon" label="ম্যাটেরিয়াল আইকন নাম" outlined dense hint="যেমন: restaurant, shopping_bag" />
+            <q-input v-model="newCat.color" label="রঙ (হেক্স)" outlined dense placeholder="#FF5722" />
+            <q-input v-model="newCat.subcategoriesStr" label="সাব-ক্যাটাগরি (কমা দিয়ে আলাদা)" outlined dense />
             <q-input
               v-if="newCat.type === 'expense'"
               v-model.number="newCat.budget"
-              label="Monthly Budget"
+              label="মাসিক বাজেট"
               type="number"
               outlined
               dense
@@ -119,12 +124,18 @@
             <q-select
               v-if="newCat.type === 'expense'"
               v-model="newCat.recurring"
-              :options="['daily', 'weekly', 'monthly']"
-              label="Recurring"
+              :options="[
+                { label: 'দৈনিক', value: 'daily' },
+                { label: 'সাপ্তাহিক', value: 'weekly' },
+                { label: 'মাসিক', value: 'monthly' },
+              ]"
+              label="পুনরাবৃত্তি"
               outlined
               dense
+              emit-value
+              map-options
             />
-            <q-btn type="submit" unelevated rounded color="primary" label="Add Category" class="full-width" />
+            <q-btn type="submit" unelevated rounded color="primary" label="ক্যাটাগরি যোগ করুন" class="full-width" />
           </q-form>
         </q-card-section>
       </q-card>
@@ -141,6 +152,16 @@ const categories = useCategoryStore()
 const settings = useSettingsStore()
 const tab = ref('expense')
 const showAddDialog = ref(false)
+
+const recurringLabels = {
+  daily: 'দৈনিক',
+  weekly: 'সাপ্তাহিক',
+  monthly: 'মাসিক',
+}
+
+function getRecurringLabel(recurring) {
+  return recurringLabels[recurring] || 'মাসিক'
+}
 
 const newCat = reactive({
   type: 'expense',

@@ -2,7 +2,7 @@
   <q-page class="q-pa-md">
     <div class="row items-center q-mb-md">
       <q-btn flat round icon="arrow_back" @click="$router.back()" />
-      <div class="text-h6 text-weight-bold q-ml-sm">Add Income</div>
+      <div class="text-h6 text-weight-bold q-ml-sm">আয় যোগ করুন</div>
     </div>
 
     <q-card class="finance-card">
@@ -11,11 +11,11 @@
           <!-- Amount -->
           <q-input
             v-model.number="form.amount"
-            label="Amount"
+            label="পরিমাণ"
             type="number"
             outlined
             :prefix="settings.currency"
-            :rules="[val => val > 0 || 'Enter a valid amount']"
+            :rules="[val => val > 0 || 'সঠিক পরিমাণ লিখুন']"
             autofocus
             input-class="text-h5 text-weight-bold"
           />
@@ -24,7 +24,7 @@
           <q-select
             v-model="form.category"
             :options="categories.incomeCategories.map(c => c.name)"
-            label="Category"
+            label="ক্যাটাগরি"
             outlined
           />
 
@@ -32,7 +32,7 @@
           <q-select
             v-model="form.accountId"
             :options="accountOptions"
-            label="Account"
+            label="অ্যাকাউন্ট"
             outlined
             emit-value
             map-options
@@ -42,7 +42,7 @@
           <div class="row q-gutter-md">
             <q-input
               v-model="form.date"
-              label="Date"
+              label="তারিখ"
               outlined
               class="col"
               readonly
@@ -57,7 +57,7 @@
             </q-input>
             <q-input
               v-model="form.time"
-              label="Time"
+              label="সময়"
               outlined
               class="col"
               readonly
@@ -73,7 +73,7 @@
           </div>
 
           <!-- Notes -->
-          <q-input v-model="form.notes" label="Notes (optional)" outlined type="textarea" rows="2" />
+          <q-input v-model="form.notes" label="নোট (ঐচ্ছিক)" outlined type="textarea" rows="2" />
 
           <!-- Submit -->
           <q-btn
@@ -81,7 +81,7 @@
             unelevated
             rounded
             color="positive"
-            label="Save Income"
+            label="আয় সংরক্ষণ করুন"
             class="full-width"
             size="lg"
             icon="check"
@@ -110,7 +110,7 @@ const settings = useSettingsStore()
 const now = new Date()
 const form = reactive({
   amount: null,
-  category: 'Salary',
+  category: categories.incomeCategories[0]?.name || 'বেতন',
   subcategory: '',
   accountId: accounts.accounts[0]?.id,
   date: now.toISOString().slice(0, 10),
@@ -126,7 +126,7 @@ function saveIncome() {
   if (!form.amount || form.amount <= 0) return
   transactions.addTransaction({ ...form, type: 'income' })
   accounts.updateBalance(form.accountId, form.amount)
-  Notify.create({ type: 'positive', message: 'Income added successfully' })
+  Notify.create({ type: 'positive', message: 'আয় সফলভাবে যোগ হয়েছে' })
   router.back()
 }
 </script>

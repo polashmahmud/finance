@@ -1,16 +1,29 @@
 <template>
   <q-page class="q-pa-md">
     <div class="q-mb-md">
-      <div class="text-h5 text-weight-bold">Reports</div>
-      <div class="text-caption text-grey">Insights & Analytics</div>
+      <div class="text-h5 text-weight-bold">রিপোর্ট</div>
+      <div class="text-caption text-grey">বিশ্লেষণ ও পরিসংখ্যান</div>
+    </div>
+
+    <!-- Summary Chips -->
+    <div class="row q-gutter-sm q-mb-md">
+      <q-chip color="green-1" text-color="positive" icon="trending_up">
+        আয় {{ settings.currency }}{{ formatShort(transactions.totalIncome) }}
+      </q-chip>
+      <q-chip color="red-1" text-color="negative" icon="trending_down">
+        ব্যয় {{ settings.currency }}{{ formatShort(transactions.totalExpense) }}
+      </q-chip>
+      <q-chip color="grey-2" text-color="dark" icon="savings" outline>
+        সঞ্চয় {{ settings.currency }}{{ formatShort(netSavings) }}
+      </q-chip>
     </div>
 
     <!-- Report Tabs -->
     <q-tabs v-model="reportTab" dense active-color="primary" indicator-color="primary" class="q-mb-md" align="justify">
-      <q-tab name="overview" label="Overview" />
-      <q-tab name="category" label="Category" />
-      <q-tab name="budget" label="Budget" />
-      <q-tab name="trend" label="Trend" />
+      <q-tab name="overview" label="সারসংক্ষেপ" />
+      <q-tab name="category" label="ক্যাটাগরি" />
+      <q-tab name="budget" label="বাজেট" />
+      <q-tab name="trend" label="প্রবণতা" />
     </q-tabs>
 
     <q-tab-panels v-model="reportTab" animated>
@@ -19,7 +32,7 @@
         <!-- Income vs Expense -->
         <q-card class="finance-card q-mb-md">
           <q-card-section>
-            <div class="text-subtitle2 text-weight-bold q-mb-md">Monthly Income vs Expense</div>
+            <div class="text-subtitle2 text-weight-bold q-mb-md">মাসিক আয় বনাম ব্যয়</div>
             <div class="row q-gutter-md q-mb-md">
               <div class="col">
                 <div class="text-center">
@@ -33,7 +46,7 @@
                   >
                     <span class="text-weight-bold text-positive">{{ incomePercent }}%</span>
                   </q-circular-progress>
-                  <div class="text-caption q-mt-sm">Income</div>
+                  <div class="text-caption q-mt-sm">আয়</div>
                   <div class="text-weight-bold text-positive">{{ settings.currency }}{{ formatNumber(transactions.totalIncome) }}</div>
                 </div>
               </div>
@@ -49,14 +62,14 @@
                   >
                     <span class="text-weight-bold text-negative">{{ expensePercent }}%</span>
                   </q-circular-progress>
-                  <div class="text-caption q-mt-sm">Expense</div>
+                  <div class="text-caption q-mt-sm">ব্যয়</div>
                   <div class="text-weight-bold text-negative">{{ settings.currency }}{{ formatNumber(transactions.totalExpense) }}</div>
                 </div>
               </div>
             </div>
             <q-separator class="q-mb-md" />
             <div class="row justify-between">
-              <span class="text-weight-medium">Net Savings</span>
+              <span class="text-weight-medium">নিট সঞ্চয়</span>
               <span :class="netSavings >= 0 ? 'text-positive' : 'text-negative'" class="text-weight-bold">
                 {{ settings.currency }}{{ formatNumber(netSavings) }}
               </span>
@@ -65,11 +78,11 @@
         </q-card>
 
         <!-- Smart Insights -->
-        <q-card class="finance-card q-mb-md">
+        <q-card class="finance-card insights-card q-mb-md">
           <q-card-section>
             <div class="text-subtitle2 text-weight-bold q-mb-md">
               <q-icon name="lightbulb" color="accent" class="q-mr-sm" />
-              Smart Insights
+              💡 অন্তর্দৃষ্টি
             </div>
             <q-list dense>
               <q-item v-for="(insight, index) in insights" :key="index">
@@ -89,7 +102,7 @@
       <q-tab-panel name="category" class="q-pa-none">
         <q-card class="finance-card q-mb-md">
           <q-card-section>
-            <div class="text-subtitle2 text-weight-bold q-mb-md">Expense by Category</div>
+            <div class="text-subtitle2 text-weight-bold q-mb-md">ক্যাটাগরি অনুযায়ী ব্যয়</div>
             <div v-for="cat in categoryBreakdown" :key="cat.name" class="q-mb-md">
               <div class="row justify-between items-center q-mb-xs">
                 <div class="row items-center q-gutter-sm">
@@ -119,7 +132,7 @@
       <q-tab-panel name="budget" class="q-pa-none">
         <q-card class="finance-card q-mb-md">
           <q-card-section>
-            <div class="text-subtitle2 text-weight-bold q-mb-md">Budget vs Actual Spending</div>
+            <div class="text-subtitle2 text-weight-bold q-mb-md">বাজেট বনাম প্রকৃত ব্যয়</div>
             <div v-for="cat in budgetComparison" :key="cat.name" class="q-mb-lg">
               <div class="row justify-between items-center q-mb-xs">
                 <span class="text-body2 text-weight-medium">{{ cat.name }}</span>
@@ -135,7 +148,7 @@
                 track-color="grey-3"
               />
               <div v-if="cat.over" class="text-caption text-negative q-mt-xs">
-                Over budget by {{ settings.currency }}{{ formatNumber(cat.spent - cat.budget) }}
+                বাজেটের চেয়ে {{ settings.currency }}{{ formatNumber(cat.spent - cat.budget) }} বেশি খরচ
               </div>
             </div>
           </q-card-section>
@@ -146,7 +159,7 @@
       <q-tab-panel name="trend" class="q-pa-none">
         <q-card class="finance-card q-mb-md">
           <q-card-section>
-            <div class="text-subtitle2 text-weight-bold q-mb-md">Spending Trend (Last 7 Days)</div>
+            <div class="text-subtitle2 text-weight-bold q-mb-md">ব্যয়ের প্রবণতা (গত ৭ দিন)</div>
             <div class="row items-end q-gutter-xs" style="height: 160px">
               <div
                 v-for="day in dailyTrend"
@@ -154,7 +167,7 @@
                 class="col text-center"
               >
                 <div
-                  class="bg-primary"
+                  class="bg-negative"
                   :style="{
                     height: day.height + 'px',
                     borderRadius: '4px 4px 0 0',
@@ -171,7 +184,7 @@
 
         <q-card class="finance-card">
           <q-card-section>
-            <div class="text-subtitle2 text-weight-bold q-mb-md">Income Trend (Last 7 Days)</div>
+            <div class="text-subtitle2 text-weight-bold q-mb-md">আয়ের প্রবণতা (গত ৭ দিন)</div>
             <div class="row items-end q-gutter-xs" style="height: 160px">
               <div
                 v-for="day in dailyIncomeTrend"
@@ -213,6 +226,11 @@ const total = computed(() => transactions.totalIncome + transactions.totalExpens
 const incomePercent = computed(() => Math.round((transactions.totalIncome / total.value) * 100))
 const expensePercent = computed(() => Math.round((transactions.totalExpense / total.value) * 100))
 const netSavings = computed(() => transactions.totalIncome - transactions.totalExpense)
+
+function formatShort(n) {
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'k'
+  return n.toString()
+}
 
 // Category breakdown
 const categoryBreakdown = computed(() => {
@@ -263,6 +281,8 @@ const budgetComparison = computed(() =>
 )
 
 // Daily trend helpers
+const dayNamesBn = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি']
+
 function getDailyData(type) {
   const days = []
   for (let i = 6; i >= 0; i--) {
@@ -274,7 +294,7 @@ function getDailyData(type) {
       .reduce((sum, t) => sum + t.amount, 0)
     days.push({
       date: dateStr,
-      label: d.toLocaleDateString('en', { weekday: 'short' }),
+      label: dayNamesBn[d.getDay()],
       amount,
     })
   }
@@ -291,11 +311,11 @@ const insights = computed(() => {
   const savingsRate = transactions.totalIncome ? Math.round(((transactions.totalIncome - transactions.totalExpense) / transactions.totalIncome) * 100) : 0
 
   if (savingsRate > 30) {
-    list.push({ icon: 'thumb_up', color: 'positive', text: `Great! You're saving ${savingsRate}% of your income.` })
+    list.push({ icon: 'thumb_up', color: 'positive', text: `দারুণ! আপনি আয়ের ${savingsRate}% সঞ্চয় করছেন।` })
   } else if (savingsRate > 0) {
-    list.push({ icon: 'info', color: 'warning', text: `You're saving ${savingsRate}% of your income. Try to reach 30%.` })
+    list.push({ icon: 'info', color: 'warning', text: `আপনি আয়ের ${savingsRate}% সঞ্চয় করছেন। ৩০% লক্ষ্য করুন।` })
   } else {
-    list.push({ icon: 'warning', color: 'negative', text: 'You are spending more than you earn!' })
+    list.push({ icon: 'warning', color: 'negative', text: 'আপনি আয়ের চেয়ে বেশি খরচ করছেন!' })
   }
 
   // Overspending categories
@@ -305,7 +325,7 @@ const insights = computed(() => {
       list.push({
         icon: 'trending_up',
         color: 'negative',
-        text: `${c.name} is over budget by ${settings.currency}${(c.spent - c.budget).toLocaleString()}.`,
+        text: `${c.name} বাজেটের চেয়ে ${settings.currency}${(c.spent - c.budget).toLocaleString()} বেশি।`,
       })
     })
 
@@ -315,7 +335,7 @@ const insights = computed(() => {
     list.push({
       icon: 'analytics',
       color: 'info',
-      text: `Your biggest expense category is "${top.name}" at ${top.percent}% of total spending.`,
+      text: `আপনার সর্বোচ্চ ব্যয়ের ক্যাটাগরি হলো "${top.name}" (মোট ব্যয়ের ${top.percent}%)।`,
     })
   }
 

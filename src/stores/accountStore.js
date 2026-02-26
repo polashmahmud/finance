@@ -5,7 +5,7 @@ export const useAccountStore = defineStore('accounts', () => {
   const accounts = ref([
     {
       id: 1,
-      name: 'Cash',
+      name: 'নগদ',
       type: 'Cash',
       balance: 5000,
       icon: 'account_balance_wallet',
@@ -14,16 +14,16 @@ export const useAccountStore = defineStore('accounts', () => {
     },
     {
       id: 2,
-      name: 'Bank Account',
+      name: 'ব্যাংক অ্যাকাউন্ট',
       type: 'Bank',
       balance: 25000,
       icon: 'account_balance',
-      color: '#2196F3',
+      color: '#1976D2',
       lastActivity: '2026-02-24',
     },
     {
       id: 3,
-      name: 'bKash',
+      name: 'বিকাশ',
       type: 'Mobile Banking',
       balance: 3500,
       icon: 'phone_android',

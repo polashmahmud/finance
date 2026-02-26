@@ -1,15 +1,15 @@
 <template>
-  <q-page class="flex flex-center column" style="padding-bottom: 0; background: linear-gradient(135deg, #4CAF50 0%, #2196F3 100%)">
+  <q-page class="flex flex-center column" style="padding-bottom: 0; background: linear-gradient(135deg, #43A047 0%, #26A69A 100%)">
     <div class="text-center text-white q-pa-xl">
       <!-- Logo -->
       <q-icon name="account_balance_wallet" size="80px" class="q-mb-lg" />
 
-      <h4 class="q-mt-md q-mb-xs text-weight-bold">Personal Finance</h4>
-      <p class="text-subtitle1 q-mb-xl" style="opacity: 0.85">Manage Your Money Smarter</p>
+      <h4 class="q-mt-md q-mb-xs text-weight-bold">ব্যক্তিগত ফাইন্যান্স</h4>
+      <p class="text-subtitle1 q-mb-xl" style="opacity: 0.85">আপনার অর্থ স্মার্টভাবে পরিচালনা করুন</p>
 
       <!-- PIN Input -->
       <div v-if="settings.appLock && !authenticated" class="q-mt-xl">
-        <p class="text-body2 q-mb-md">Enter your PIN to continue</p>
+        <p class="text-body2 q-mb-md">চালিয়ে যেতে পিন দিন</p>
         <div class="row justify-center q-gutter-sm q-mb-lg">
           <q-input
             v-for="i in 4"
@@ -28,7 +28,7 @@
         </div>
         <q-btn
           flat
-          label="Unlock"
+          label="আনলক"
           text-color="white"
           class="q-px-xl"
           @click="verifyPin"
@@ -42,7 +42,7 @@
           rounded
           color="white"
           text-color="primary"
-          label="Get Started"
+          label="শুরু করুন"
           class="q-px-xl q-py-sm text-weight-bold"
           size="lg"
           @click="enter"
@@ -52,7 +52,7 @@
           <q-toggle
             v-model="isDark"
             color="accent"
-            label="Dark Mode"
+            label="ডার্ক মোড"
             dark
             @update:model-value="settings.setDarkMode($event)"
           />

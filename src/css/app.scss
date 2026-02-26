@@ -2,10 +2,15 @@
 // Personal Finance Manager – Global Styles
 // =============================================
 
+// ---------- Google Fonts ----------
+@import '../../public/fonts/tiro-bangla.css';
+
 // ---------- Body ----------
 body {
+  font-family: 'Tiro Bangla', 'Noto Sans Bengali', 'SolaimanLipi', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #faf9f6;
 }
 
 // ---------- Helper classes ----------
@@ -13,19 +18,30 @@ body {
   font-weight: 600;
 }
 
+// ---------- Green gradient utility ----------
+.bg-green-gradient {
+  background: linear-gradient(135deg, #43a047 0%, #26a69a 100%) !important;
+  color: #fff;
+}
+
 // ---------- Cards ----------
 .finance-card {
   border-radius: 16px !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #f0efe9 !important;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04) !important;
   transition: box-shadow 0.25s ease;
+  background: #fff;
 
   &:active {
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
   }
 }
 
 // ---------- Bottom nav ----------
 .finance-bottom-nav {
+  border-top: 1px solid #e8e8e2 !important;
+  box-shadow: none !important;
+
   .q-tab {
     min-height: 56px;
   }
@@ -38,11 +54,10 @@ body {
 
 // ---------- Section titles ----------
 .section-title {
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.54);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(0, 0, 0, 0.7);
   padding: 16px 16px 4px;
 }
 
@@ -70,15 +85,15 @@ body {
 }
 
 .amount-income {
-  color: #4caf50;
+  color: #388e3c;
 }
 
 .amount-expense {
-  color: #e53935;
+  color: #d32f2f;
 }
 
 .amount-transfer {
-  color: #2196f3;
+  color: #1976d2;
 }
 
 // ---------- Smooth page transitions ----------
@@ -105,9 +120,23 @@ body {
   padding: 4px 0;
 }
 
+// ---------- Insights card (yellow bg) ----------
+.insights-card {
+  background: #fff8e1 !important;
+  border: 1px solid #fff0b3 !important;
+  border-left: 4px solid #f9a825 !important;
+}
+
 // ---------- Dark mode overrides ----------
 .body--dark {
   .finance-card {
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    background: #2e2e2e;
+  }
+
+  .insights-card {
+    background: #3e3520 !important;
+    border-color: #5a4e30 !important;
   }
 }

@@ -3,7 +3,7 @@
     <!-- Search Input -->
     <q-input
       v-model="query"
-      placeholder="Search transactions..."
+      placeholder="লেনদেন খুঁজুন..."
       outlined
       clearable
       autofocus
@@ -18,13 +18,13 @@
     <div class="row q-gutter-sm q-mb-md">
       <q-chip
         v-for="filter in filters"
-        :key="filter"
-        :color="activeFilter === filter ? 'primary' : 'grey-3'"
-        :text-color="activeFilter === filter ? 'white' : 'dark'"
+        :key="filter.value"
+        :color="activeFilter === filter.value ? 'primary' : 'grey-3'"
+        :text-color="activeFilter === filter.value ? 'white' : 'dark'"
         clickable
-        @click="activeFilter = activeFilter === filter ? '' : filter"
+        @click="activeFilter = activeFilter === filter.value ? '' : filter.value"
       >
-        {{ filter }}
+        {{ filter.label }}
       </q-chip>
     </div>
 
@@ -44,7 +44,7 @@
           </q-avatar>
         </q-item-section>
         <q-item-section>
-          <q-item-label class="text-weight-medium">{{ tx.category || 'Transfer' }}</q-item-label>
+          <q-item-label class="text-weight-medium">{{ tx.category || 'ট্রান্সফার' }}</q-item-label>
           <q-item-label caption>{{ tx.notes }} &middot; {{ tx.date }}</q-item-label>
         </q-item-section>
         <q-item-section side>
@@ -52,7 +52,7 @@
             {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ tx.amount.toLocaleString() }}
           </q-item-label>
           <q-badge :color="tx.type === 'income' ? 'positive' : tx.type === 'expense' ? 'negative' : 'info'" dense>
-            {{ tx.type }}
+            {{ getTypeLabel(tx.type) }}
           </q-badge>
         </q-item-section>
       </q-item>
@@ -61,14 +61,14 @@
     <!-- Empty state -->
     <div v-else-if="query" class="text-center text-grey q-mt-xl">
       <q-icon name="search_off" size="60px" class="q-mb-md" />
-      <div class="text-h6">No results found</div>
-      <div class="text-body2">Try a different search term</div>
+      <div class="text-h6">কোনো ফলাফল পাওয়া যায়নি</div>
+      <div class="text-body2">অন্য কিছু দিয়ে খুঁজুন</div>
     </div>
 
     <!-- Initial state -->
     <div v-else class="text-center text-grey q-mt-xl">
       <q-icon name="manage_search" size="60px" class="q-mb-md" />
-      <div class="text-body1">Search by amount, category, notes, or date</div>
+      <div class="text-body1">পরিমাণ, ক্যাটাগরি, নোট বা তারিখ দিয়ে খুঁজুন</div>
     </div>
   </q-page>
 </template>
@@ -83,19 +83,33 @@ const settings = useSettingsStore()
 
 const query = ref('')
 const activeFilter = ref('')
-const filters = ['Income', 'Expense', 'Transfer']
+const filters = [
+  { label: 'আয়', value: 'income' },
+  { label: 'ব্যয়', value: 'expense' },
+  { label: 'ট্রান্সফার', value: 'transfer' },
+]
+
+const typeLabels = {
+  income: 'আয়',
+  expense: 'ব্যয়',
+  transfer: 'ট্রান্সফার',
+}
+
+function getTypeLabel(type) {
+  return typeLabels[type] || type
+}
 
 const results = computed(() => {
   let list = query.value ? transactions.searchTransactions(query.value) : []
   if (activeFilter.value) {
-    list = list.filter((t) => t.type === activeFilter.value.toLowerCase())
+    list = list.filter((t) => t.type === activeFilter.value)
   }
   return list.sort((a, b) => b.date.localeCompare(a.date))
 })
 
 function getColor(tx) {
-  if (tx.type === 'income') return '#4CAF50'
-  if (tx.type === 'expense') return '#E53935'
-  return '#2196F3'
+  if (tx.type === 'income') return '#388E3C'
+  if (tx.type === 'expense') return '#D32F2F'
+  return '#1976D2'
 }
 </script>

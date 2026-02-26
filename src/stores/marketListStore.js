@@ -5,14 +5,14 @@ export const useMarketListStore = defineStore('marketLists', () => {
   const lists = ref([
     {
       id: 1,
-      name: 'Weekly Groceries',
+      name: 'সাপ্তাহিক বাজার',
       date: '2026-02-26',
       items: [
-        { id: 1, name: 'Rice (5kg)', quantity: 1, price: 350, bought: false },
-        { id: 2, name: 'Chicken (1kg)', quantity: 2, price: 280, bought: true },
-        { id: 3, name: 'Vegetables', quantity: 1, price: 200, bought: false },
-        { id: 4, name: 'Cooking Oil', quantity: 1, price: 180, bought: false },
-        { id: 5, name: 'Eggs (12pc)', quantity: 1, price: 150, bought: true },
+        { id: 1, name: 'চাল (৫ কেজি)', quantity: 1, price: 350, bought: false },
+        { id: 2, name: 'মুরগি (১ কেজি)', quantity: 2, price: 280, bought: true },
+        { id: 3, name: 'সবজি', quantity: 1, price: 200, bought: false },
+        { id: 4, name: 'তেল', quantity: 1, price: 180, bought: false },
+        { id: 5, name: 'ডিম (১২টি)', quantity: 1, price: 150, bought: true },
       ],
     },
   ])

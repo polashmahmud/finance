@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hHh lpR fFf">
     <!-- Header - only on certain pages -->
-    <q-header v-if="showHeader" class="bg-primary text-white">
+    <q-header v-if="showHeader" class="bg-green-gradient text-white">
       <q-toolbar>
         <q-btn v-if="showBack" flat dense round icon="arrow_back" @click="$router.back()" />
         <q-toolbar-title class="text-weight-semibold">{{ pageTitle }}</q-toolbar-title>
@@ -19,16 +19,16 @@
       class="finance-fab"
       icon="add"
       direction="up"
-      color="accent"
-      text-color="dark"
+      color="secondary"
+      text-color="white"
       vertical-actions-align="right"
       style="position: fixed; right: 16px; z-index: 100"
     >
-      <q-fab-action color="positive" icon="arrow_downward" label="Income" @click="$router.push('/add-income')" />
-      <q-fab-action color="negative" icon="arrow_upward" label="Expense" @click="$router.push('/add-expense')" />
-      <q-fab-action color="info" icon="swap_horiz" label="Transfer" @click="$router.push('/transfer')" />
-      <q-fab-action color="purple" icon="shopping_cart" label="Market List" @click="$router.push('/market-lists')" />
-      <q-fab-action color="orange" icon="note_add" label="Note" @click="$router.push('/notes')" />
+      <q-fab-action color="positive" text-color="white" icon="arrow_downward" label="আয়" @click="$router.push('/add-income')" />
+      <q-fab-action color="negative" text-color="white" icon="arrow_upward" label="ব্যয়" @click="$router.push('/add-expense')" />
+      <q-fab-action color="info" text-color="white" icon="swap_horiz" label="ট্রান্সফার" @click="$router.push('/transfer')" />
+      <q-fab-action color="purple" text-color="white" icon="shopping_cart" label="বাজার তালিকা" @click="$router.push('/market-lists')" />
+      <q-fab-action color="orange" text-color="white" icon="note_add" label="নোট" @click="$router.push('/notes')" />
     </q-fab>
 
     <!-- Bottom Navigation -->
@@ -41,11 +41,11 @@
         class="text-grey-6"
         narrow-indicator
       >
-        <q-route-tab name="home" icon="home" label="Home" to="/" exact />
-        <q-route-tab name="accounts" icon="account_balance_wallet" label="Accounts" to="/accounts" />
-        <q-route-tab name="reports" icon="bar_chart" label="Reports" to="/reports" />
-        <q-route-tab name="lists" icon="list_alt" label="Lists" to="/market-lists" />
-        <q-route-tab name="settings" icon="settings" label="Settings" to="/settings" />
+        <q-route-tab name="home" icon="home" label="হোম" to="/" exact />
+        <q-route-tab name="accounts" icon="account_balance_wallet" label="অ্যাকাউন্ট" to="/accounts" />
+        <q-route-tab name="reports" icon="bar_chart" label="রিপোর্ট" to="/reports" />
+        <q-route-tab name="lists" icon="shopping_cart" label="তালিকা" to="/market-lists" />
+        <q-route-tab name="settings" icon="settings" label="সেটিংস" to="/settings" />
       </q-tabs>
     </q-footer>
   </q-layout>
@@ -68,12 +68,12 @@ const showFab = computed(() => !noFabPages.includes(route.path))
 const showBottomNav = computed(() => !noBottomNavPages.includes(route.path))
 
 const pageTitles = {
-  '/add-income': 'Add Income',
-  '/add-expense': 'Add Expense',
-  '/transfer': 'Transfer',
-  '/categories': 'Categories & Budget',
-  '/notes': 'Notes',
+  '/add-income': 'আয় যোগ করুন',
+  '/add-expense': 'ব্যয় যোগ করুন',
+  '/transfer': 'ট্রান্সফার',
+  '/categories': 'ক্যাটাগরি ও বাজেট',
+  '/notes': 'নোটস',
 }
 
-const pageTitle = computed(() => pageTitles[route.path] || 'Finance Manager')
+const pageTitle = computed(() => pageTitles[route.path] || 'ফাইন্যান্স ম্যানেজার')
 </script>

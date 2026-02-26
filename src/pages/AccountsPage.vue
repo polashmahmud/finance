@@ -3,18 +3,18 @@
     <!-- Header -->
     <div class="row items-center justify-between q-mb-md">
       <div>
-        <div class="text-h5 text-weight-bold">Accounts</div>
-        <div class="text-caption text-grey">{{ accounts.accounts.length }} accounts</div>
+        <div class="text-h5 text-weight-bold">অ্যাকাউন্টস</div>
+        <div class="text-caption text-grey">{{ accounts.accounts.length }}টি অ্যাকাউন্ট</div>
       </div>
       <q-btn round flat icon="add_circle" color="primary" size="lg" @click="showAddDialog = true" />
     </div>
 
     <!-- Total Balance Banner -->
-    <q-card class="finance-card q-mb-lg bg-primary text-white">
-      <q-card-section>
+    <q-card class="finance-card q-mb-lg">
+      <q-card-section class="bg-green-gradient" style="border-radius: 16px">
         <div class="text-center">
-          <div class="stat-label text-white">Total Balance</div>
-          <div class="stat-value">{{ settings.currency }} {{ formatNumber(accounts.totalBalance) }}</div>
+          <div class="text-body2" style="opacity: 0.9">মোট সম্পদ</div>
+          <div class="stat-value text-white">{{ settings.currency }}{{ formatNumber(accounts.totalBalance) }}</div>
         </div>
       </q-card-section>
     </q-card>
@@ -40,11 +40,11 @@
               </q-avatar>
               <div class="col">
                 <div class="text-subtitle1 text-weight-bold">{{ account.name }}</div>
-                <div class="text-caption text-grey">{{ account.type }}</div>
+                <div class="text-caption text-grey">{{ getTypeLabel(account.type) }}</div>
               </div>
               <div class="text-right">
-                <div class="text-subtitle1 text-weight-bold">{{ settings.currency }} {{ formatNumber(account.balance) }}</div>
-                <div class="text-caption text-grey">Last: {{ account.lastActivity }}</div>
+                <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{ formatNumber(account.balance) }}</div>
+                <div class="text-caption text-grey">সর্বশেষ: {{ account.lastActivity }}</div>
               </div>
             </div>
           </q-card-section>
@@ -52,29 +52,35 @@
       </q-slide-item>
     </div>
 
-    <div class="swipe-hint q-mt-sm">Swipe left to delete</div>
+    <div class="swipe-hint q-mt-sm">বামে সোয়াইপ করে মুছুন</div>
 
     <!-- Add Account Dialog -->
     <q-dialog v-model="showAddDialog" position="bottom">
       <q-card style="width: 100%; max-width: 500px; border-radius: 16px 16px 0 0">
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6 text-weight-bold">New Account</div>
+          <div class="text-h6 text-weight-bold">নতুন অ্যাকাউন্ট</div>
           <q-space />
           <q-btn flat round icon="close" v-close-popup />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="addNewAccount" class="q-gutter-md">
-            <q-input v-model="newAccount.name" label="Account Name" outlined dense />
+            <q-input v-model="newAccount.name" label="অ্যাকাউন্টের নাম" outlined dense />
             <q-select
               v-model="newAccount.type"
-              :options="['Cash', 'Bank', 'Mobile Banking']"
-              label="Account Type"
+              :options="[
+                { label: 'নগদ', value: 'Cash' },
+                { label: 'ব্যাংক', value: 'Bank' },
+                { label: 'মোবাইল ব্যাংকিং', value: 'Mobile Banking' },
+              ]"
+              label="অ্যাকাউন্টের ধরন"
               outlined
               dense
+              emit-value
+              map-options
             />
             <q-input
               v-model.number="newAccount.balance"
-              label="Opening Balance"
+              label="প্রারম্ভিক ব্যালেন্স"
               type="number"
               outlined
               dense
@@ -83,7 +89,7 @@
             <q-select
               v-model="newAccount.icon"
               :options="iconOptions"
-              label="Icon"
+              label="আইকন"
               outlined
               dense
               emit-value
@@ -94,7 +100,7 @@
               unelevated
               rounded
               color="primary"
-              label="Add Account"
+              label="অ্যাকাউন্ট যোগ করুন"
               class="full-width q-mt-md"
             />
           </q-form>
@@ -114,17 +120,27 @@ const settings = useSettingsStore()
 const showAddDialog = ref(false)
 
 const iconOptions = [
-  { label: 'Wallet', value: 'account_balance_wallet' },
-  { label: 'Bank', value: 'account_balance' },
-  { label: 'Phone', value: 'phone_android' },
-  { label: 'Credit Card', value: 'credit_card' },
-  { label: 'Savings', value: 'savings' },
+  { label: 'ওয়ালেট', value: 'account_balance_wallet' },
+  { label: 'ব্যাংক', value: 'account_balance' },
+  { label: 'মোবাইল', value: 'phone_android' },
+  { label: 'ক্রেডিট কার্ড', value: 'credit_card' },
+  { label: 'সঞ্চয়', value: 'savings' },
 ]
 
 const colorMap = {
   Cash: '#4CAF50',
-  Bank: '#2196F3',
+  Bank: '#1976D2',
   'Mobile Banking': '#E91E63',
+}
+
+const typeLabels = {
+  Cash: 'নগদ অ্যাকাউন্ট',
+  Bank: 'ব্যাংক অ্যাকাউন্ট',
+  'Mobile Banking': 'মোবাইল অ্যাকাউন্ট',
+}
+
+function getTypeLabel(type) {
+  return typeLabels[type] || type
 }
 
 const newAccount = reactive({

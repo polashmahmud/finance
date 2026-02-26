@@ -2,7 +2,7 @@
   <q-page class="q-pa-md">
     <div class="row items-center q-mb-md">
       <q-btn flat round icon="arrow_back" @click="$router.back()" />
-      <div class="text-h6 text-weight-bold q-ml-sm">Add Expense</div>
+      <div class="text-h6 text-weight-bold q-ml-sm">ব্যয় যোগ করুন</div>
     </div>
 
     <q-card class="finance-card">
@@ -11,11 +11,11 @@
           <!-- Amount -->
           <q-input
             v-model.number="form.amount"
-            label="Amount"
+            label="পরিমাণ"
             type="number"
             outlined
             :prefix="settings.currency"
-            :rules="[val => val > 0 || 'Enter a valid amount']"
+            :rules="[val => val > 0 || 'সঠিক পরিমাণ লিখুন']"
             autofocus
             input-class="text-h5 text-weight-bold"
           />
@@ -24,7 +24,7 @@
           <q-select
             v-model="form.category"
             :options="categories.expenseCategories.map(c => c.name)"
-            label="Category"
+            label="ক্যাটাগরি"
             outlined
             @update:model-value="onCategoryChange"
           />
@@ -34,7 +34,7 @@
             v-if="subcategoryOptions.length"
             v-model="form.subcategory"
             :options="subcategoryOptions"
-            label="Subcategory"
+            label="সাব-ক্যাটাগরি"
             outlined
           />
 
@@ -42,7 +42,7 @@
           <q-select
             v-model="form.accountId"
             :options="accountOptions"
-            label="Account"
+            label="অ্যাকাউন্ট"
             outlined
             emit-value
             map-options
@@ -50,7 +50,7 @@
 
           <!-- Date & Time -->
           <div class="row q-gutter-md">
-            <q-input v-model="form.date" label="Date" outlined class="col" readonly>
+            <q-input v-model="form.date" label="তারিখ" outlined class="col" readonly>
               <template v-slot:append>
                 <q-icon name="event" class="cursor-pointer">
                   <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -59,7 +59,7 @@
                 </q-icon>
               </template>
             </q-input>
-            <q-input v-model="form.time" label="Time" outlined class="col" readonly>
+            <q-input v-model="form.time" label="সময়" outlined class="col" readonly>
               <template v-slot:append>
                 <q-icon name="access_time" class="cursor-pointer">
                   <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -71,7 +71,7 @@
           </div>
 
           <!-- Notes -->
-          <q-input v-model="form.notes" label="Notes (optional)" outlined type="textarea" rows="2" />
+          <q-input v-model="form.notes" label="নোট (ঐচ্ছিক)" outlined type="textarea" rows="2" />
 
           <!-- Submit -->
           <q-btn
@@ -79,7 +79,7 @@
             unelevated
             rounded
             color="negative"
-            label="Save Expense"
+            label="ব্যয় সংরক্ষণ করুন"
             class="full-width"
             size="lg"
             icon="check"
@@ -108,7 +108,7 @@ const settings = useSettingsStore()
 const now = new Date()
 const form = reactive({
   amount: null,
-  category: 'Food',
+  category: categories.expenseCategories[0]?.name || 'খাবার',
   subcategory: '',
   accountId: accounts.accounts[0]?.id,
   date: now.toISOString().slice(0, 10),
@@ -133,7 +133,7 @@ function saveExpense() {
   if (!form.amount || form.amount <= 0) return
   transactions.addTransaction({ ...form, type: 'expense' })
   accounts.updateBalance(form.accountId, -form.amount)
-  Notify.create({ type: 'positive', message: 'Expense added successfully' })
+  Notify.create({ type: 'positive', message: 'ব্যয় সফলভাবে যোগ হয়েছে' })
   router.back()
 }
 </script>
