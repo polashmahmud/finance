@@ -2,6 +2,7 @@ import { boot } from 'quasar/wrappers'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { getDatabase } from 'firebase/database'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -20,6 +21,7 @@ const app = initializeApp(firebaseConfig)
 // eslint-disable-next-line no-unused-vars
 const analytics = getAnalytics(app)
 const auth = getAuth(app)
+const database = getDatabase(app)
 
 // We export a promise to delay the Vue app boot process until Firebase Auth has initialized.
 export default boot(() => {
@@ -31,4 +33,4 @@ export default boot(() => {
   })
 })
 
-export { auth }
+export { auth, database }
