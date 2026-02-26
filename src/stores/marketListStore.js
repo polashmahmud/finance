@@ -61,7 +61,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
     const newRef = push(itemsRef)
     await set(newRef, {
       name: item.name,
-      quantity: item.quantity || 1,
+      quantity: item.quantity || '',
       price: item.price || 0,
       bought: false,
     })
@@ -83,7 +83,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
   function getListTotal(listId) {
     const list = lists.value.find((l) => l.id === listId)
     if (!list) return 0
-    return list.items.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0)
+    return list.items.reduce((sum, item) => sum + (item.price || 0), 0)
   }
 
   function stopListening() {

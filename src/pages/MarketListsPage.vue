@@ -52,7 +52,7 @@
                 <q-item-section side>
                   <div class="row items-center q-gutter-xs">
                     <span class="text-weight-medium">
-                      {{ settings.currency }}{{ ((item.price || 0) * (item.quantity || 1)).toLocaleString() }}
+                      {{ settings.currency }}{{ (item.price || 0).toLocaleString() }}
                     </span>
                     <q-btn flat round dense icon="close" size="xs" color="grey"
                       @click="marketLists.removeItem(list.id, item.id)" />
@@ -113,7 +113,7 @@
     <!-- Add Item Dialog -->
     <q-dialog v-model="showAddItem" position="bottom" transition-show="slide-up" transition-hide="slide-down">
       <q-card
-        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
+        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; padding: 0 16px 24px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">আইটেম যোগ করুন</div>
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
@@ -122,11 +122,15 @@
           <q-form @submit.prevent="addItem" class="q-gutter-md">
             <q-input v-model="newItem.name" label="আইটেমের নাম" outlined dense autofocus color="dark"
               :rules="[(val) => (val && val.length > 0) || 'নাম আবশ্যক']" />
-            <div class="row q-gutter-md">
-              <q-input v-model.number="newItem.quantity" label="পরিমাণ" type="number" outlined dense class="col"
-                color="dark" />
-              <q-input v-model.number="newItem.price" label="আনুমানিক দাম" type="number" outlined dense class="col"
-                color="dark" :prefix="settings.currency" />
+            <div class="row q-col-gutter-md">
+              <div class="col-6">
+                <q-input v-model="newItem.quantity" label="পরিমাণ" outlined dense color="dark"
+                  hint="যেমন: ২ কেজি, ১ প্যাকেট" />
+              </div>
+              <div class="col-6">
+                <q-input v-model.number="newItem.price" label="আনুমানিক দাম" type="number" outlined dense color="dark"
+                  :prefix="settings.currency" />
+              </div>
             </div>
             <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
               label="আইটেম যোগ করুন" :loading="saving" />
