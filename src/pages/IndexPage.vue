@@ -130,11 +130,13 @@ const settings = useSettingsStore()
 onMounted(() => {
   accounts.listenAccounts()
   categories.listenCategories()
+  transactions.listenTransactions()
 })
 
 onUnmounted(() => {
   accounts.stopListening()
   categories.stopListening()
+  transactions.stopListening()
 })
 
 const hour = new Date().getHours()
