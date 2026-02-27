@@ -119,7 +119,7 @@ const quickAddOpen = ref(false)
 const noFabPages = ['/splash', '/add-income', '/add-expense', '/transfer', '/search', '/categories', '/all-transactions']
 const noBottomNavPages = ['/splash']
 
-const showFab = computed(() => !noFabPages.includes(route.path) && !route.path.startsWith('/account/'))
+const showFab = computed(() => !noFabPages.includes(route.path) && !route.path.startsWith('/account/') && !route.path.startsWith('/category/'))
 const showBottomNav = computed(() => !noBottomNavPages.includes(route.path))
 
 const quickAddActions = computed(() => [

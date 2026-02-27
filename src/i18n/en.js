@@ -337,6 +337,15 @@ export default {
     selectMonth: 'Select Month',
   },
 
+  // ========== Category Transactions ==========
+  categoryTransactions: {
+    budgetUsed: 'Budget Used',
+    overBudgetBy: 'Over budget by {amount}',
+    remaining: '{amount} remaining',
+    totalAmount: 'Total Amount',
+    transactions: 'transactions',
+  },
+
   // ========== Error Page ==========
   error: {
     notFound: 'Oops. Nothing here...',

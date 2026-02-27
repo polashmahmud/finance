@@ -38,6 +38,10 @@ const routes = [
         path: 'account/:id/transactions',
         component: () => import('pages/AccountTransactionsPage.vue'),
       },
+      {
+        path: 'category/:name/transactions',
+        component: () => import('pages/CategoryTransactionsPage.vue'),
+      },
     ],
   },
 

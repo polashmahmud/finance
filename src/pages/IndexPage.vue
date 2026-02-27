@@ -14,7 +14,7 @@
           <div class="col-6">
             <div class="q-mb-sm">
               <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance')
-              }}</div>
+                }}</div>
               <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
                 formatNumber(accounts.totalBalance) }}</div>
             </div>
@@ -70,7 +70,8 @@
     <!-- Budget Status -->
     <div class="section-title">{{ $t('dashboard.budgetStatus') }}</div>
     <div class="q-gutter-md q-mb-md">
-      <q-card v-for="cat in topBudgetCategories" :key="cat.id" class="finance-card">
+      <q-card v-for="cat in topBudgetCategories" :key="cat.id" class="finance-card cursor-pointer" v-ripple
+        @click="$router.push('/category/' + encodeURIComponent(cat.name) + '/transactions')">
         <q-card-section>
           <div class="row justify-between items-center q-mb-xs">
             <div class="row items-center q-gutter-sm">

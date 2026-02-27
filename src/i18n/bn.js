@@ -337,6 +337,15 @@ export default {
     selectMonth: 'মাস নির্বাচন করুন',
   },
 
+  // ========== Category Transactions ==========
+  categoryTransactions: {
+    budgetUsed: 'বাজেট ব্যবহার',
+    overBudgetBy: 'বাজেটের চেয়ে {amount} বেশি খরচ',
+    remaining: 'বাকি আছে {amount}',
+    totalAmount: 'মোট পরিমাণ',
+    transactions: 'টি লেনদেন',
+  },
+
   // ========== Error Page ==========
   error: {
     notFound: 'উফ! এখানে কিছু নেই...',
