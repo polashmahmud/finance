@@ -50,6 +50,15 @@ export default defineRouter(function (/* { store, ssrContext } */) {
       return '/'
     }
 
+    // PIN lock check: if Firebase-authenticated but PIN lock is on and not yet unlocked
+    if (authStore.isAuthenticated && to.path !== '/splash') {
+      const settingsStoreModule = await import('src/stores/settingsStore')
+      const settingsStore = settingsStoreModule.useSettingsStore()
+      if (settingsStore.appLock && !settingsStore.isAuthenticated) {
+        return '/splash'
+      }
+    }
+
     // Allow navigation
     return true
   })

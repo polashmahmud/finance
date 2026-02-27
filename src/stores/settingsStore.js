@@ -13,6 +13,16 @@ export const useSettingsStore = defineStore('settings', () => {
   const pin = ref('')
   const isAuthenticated = ref(false)
 
+  // Load PIN from localStorage on init
+  function loadPin() {
+    const saved = localStorage.getItem('finance_pin')
+    if (saved) {
+      pin.value = saved
+      appLock.value = true
+    }
+  }
+  loadPin()
+
   function toggleDarkMode() {
     darkMode.value = !darkMode.value
     Dark.set(darkMode.value)
@@ -40,6 +50,18 @@ export const useSettingsStore = defineStore('settings', () => {
   function setPin(newPin) {
     pin.value = newPin
     appLock.value = true
+    localStorage.setItem('finance_pin', newPin)
+  }
+
+  function removePin() {
+    pin.value = ''
+    appLock.value = false
+    isAuthenticated.value = false
+    localStorage.removeItem('finance_pin')
+  }
+
+  function verifyPin(input) {
+    return input === pin.value
   }
 
   function authenticate() {
@@ -65,6 +87,8 @@ export const useSettingsStore = defineStore('settings', () => {
     setLanguage,
     setFont,
     setPin,
+    removePin,
+    verifyPin,
     authenticate,
     lock,
   }

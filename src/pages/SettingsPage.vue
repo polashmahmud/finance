@@ -100,7 +100,8 @@
     <!-- Security Section -->
     <div class="section-title">{{ $t('settings.security') }}</div>
     <q-card class="finance-card q-mb-md">
-      <q-list>
+      <q-list separator>
+        <!-- App Lock Toggle -->
         <q-item class="touch-target">
           <q-item-section avatar>
             <q-icon name="lock" color="dark" />
@@ -111,8 +112,20 @@
               }}</q-item-label>
           </q-item-section>
           <q-item-section side>
-            <q-btn flat dense :label="settings.appLock ? $t('settings.change') : $t('settings.setPin')" color="dark"
-              @click="showPinDialog = true" />
+            <q-toggle :model-value="settings.appLock" color="dark" @update:model-value="onToggleAppLock" />
+          </q-item-section>
+        </q-item>
+
+        <!-- Change PIN (only when active) -->
+        <q-item v-if="settings.appLock" clickable class="touch-target" @click="showChangePinDialog = true">
+          <q-item-section avatar>
+            <q-icon name="pin" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('settings.change') }} PIN</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-icon name="chevron_right" />
           </q-item-section>
         </q-item>
       </q-list>
@@ -193,11 +206,49 @@
           <div class="text-h6 text-weight-bold">{{ $t('settings.setPin') }}</div>
         </q-card-section>
         <q-card-section>
-          <q-input v-model="newPin" :label="$t('settings.enterPin')" type="password" maxlength="4" outlined autofocus />
+          <q-input v-model="newPin" :label="$t('settings.newPinLabel')" type="password" maxlength="4" mask="####"
+            outlined autofocus />
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat :label="$t('common.cancel')" v-close-popup />
           <q-btn unelevated color="dark" :label="$t('common.save')" @click="savePin" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!-- Change PIN Dialog -->
+    <q-dialog v-model="showChangePinDialog">
+      <q-card style="min-width: 300px; border-radius: 16px">
+        <q-card-section>
+          <div class="text-h6 text-weight-bold">{{ $t('settings.change') }} PIN</div>
+        </q-card-section>
+        <q-card-section class="q-gutter-sm">
+          <q-input v-model="currentPinInput" :label="$t('settings.enterCurrentPin')" type="password" maxlength="4"
+            mask="####" outlined autofocus />
+          <q-input v-model="newPin" :label="$t('settings.newPinLabel')" type="password" maxlength="4" mask="####"
+            outlined />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat :label="$t('common.cancel')" v-close-popup />
+          <q-btn unelevated color="dark" :label="$t('common.save')" @click="changePin" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!-- Remove PIN Dialog -->
+    <q-dialog v-model="showRemovePinDialog">
+      <q-card style="min-width: 300px; border-radius: 16px">
+        <q-card-section>
+          <div class="text-h6 text-weight-bold">{{ $t('settings.removePin') }}</div>
+          <div class="text-caption text-grey q-mt-xs">{{ $t('settings.removePinConfirm') }}</div>
+        </q-card-section>
+        <q-card-section>
+          <q-input v-model="currentPinInput" :label="$t('settings.enterCurrentPin')" type="password" maxlength="4"
+            mask="####" outlined autofocus />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat :label="$t('common.cancel')" v-close-popup />
+          <q-btn unelevated color="negative" :label="$t('settings.removePin')" @click="removePinConfirm" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -221,7 +272,10 @@ const selectedCurrency = ref(settings.currencyCode)
 const selectedLang = ref(settings.language)
 const selectedFont = ref(settings.fontFamily)
 const showPinDialog = ref(false)
+const showChangePinDialog = ref(false)
+const showRemovePinDialog = ref(false)
 const newPin = ref('')
+const currentPinInput = ref('')
 
 const currencyOptions = [
   { label: 'BDT (৳)', value: 'BDT' },
@@ -260,6 +314,20 @@ function onFontChange(font) {
   settings.setFont(font)
 }
 
+// --- PIN Logic ---
+
+function onToggleAppLock(val) {
+  if (val) {
+    // Turning ON → set new PIN
+    newPin.value = ''
+    showPinDialog.value = true
+  } else {
+    // Turning OFF → confirm with current PIN
+    currentPinInput.value = ''
+    showRemovePinDialog.value = true
+  }
+}
+
 function savePin() {
   if (newPin.value.length !== 4) {
     Notify.create({ type: 'warning', message: t('settings.pinMustBe4') })
@@ -271,7 +339,35 @@ function savePin() {
   Notify.create({ type: 'positive', message: t('settings.pinSetSuccess') })
 }
 
+function changePin() {
+  if (!settings.verifyPin(currentPinInput.value)) {
+    Notify.create({ type: 'negative', message: t('settings.wrongPin') })
+    return
+  }
+  if (newPin.value.length !== 4) {
+    Notify.create({ type: 'warning', message: t('settings.pinMustBe4') })
+    return
+  }
+  settings.setPin(newPin.value)
+  newPin.value = ''
+  currentPinInput.value = ''
+  showChangePinDialog.value = false
+  Notify.create({ type: 'positive', message: t('settings.pinSetSuccess') })
+}
+
+function removePinConfirm() {
+  if (!settings.verifyPin(currentPinInput.value)) {
+    Notify.create({ type: 'negative', message: t('settings.wrongPin') })
+    return
+  }
+  settings.removePin()
+  currentPinInput.value = ''
+  showRemovePinDialog.value = false
+  Notify.create({ type: 'positive', message: t('settings.pinRemoved') })
+}
+
 async function onLogout() {
+  settings.lock()
   const result = await authStore.logout()
   if (result.success) {
     Notify.create({ type: 'positive', icon: 'check_circle', message: t('common.logoutSuccess'), position: 'top' })
