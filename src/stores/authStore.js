@@ -13,12 +13,23 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
   const isAuthReady = ref(false)
 
+  // Promise that resolves when Firebase auth state is first determined
+  let _authReadyResolve
+  const authReadyPromise = new Promise((resolve) => {
+    _authReadyResolve = resolve
+  })
+
   // Wait for initial auth state before allowing navigation
   onAuthStateChanged(auth, (currentUser) => {
     user.value = currentUser
     isAuthenticated.value = !!currentUser
     isAuthReady.value = true
+    _authReadyResolve()
   })
+
+  function waitForAuth() {
+    return authReadyPromise
+  }
 
   async function login(email, password) {
     try {
@@ -57,6 +68,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     isAuthenticated,
     isAuthReady,
+    waitForAuth,
     login,
     register,
     logout,

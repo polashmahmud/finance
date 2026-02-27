@@ -39,11 +39,13 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from 'stores/authStore'
+import { useSettingsStore } from 'stores/settingsStore'
 import { Notify } from 'quasar'
 
 const { t } = useI18n()
 const router = useRouter()
 const auth = useAuthStore()
+const settings = useSettingsStore()
 
 const email = ref('')
 const password = ref('')
@@ -53,9 +55,17 @@ const loading = ref(false)
 async function onLogin() {
   loading.value = true
   try {
-    await auth.login(email.value, password.value)
-    Notify.create({ message: t('auth.loginSuccess'), color: 'positive' })
-    router.push('/')
+    const result = await auth.login(email.value, password.value)
+    if (result.success) {
+      Notify.create({ message: t('auth.loginSuccess'), color: 'positive' })
+      if (settings.appLock) {
+        router.push('/splash')
+      } else {
+        router.push('/')
+      }
+    } else {
+      Notify.create({ message: t('auth.loginFailed') + result.error, color: 'negative' })
+    }
   } catch (e) {
     Notify.create({ message: t('auth.loginFailed') + e.message, color: 'negative' })
   } finally {

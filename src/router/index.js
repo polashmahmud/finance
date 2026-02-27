@@ -37,21 +37,18 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     const authStoreModule = await import('src/stores/authStore')
     const authStore = authStoreModule.useAuthStore()
 
+    // Wait for Firebase auth to be ready before making any decisions
+    await authStore.waitForAuth()
+
     const publicPages = ['/login', '/register', '/splash']
     const authRequired = !publicPages.includes(to.path)
 
     if (authRequired && !authStore.isAuthenticated) {
-      // User is not authenticated, redirect to login
       return '/login'
     }
 
-    if (!authRequired && authStore.isAuthenticated && to.path !== '/splash') {
-      // User is already authenticated, redirect to home
-      return '/'
-    }
-
-    // PIN lock check: if Firebase-authenticated but PIN lock is on and not yet unlocked
-    if (authStore.isAuthenticated && to.path !== '/splash') {
+    // PIN lock check: if authenticated but PIN not yet entered
+    if (authStore.isAuthenticated && authRequired) {
       const settingsStoreModule = await import('src/stores/settingsStore')
       const settingsStore = settingsStoreModule.useSettingsStore()
       if (settingsStore.appLock && !settingsStore.isAuthenticated) {
@@ -59,7 +56,16 @@ export default defineRouter(function (/* { store, ssrContext } */) {
       }
     }
 
-    // Allow navigation
+    // Authenticated user visiting public pages (except splash) → go home
+    if (!authRequired && authStore.isAuthenticated && to.path !== '/splash') {
+      const settingsStoreModule = await import('src/stores/settingsStore')
+      const settingsStore = settingsStoreModule.useSettingsStore()
+      // Only redirect to home if no PIN lock, or PIN already entered
+      if (!settingsStore.appLock || settingsStore.isAuthenticated) {
+        return '/'
+      }
+    }
+
     return true
   })
 
