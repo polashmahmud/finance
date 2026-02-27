@@ -13,7 +13,8 @@
           <!-- Left Content -->
           <div class="col-6">
             <div class="q-mb-sm">
-              <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance') }}</div>
+              <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance')
+                }}</div>
               <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
                 formatNumber(accounts.totalBalance) }}</div>
             </div>
@@ -55,7 +56,8 @@
         <q-card-section class="q-pa-md">
           <div class="row items-center q-gutter-sm q-mb-sm">
             <q-icon :name="account.icon" :style="{ color: account.color }" size="20px" />
-            <span class="text-caption text-grey">{{ account.type === 'Cash' ? $t('dashboard.cash') : account.type === 'Bank' ? $t('dashboard.bank')
+            <span class="text-caption text-grey">{{ account.type === 'Cash' ? $t('dashboard.cash') : account.type ===
+              'Bank' ? $t('dashboard.bank')
               : $t('dashboard.mobile') }}</span>
           </div>
           <div class="text-body2 text-weight-medium">{{ account.name }}</div>
@@ -89,13 +91,13 @@
     <!-- Recent Transactions -->
     <div class="row items-center justify-between q-mb-sm">
       <div class="section-title q-mb-none">{{ $t('dashboard.recentTransactions') }}</div>
-      <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right" @click="$router.push('/all-transactions')" size="sm" />
+      <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right"
+        @click="$router.push('/all-transactions')" size="sm" />
     </div>
     <q-card class="finance-card">
       <q-list separator>
         <q-slide-item v-for="tx in transactions.recentTransactions" :key="tx.id"
-          @left="({ reset }) => onEditTx(tx, reset)"
-          @right="({ reset }) => onDeleteTx(tx.id, reset)">
+          @left="({ reset }) => onEditTx(tx, reset)" @right="({ reset }) => onDeleteTx(tx.id, reset)">
           <template v-slot:left>
             <div class="row items-center">
               <q-icon name="edit" color="info" />
@@ -144,9 +146,13 @@
 
         <q-card-section class="q-pt-none">
           <q-form @submit.prevent="saveEdit">
-            <q-input v-model.number="editForm.amount" :label="$t('common.amount')" type="number" outlined color="dark" :prefix="settings.currency" :rules="[val => val > 0 || $t('common.validAmount')]" input-class="text-h6 text-weight-bold" class="q-mb-sm" />
+            <q-input v-model.number="editForm.amount" :label="$t('common.amount')" type="number" outlined color="dark"
+              :prefix="settings.currency" :rules="[val => val > 0 || $t('common.validAmount')]"
+              input-class="text-h6 text-weight-bold" class="q-mb-sm" />
 
-            <q-select v-if="editForm.type !== 'transfer'" v-model="editForm.category" :options="editForm.type === 'income' ? incomeCategoryOptions : expenseCategoryOptions" :label="$t('common.category')" outlined color="dark" emit-value map-options class="q-mb-sm">
+            <q-select v-if="editForm.type !== 'transfer'" v-model="editForm.category"
+              :options="editForm.type === 'income' ? incomeCategoryOptions : expenseCategoryOptions"
+              :label="$t('common.category')" outlined color="dark" emit-value map-options class="q-mb-sm">
               <template v-slot:option="scope">
                 <q-item v-bind="scope.itemProps">
                   <q-item-section avatar>
@@ -161,7 +167,8 @@
               </template>
             </q-select>
 
-            <q-select v-if="editForm.type !== 'transfer'" v-model="editForm.accountId" :options="accountOptions" :label="$t('common.account')" outlined color="dark" emit-value map-options class="q-mb-sm" />
+            <q-select v-if="editForm.type !== 'transfer'" v-model="editForm.accountId" :options="accountOptions"
+              :label="$t('common.account')" outlined color="dark" emit-value map-options class="q-mb-sm" />
 
             <div class="row q-col-gutter-md q-mb-sm">
               <div class="col-6">
@@ -188,9 +195,11 @@
               </div>
             </div>
 
-            <q-input v-model="editForm.notes" :label="$t('common.noteOptional')" outlined color="dark" type="textarea" rows="2" class="q-mb-sm" />
+            <q-input v-model="editForm.notes" :label="$t('common.noteOptional')" outlined color="dark" type="textarea"
+              rows="2" class="q-mb-sm" />
 
-            <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated size="lg" icon="check" :label="$t('common.update')" :loading="saving" />
+            <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated size="lg"
+              icon="check" :label="$t('common.update')" :loading="saving" />
           </q-form>
         </q-card-section>
       </q-card>

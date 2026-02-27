@@ -334,6 +334,7 @@ export default {
     all: 'সব',
     editTransaction: 'লেনদেন সম্পাদনা',
     transactionUpdated: 'লেনদেন আপডেট হয়েছে',
+    selectMonth: 'মাস নির্বাচন করুন',
   },
 
   // ========== Error Page ==========

@@ -334,6 +334,7 @@ export default {
     all: 'All',
     editTransaction: 'Edit Transaction',
     transactionUpdated: 'Transaction updated',
+    selectMonth: 'Select Month',
   },
 
   // ========== Error Page ==========
