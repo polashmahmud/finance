@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { Dark } from 'quasar'
+import i18n from 'src/i18n'
 
 export const useSettingsStore = defineStore('settings', () => {
   const currency = ref('৳')
   const currencyCode = ref('BDT')
-  const language = ref('en')
+  const language = ref('bn')
   const darkMode = ref(false)
   const appLock = ref(false)
   const pin = ref('')
@@ -28,6 +29,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
   function setLanguage(lang) {
     language.value = lang
+    i18n.global.locale.value = lang
   }
 
   function setPin(newPin) {

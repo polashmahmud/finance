@@ -3,7 +3,7 @@
     <!-- Greeting -->
     <div class="q-mb-md">
       <div class="text-caption text-grey">{{ greeting }} 👋</div>
-      <div class="text-h5 text-weight-bold">আমার ফাইন্যান্স</div>
+      <div class="text-h5 text-weight-bold">{{ $t('dashboard.myFinance') }}</div>
     </div>
 
     <!-- Total Balance Card -->
@@ -13,7 +13,7 @@
           <!-- Left Content -->
           <div class="col-6">
             <div class="q-mb-sm">
-              <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">মোট ব্যালেন্স</div>
+              <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance') }}</div>
               <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
                 formatNumber(accounts.totalBalance) }}</div>
             </div>
@@ -21,7 +21,7 @@
               <div class="row items-center q-gutter-xs">
                 <q-icon name="trending_up" size="18px" style="color: #4ade80" />
                 <div>
-                  <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">আয়</div>
+                  <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">{{ $t('common.income') }}</div>
                   <div class="text-white text-weight-bold" style="font-size: 0.85rem">{{ settings.currency }}{{
                     formatShort(transactions.totalIncome) }}</div>
                 </div>
@@ -29,7 +29,7 @@
               <div class="row items-center q-gutter-xs">
                 <q-icon name="trending_down" size="18px" style="color: #f87171" />
                 <div>
-                  <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">ব্যয়</div>
+                  <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">{{ $t('common.expense') }}</div>
                   <div class="text-white text-weight-bold" style="font-size: 0.85rem">{{ settings.currency }}{{
                     formatShort(transactions.totalExpense) }}</div>
                 </div>
@@ -48,15 +48,15 @@
     </q-card>
 
     <!-- Accounts Horizontal Scroll -->
-    <div class="section-title">অ্যাকাউন্ট</div>
+    <div class="section-title">{{ $t('dashboard.accounts') }}</div>
     <div class="row q-gutter-md q-mb-md" style="overflow-x: auto; flex-wrap: nowrap; padding-bottom: 8px">
       <q-card v-for="account in accounts.accounts" :key="account.id" class="finance-card"
         style="min-width: 160px; flex-shrink: 0">
         <q-card-section class="q-pa-md">
           <div class="row items-center q-gutter-sm q-mb-sm">
             <q-icon :name="account.icon" :style="{ color: account.color }" size="20px" />
-            <span class="text-caption text-grey">{{ account.type === 'Cash' ? 'নগদ' : account.type === 'Bank' ? 'ব্যাংক'
-              : 'মোবাইল' }}</span>
+            <span class="text-caption text-grey">{{ account.type === 'Cash' ? $t('dashboard.cash') : account.type === 'Bank' ? $t('dashboard.bank')
+              : $t('dashboard.mobile') }}</span>
           </div>
           <div class="text-body2 text-weight-medium">{{ account.name }}</div>
           <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{ formatNumber(account.balance) }}</div>
@@ -65,7 +65,7 @@
     </div>
 
     <!-- Budget Status -->
-    <div class="section-title">বাজেট স্ট্যাটাস</div>
+    <div class="section-title">{{ $t('dashboard.budgetStatus') }}</div>
     <div class="q-gutter-md q-mb-md">
       <q-card v-for="cat in topBudgetCategories" :key="cat.id" class="finance-card">
         <q-card-section>
@@ -87,7 +87,7 @@
     </div>
 
     <!-- Recent Transactions -->
-    <div class="section-title">সাম্প্রতিক লেনদেন</div>
+    <div class="section-title">{{ $t('dashboard.recentTransactions') }}</div>
     <q-card class="finance-card">
       <q-list separator>
         <q-slide-item v-for="tx in transactions.recentTransactions" :key="tx.id"
@@ -121,7 +121,7 @@
 
       <q-card-section v-if="!transactions.recentTransactions.length" class="text-center text-grey q-pa-lg">
         <q-icon name="receipt_long" size="40px" class="q-mb-sm" />
-        <div>এখনো কোনো লেনদেন হয়নি</div>
+        <div>{{ $t('dashboard.noTransactionsYet') }}</div>
       </q-card-section>
     </q-card>
   </q-page>
@@ -129,11 +129,13 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAccountStore } from 'stores/accountStore'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
 
+const { t } = useI18n()
 const accounts = useAccountStore()
 const transactions = useTransactionStore()
 const categories = useCategoryStore()
@@ -153,10 +155,10 @@ onUnmounted(() => {
 
 const hour = new Date().getHours()
 const greeting = computed(() => {
-  if (hour < 12) return 'শুভ সকাল'
-  if (hour < 17) return 'শুভ অপরাহ্ন'
-  if (hour < 20) return 'শুভ সন্ধ্যা'
-  return 'শুভ রাত্রি'
+  if (hour < 12) return t('greetings.morning')
+  if (hour < 17) return t('greetings.afternoon')
+  if (hour < 20) return t('greetings.evening')
+  return t('greetings.night')
 })
 
 const topBudgetCategories = computed(() =>

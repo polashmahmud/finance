@@ -1,8 +1,8 @@
 <template>
   <q-page class="q-pa-md">
     <div class="q-mb-md">
-      <div class="text-h5 text-weight-bold">রিপোর্ট</div>
-      <div class="text-caption text-grey">বিশ্লেষণ ও পরিসংখ্যান</div>
+      <div class="text-h5 text-weight-bold">{{ $t('reports.title') }}</div>
+      <div class="text-caption text-grey">{{ $t('reports.subtitle') }}</div>
     </div>
 
     <!-- Loading -->
@@ -15,17 +15,17 @@
       <div class="row q-col-gutter-sm q-mb-md">
         <div class="col-auto">
           <q-chip color="dark" text-color="white" icon="trending_up" class="q-ma-none shadow-1">
-            আয় {{ settings.currency }}{{ formatShort(transactions.totalIncome) }}
+            {{ $t('common.income') }} {{ settings.currency }}{{ formatShort(transactions.totalIncome) }}
           </q-chip>
         </div>
         <div class="col-auto">
           <q-chip color="dark" text-color="white" icon="trending_down" class="q-ma-none shadow-1">
-            ব্যয় {{ settings.currency }}{{ formatShort(transactions.totalExpense) }}
+            {{ $t('common.expense') }} {{ settings.currency }}{{ formatShort(transactions.totalExpense) }}
           </q-chip>
         </div>
         <div class="col-auto">
           <q-chip color="dark" text-color="white" icon="savings" class="q-ma-none shadow-1">
-            সঞ্চয় {{ settings.currency }}{{ formatShort(netSavings) }}
+            {{ $t('reports.savings') }} {{ settings.currency }}{{ formatShort(netSavings) }}
           </q-chip>
         </div>
       </div>
@@ -34,10 +34,10 @@
       <q-card class="finance-card q-mb-md">
         <q-tabs v-model="reportTab" dense active-color="dark" indicator-color="dark" class="text-grey-6"
           align="justify">
-          <q-tab name="overview" label="সারসংক্ষেপ" />
-          <q-tab name="category" label="ক্যাটাগরি" />
-          <q-tab name="budget" label="বাজেট" />
-          <q-tab name="trend" label="প্রবণতা" />
+          <q-tab name="overview" :label="$t('reports.overview')" />
+          <q-tab name="category" :label="$t('reports.categoryTab')" />
+          <q-tab name="budget" :label="$t('reports.budget')" />
+          <q-tab name="trend" :label="$t('reports.trend')" />
         </q-tabs>
       </q-card>
 
@@ -46,7 +46,7 @@
         <q-tab-panel name="overview" class="q-pa-none">
           <q-card class="finance-card q-mb-md">
             <q-card-section>
-              <div class="text-subtitle2 text-weight-bold q-mb-md">মাসিক আয় বনাম ব্যয়</div>
+              <div class="text-subtitle2 text-weight-bold q-mb-md">{{ $t('reports.monthlyIncomeVsExpense') }}</div>
               <div class="row q-gutter-md q-mb-md">
                 <div class="col">
                   <div class="text-center">
@@ -54,7 +54,7 @@
                       track-color="grey-3" show-value>
                       <span class="text-weight-bold text-positive">{{ incomePercent }}%</span>
                     </q-circular-progress>
-                    <div class="text-caption q-mt-sm">আয়</div>
+                    <div class="text-caption q-mt-sm">{{ $t('common.income') }}</div>
                     <div class="text-weight-bold text-positive">{{ settings.currency }}{{
                       formatNumber(transactions.totalIncome) }}</div>
                   </div>
@@ -65,7 +65,7 @@
                       track-color="grey-3" show-value>
                       <span class="text-weight-bold text-negative">{{ expensePercent }}%</span>
                     </q-circular-progress>
-                    <div class="text-caption q-mt-sm">ব্যয়</div>
+                    <div class="text-caption q-mt-sm">{{ $t('common.expense') }}</div>
                     <div class="text-weight-bold text-negative">{{ settings.currency }}{{
                       formatNumber(transactions.totalExpense) }}</div>
                   </div>
@@ -73,7 +73,7 @@
               </div>
               <q-separator class="q-mb-md" />
               <div class="row justify-between">
-                <span class="text-weight-medium">নিট সঞ্চয়</span>
+                <span class="text-weight-medium">{{ $t('reports.netSavings') }}</span>
                 <span :class="netSavings >= 0 ? 'text-positive' : 'text-negative'" class="text-weight-bold">
                   {{ settings.currency }}{{ formatNumber(netSavings) }}
                 </span>
@@ -86,10 +86,10 @@
         <q-tab-panel name="category" class="q-pa-none">
           <q-card class="finance-card q-mb-md">
             <q-card-section>
-              <div class="text-subtitle2 text-weight-bold q-mb-md">ক্যাটাগরি অনুযায়ী ব্যয়</div>
+              <div class="text-subtitle2 text-weight-bold q-mb-md">{{ $t('reports.categoryBreakdown') }}</div>
               <div v-if="!categoryBreakdown.length" class="text-center text-grey q-pa-md">
                 <q-icon name="pie_chart" size="40px" class="q-mb-sm" />
-                <div>কোনো ব্যয়ের ডাটা নেই</div>
+                <div>{{ $t('reports.noExpenseData') }}</div>
               </div>
               <div v-for="cat in categoryBreakdown" :key="cat.name" class="q-mb-md">
                 <div class="row justify-between items-center q-mb-xs">
@@ -114,10 +114,10 @@
         <q-tab-panel name="budget" class="q-pa-none">
           <q-card class="finance-card q-mb-md">
             <q-card-section>
-              <div class="text-subtitle2 text-weight-bold q-mb-md">বাজেট বনাম প্রকৃত ব্যয়</div>
+              <div class="text-subtitle2 text-weight-bold q-mb-md">{{ $t('reports.budgetVsActual') }}</div>
               <div v-if="!budgetComparison.length" class="text-center text-grey q-pa-md">
                 <q-icon name="account_balance_wallet" size="40px" class="q-mb-sm" />
-                <div>কোনো বাজেট সেট করা হয়নি</div>
+                <div>{{ $t('reports.noBudgetSet') }}</div>
               </div>
               <div v-for="cat in budgetComparison" :key="cat.name" class="q-mb-lg">
                 <div class="row justify-between items-center q-mb-xs">
@@ -131,7 +131,7 @@
                   :color="cat.over ? 'negative' : cat.usage > 0.8 ? 'warning' : 'dark'" rounded size="10px"
                   track-color="grey-3" />
                 <div v-if="cat.over" class="text-caption text-negative q-mt-xs">
-                  বাজেটের চেয়ে {{ settings.currency }}{{ formatNumber(cat.spent - cat.budget) }} বেশি খরচ
+                  {{ $t('reports.overBudget', { amount: settings.currency + formatNumber(cat.spent - cat.budget) }) }}
                 </div>
               </div>
             </q-card-section>
@@ -142,7 +142,7 @@
         <q-tab-panel name="trend" class="q-pa-none">
           <q-card class="finance-card q-mb-md">
             <q-card-section>
-              <div class="text-subtitle2 text-weight-bold q-mb-md">আয় বনাম ব্যয়ের প্রবণতা (গত ৭ দিন)</div>
+              <div class="text-subtitle2 text-weight-bold q-mb-md">{{ $t('reports.trendTitle') }}</div>
               <div style="min-height: 250px">
                 <vue-apex-charts type="area" height="250" :options="chartOptions" :series="chartSeries" />
               </div>
@@ -156,11 +156,13 @@
 
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
 import VueApexCharts from 'vue3-apexcharts'
 
+const { t } = useI18n()
 const transactions = useTransactionStore()
 const categories = useCategoryStore()
 const settings = useSettingsStore()
@@ -223,15 +225,17 @@ const budgetComparison = computed(() =>
 )
 
 // Chart Data Helpers
-const dayNamesBn = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি']
+const dayNames = computed(() => [
+  t('reports.sun'), t('reports.mon'), t('reports.tue'), t('reports.wed'),
+  t('reports.thu'), t('reports.fri'), t('reports.sat')
+])
 
 const chartData = computed(() => {
-  const categories = []
+  const cats = []
   const incomeData = []
   const expenseData = []
 
-  // Ensure transactions are loaded
-  if (transactions.loading) return { categories, incomeData, expenseData }
+  if (transactions.loading) return { categories: cats, incomeData, expenseData }
 
   for (let i = 6; i >= 0; i--) {
     const d = new Date()
@@ -246,17 +250,17 @@ const chartData = computed(() => {
       .filter((t) => t.type === 'expense' && t.date === dateStr)
       .reduce((sum, t) => sum + (t.amount || 0), 0)
 
-    categories.push(dayNamesBn[d.getDay()])
+    cats.push(dayNames.value[d.getDay()])
     incomeData.push(dailyIncome)
     expenseData.push(dailyExpense)
   }
 
-  return { categories, incomeData, expenseData }
+  return { categories: cats, incomeData, expenseData }
 })
 
 const chartSeries = computed(() => [
-  { name: 'আয়', data: chartData.value.incomeData },
-  { name: 'ব্যয়', data: chartData.value.expenseData }
+  { name: t('common.income'), data: chartData.value.incomeData },
+  { name: t('common.expense'), data: chartData.value.expenseData }
 ])
 
 const chartOptions = computed(() => ({
@@ -265,7 +269,7 @@ const chartOptions = computed(() => ({
     toolbar: { show: false },
     fontFamily: 'Tiro Bangla, sans-serif'
   },
-  colors: ['#21BA45', '#C10015'], // positive and negative quasar colors
+  colors: ['#21BA45', '#C10015'],
   dataLabels: { enabled: false },
   stroke: { curve: 'smooth', width: 2 },
   xaxis: {

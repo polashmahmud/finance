@@ -1,75 +1,33 @@
 <template>
-  <q-page class="flex flex-center q-pa-md bg-white">
-    <div style="width: 100%; max-width: 400px">
-      <!-- Logo / Header -->
-      <div class="text-center q-mb-xl">
-        <q-avatar size="72px" class="bg-primary-gradient text-white q-mb-md shadow-3">
-          <q-icon name="account_balance_wallet" />
-        </q-avatar>
-        <div class="text-h5 text-weight-bold" style="color: #111;">স্বাগতম</div>
-        <div class="text-subtitle1 text-grey-7">আপনার একাউন্টে লগইন করুন</div>
+  <q-page class="flex flex-center">
+    <div class="column items-center q-gutter-md q-pa-lg" style="max-width: 350px; width: 100%">
+      <q-avatar size="70px" color="dark" text-color="white" icon="account_balance_wallet" />
+
+      <div class="text-center">
+        <div class="text-h5 text-weight-bold">{{ $t('auth.welcome') }}</div>
+        <div class="text-caption text-grey">{{ $t('auth.loginSubtitle') }}</div>
       </div>
 
-      <!-- Login Form -->
-      <q-form @submit="onSubmit" class="q-gutter-md">
-        <q-input
-          v-model="email"
-          type="email"
-          label="ইমেইল"
-          outlined
-          hide-bottom-space
-          color="primary"
-          bg-color="grey-1"
-          lazy-rules
-          :rules="[(val) => (val && val.length > 0) || 'ইমেইল আবশ্যক']"
-        >
-          <template v-slot:prepend>
-            <q-icon name="email" color="grey-6" />
-          </template>
-        </q-input>
+      <q-form @submit.prevent="onLogin" class="full-width q-gutter-sm">
+        <q-input v-model="email" :label="$t('auth.email')" outlined dense type="email"
+          :rules="[val => !!val || $t('auth.emailRequired')]" />
 
-        <q-input
-          v-model="password"
-          :type="showPassword ? 'text' : 'password'"
-          label="পাসওয়ার্ড"
-          outlined
-          hide-bottom-space
-          color="primary"
-          bg-color="grey-1"
-          lazy-rules
-          :rules="[(val) => (val && val.length > 0) || 'পাসওয়ার্ড আবশ্যক']"
-        >
-          <template v-slot:prepend>
-            <q-icon name="lock" color="grey-6" />
-          </template>
+        <q-input v-model="password" :label="$t('auth.password')" outlined dense
+          :type="showPassword ? 'text' : 'password'" :rules="[val => !!val || $t('auth.passwordRequired')]">
           <template v-slot:append>
-            <q-icon
-              :name="showPassword ? 'visibility_off' : 'visibility'"
-              class="cursor-pointer"
-              color="grey-6"
-              @click="showPassword = !showPassword"
-            />
+            <q-icon :name="showPassword ? 'visibility_off' : 'visibility'" class="cursor-pointer"
+              @click="showPassword = !showPassword" />
           </template>
         </q-input>
 
-        <div>
-          <q-btn
-            label="লগইন"
-            type="submit"
-            class="full-width bg-primary-gradient shadow-3"
-            text-color="white"
-            size="lg"
-            rounded
-            :loading="loading"
-          />
-        </div>
+        <q-btn type="submit" :label="$t('auth.login')" color="dark" unelevated rounded class="full-width q-mt-md"
+          no-caps :loading="loading" />
       </q-form>
 
-      <!-- Registration Link -->
-      <div class="text-center q-mt-lg">
-        <span class="text-grey-7">একাউন্ট নেই? </span>
-        <router-link to="/register" class="text-weight-bold text-primary" style="text-decoration: none">
-          নতুন একাউন্ট তৈরি করুন
+      <div class="text-center text-caption q-mt-sm">
+        {{ $t('auth.noAccount') }}
+        <router-link to="/auth/register" class="text-dark text-weight-bold" style="text-decoration: none">
+          {{ $t('auth.createNewAccount') }}
         </router-link>
       </div>
     </div>
@@ -78,39 +36,30 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from 'stores/authStore'
-import { useQuasar } from 'quasar'
+import { Notify } from 'quasar'
 
+const { t } = useI18n()
 const router = useRouter()
-const authStore = useAuthStore()
-const $q = useQuasar()
+const auth = useAuthStore()
 
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const loading = ref(false)
 
-async function onSubmit() {
+async function onLogin() {
   loading.value = true
-  const result = await authStore.login(email.value, password.value)
-  loading.value = false
-
-  if (result.success) {
-    $q.notify({
-      color: 'positive',
-      icon: 'check_circle',
-      message: 'সফলভাবে লগইন হয়েছে',
-      position: 'top',
-    })
+  try {
+    await auth.login(email.value, password.value)
+    Notify.create({ message: t('auth.loginSuccess'), color: 'positive' })
     router.push('/')
-  } else {
-    $q.notify({
-      color: 'negative',
-      icon: 'warning',
-      message: 'লগইন ব্যর্থ হয়েছে: ' + result.error,
-      position: 'top',
-    })
+  } catch (e) {
+    Notify.create({ message: t('auth.loginFailed') + e.message, color: 'negative' })
+  } finally {
+    loading.value = false
   }
 }
 </script>

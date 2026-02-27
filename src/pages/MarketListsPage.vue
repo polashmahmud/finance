@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="row items-center justify-between q-mb-md">
       <div>
-        <div class="text-h5 text-weight-bold">বাজারের তালিকা</div>
-        <div class="text-caption text-grey">{{ marketLists.lists.length }}টি তালিকা</div>
+        <div class="text-h5 text-weight-bold">{{ $t('marketLists.title') }}</div>
+        <div class="text-caption text-grey">{{ marketLists.lists.length }}{{ $t('marketLists.countSuffix') }}</div>
       </div>
       <q-btn round flat icon="add_circle" color="dark" size="lg" @click="showNewList = true" />
     </div>
@@ -25,7 +25,7 @@
                   <q-icon name="shopping_cart" color="dark" size="20px" />
                   <div class="text-subtitle1 text-weight-bold">{{ list.name }}</div>
                 </div>
-                <div class="text-caption text-grey q-ml-lg">{{ getCompletedCount(list) }}/{{ list.items.length }} আইটেম
+                <div class="text-caption text-grey q-ml-lg">{{ getCompletedCount(list) }}/{{ list.items.length }} {{ $t('marketLists.items') }}
                 </div>
               </div>
               <div class="row q-gutter-xs">
@@ -47,7 +47,7 @@
                 </q-item-section>
                 <q-item-section :class="{ 'text-strike text-grey': item.bought }">
                   <q-item-label>{{ item.name }}</q-item-label>
-                  <q-item-label caption>পরিমাণ: {{ item.quantity }}</q-item-label>
+                  <q-item-label caption>{{ $t('marketLists.quantityPrefix') }} {{ item.quantity }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
                   <div class="row items-center q-gutter-xs">
@@ -64,20 +64,20 @@
             <!-- Empty items -->
             <div v-if="!list.items.length" class="text-center text-grey q-pa-md">
               <q-icon name="playlist_add" size="28px" class="q-mb-xs" />
-              <div class="text-caption">কোনো আইটেম নেই</div>
+              <div class="text-caption">{{ $t('marketLists.noItems') }}</div>
             </div>
 
             <!-- Total -->
             <q-separator class="q-my-sm" />
             <div class="row justify-between items-center">
-              <span class="text-weight-bold text-grey">আনুমানিক মোট</span>
+              <span class="text-weight-bold text-grey">{{ $t('marketLists.estimatedTotal') }}</span>
               <span class="text-weight-bold" style="color: #111;">
                 {{ settings.currency }}{{ marketLists.getListTotal(list.id).toLocaleString() }}
               </span>
             </div>
 
             <!-- Convert to Expense -->
-            <q-btn flat dense color="dark" label="খরচে রূপান্তর করুন" icon="receipt" class="q-mt-sm full-width"
+            <q-btn flat dense color="dark" :label="$t('marketLists.convertToExpense')" icon="receipt" class="q-mt-sm full-width"
               @click="convertToExpense(list)" :disable="!list.items.length" />
           </q-card-section>
         </q-card>
@@ -86,8 +86,8 @@
       <!-- Empty state -->
       <div v-if="!marketLists.lists.length" class="text-center text-grey q-mt-xl">
         <q-icon name="shopping_cart" size="60px" class="q-mb-md" />
-        <div class="text-h6">এখনো কোনো তালিকা নেই</div>
-        <div class="text-body2">+ চাপুন নতুন তালিকা তৈরি করতে</div>
+        <div class="text-h6">{{ $t('marketLists.noLists') }}</div>
+        <div class="text-body2">{{ $t('marketLists.addPrompt') }}</div>
       </div>
     </template>
 
@@ -96,15 +96,15 @@
       <q-card
         style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">নতুন বাজার তালিকা</div>
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.newMarketList') }}</div>
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="createList">
-            <q-input v-model="newListName" label="তালিকার নাম" outlined dense autofocus color="dark"
-              :rules="[(val) => (val && val.length > 0) || 'নাম আবশ্যক']" style="margin-bottom: 10px;" />
+            <q-input v-model="newListName" :label="$t('marketLists.listName')" outlined dense autofocus color="dark"
+              :rules="[(val) => (val && val.length > 0) || $t('common.nameRequired')]" style="margin-bottom: 10px;" />
             <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
-              label="তৈরি করুন" :loading="saving" />
+              :label="$t('marketLists.create')" :loading="saving" />
           </q-form>
         </q-card-section>
       </q-card>
@@ -115,25 +115,25 @@
       <q-card
         style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; padding: 0 16px 24px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">আইটেম যোগ করুন</div>
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.addItem') }}</div>
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="addItem">
-            <q-input v-model="newItem.name" label="আইটেমের নাম" outlined dense autofocus color="dark"
-              :rules="[(val) => (val && val.length > 0) || 'নাম আবশ্যক']" style="margin-bottom: 10px;" />
+            <q-input v-model="newItem.name" :label="$t('marketLists.itemName')" outlined dense autofocus color="dark"
+              :rules="[(val) => (val && val.length > 0) || $t('common.nameRequired')]" style="margin-bottom: 10px;" />
             <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
               <div class="col-6">
-                <q-input v-model="newItem.quantity" label="পরিমাণ" outlined dense color="dark"
-                  hint="যেমন: ২ কেজি, ১ প্যাকেট" />
+                <q-input v-model="newItem.quantity" :label="$t('common.amount')" outlined dense color="dark"
+                  :hint="$t('marketLists.quantityHint')" />
               </div>
               <div class="col-6">
-                <q-input v-model.number="newItem.price" label="আনুমানিক দাম" type="number" outlined dense color="dark"
+                <q-input v-model.number="newItem.price" :label="$t('marketLists.estimatedPrice')" type="number" outlined dense color="dark"
                   :prefix="settings.currency" />
               </div>
             </div>
             <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
-              label="আইটেম যোগ করুন" :loading="saving" />
+              :label="$t('marketLists.addItemBtn')" :loading="saving" />
           </q-form>
         </q-card-section>
       </q-card>
@@ -144,11 +144,13 @@
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useQuasar } from 'quasar'
+import { useI18n } from 'vue-i18n'
 import { useMarketListStore } from 'stores/marketListStore'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useAccountStore } from 'stores/accountStore'
 import { useSettingsStore } from 'stores/settingsStore'
 
+const { t } = useI18n()
 const $q = useQuasar()
 const marketLists = useMarketListStore()
 const transactions = useTransactionStore()
@@ -173,22 +175,22 @@ async function createList() {
     await marketLists.addList({ name: newListName.value })
     newListName.value = ''
     showNewList.value = false
-    $q.notify({ type: 'positive', message: 'তালিকা তৈরি হয়েছে', position: 'top' })
+    $q.notify({ type: 'positive', message: t('marketLists.listCreated'), position: 'top' })
   } catch (err) {
-    $q.notify({ type: 'negative', message: 'ত্রুটি: ' + err.message, position: 'top' })
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
   }
   saving.value = false
 }
 
 function confirmDeleteList(list) {
   $q.dialog({
-    title: 'তালিকা মুছুন',
-    message: `"${list.name}" তালিকাটি মুছে ফেলতে চান?`,
-    ok: { label: 'মুছুন', color: 'negative', flat: true },
-    cancel: { label: 'বাতিল', flat: true },
+    title: t('marketLists.deleteList'),
+    message: `"${list.name}" ${t('marketLists.deleteConfirm')}`,
+    ok: { label: t('common.delete'), color: 'negative', flat: true },
+    cancel: { label: t('common.cancel'), flat: true },
   }).onOk(async () => {
     await marketLists.deleteList(list.id)
-    $q.notify({ type: 'positive', message: 'তালিকা মুছে ফেলা হয়েছে', position: 'top' })
+    $q.notify({ type: 'positive', message: t('marketLists.listDeleted'), position: 'top' })
   })
 }
 
@@ -210,7 +212,7 @@ async function addItem() {
     newItem.price = 0
     showAddItem.value = false
   } catch (err) {
-    $q.notify({ type: 'negative', message: 'ত্রুটি: ' + err.message, position: 'top' })
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
   }
   saving.value = false
 }
@@ -225,10 +227,10 @@ function convertToExpense(list) {
     accountId: accounts.accounts[0]?.id,
     date: new Date().toISOString().slice(0, 10),
     time: new Date().toTimeString().slice(0, 5),
-    notes: `বাজার তালিকা: ${list.name}`,
+    notes: `${t('marketLists.marketListNotePrefix')}${list.name}`,
   })
   accounts.updateBalance(accounts.accounts[0]?.id, -total)
-  $q.notify({ type: 'positive', message: `"${list.name}" থেকে ${settings.currency}${total.toLocaleString()} খরচ তৈরি হয়েছে`, position: 'top' })
+  $q.notify({ type: 'positive', message: `"${list.name}" ${t('marketLists.expenseCreated', { amount: settings.currency + total.toLocaleString() })}`, position: 'top' })
 }
 
 onMounted(() => {

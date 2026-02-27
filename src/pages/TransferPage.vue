@@ -1,133 +1,109 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="row items-center q-mb-md">
-      <q-btn flat round icon="arrow_back" @click="$router.back()" />
-      <div class="text-h6 text-weight-bold q-ml-sm">ট্রান্সফার</div>
+    <div class="q-mb-md">
+      <div class="text-h5 text-weight-bold">{{ $t('transferPage.title') }}</div>
     </div>
 
-    <q-card class="finance-card">
-      <q-card-section>
-        <q-form @submit.prevent="saveTransfer">
-          <!-- From and To Accounts -->
-          <div class="row q-col-gutter-sm items-center position-relative" style="margin-bottom: 15px;">
-            <div class="col-5">
-              <q-select v-model="form.fromAccountId" :options="accountOptions" label="যে অ্যাকাউন্ট থেকে" outlined
-                color="dark" emit-value map-options />
-            </div>
+    <q-form @submit.prevent="onSubmit" class="q-gutter-md">
+      <!-- From Account -->
+      <q-select v-model="form.fromAccount" :options="accountOptions" :label="$t('transferPage.fromAccount')" outlined
+        dense emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
 
-            <div class="col-2 text-center q-px-none">
-              <q-icon name="arrow_forward" color="dark" size="28px" class="bg-grey-2 q-pa-xs rounded-borders" />
-            </div>
+      <!-- To Account -->
+      <q-select v-model="form.toAccount" :options="accountOptions" :label="$t('transferPage.toAccount')" outlined dense
+        emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
 
-            <div class="col-5">
-              <q-select v-model="form.toAccountId" :options="accountOptions" label="যে অ্যাকাউন্টে" outlined
-                color="dark" emit-value map-options />
-            </div>
-          </div>
+      <!-- Transfer Amount -->
+      <q-input v-model.number="form.amount" type="number" :label="$t('transferPage.transferAmount')" outlined dense
+        :prefix="settings.currency" :rules="[val => val > 0 || $t('common.validAmount')]" />
 
-          <!-- Amount -->
-          <q-input v-model.number="form.amount" label="ট্রান্সফারের পরিমাণ" type="number" outlined color="dark"
-            :prefix="settings.currency" :rules="[val => val > 0 || 'সঠিক পরিমাণ লিখুন']"
-            input-class="text-h5 text-weight-bold" style="margin-bottom: 10px;" />
+      <!-- Transfer Fee -->
+      <q-input v-model.number="form.fee" type="number" :label="$t('transferPage.transferFee')" outlined dense
+        :prefix="settings.currency" />
 
-          <!-- Fee and Date -->
-          <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
-            <div class="col-6">
-              <q-input v-model.number="form.fee" label="ট্রান্সফার ফি" type="number" outlined color="dark"
-                :prefix="settings.currency" />
-            </div>
-            <div class="col-6">
-              <q-input v-model="form.date" label="তারিখ" outlined color="dark" readonly>
-                <template v-slot:append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-date v-model="form.date" mask="YYYY-MM-DD" color="dark" />
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
-          </div>
+      <!-- Date -->
+      <q-input v-model="form.date" :label="$t('common.date')" outlined dense type="date"
+        :rules="[val => !!val || $t('common.dateRequired')]" />
 
-          <!-- Notes -->
-          <q-input v-model="form.notes" label="নোট (ঐচ্ছিক)" outlined color="dark" type="textarea" rows="2"
-            style="margin-bottom: 15px;" />
+      <!-- Note -->
+      <q-input v-model="form.note" :label="$t('common.noteOptional')" outlined dense autogrow />
 
-          <!-- Submit -->
-          <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated size="lg"
-            icon="sync_alt" label="ট্রান্সফার করুন" :loading="saving" />
-        </q-form>
-      </q-card-section>
-    </q-card>
+      <!-- Submit -->
+      <q-btn type="submit" :label="$t('transferPage.transferBtn')" color="dark" class="full-width" unelevated
+        rounded no-caps :loading="loading" />
+    </q-form>
   </q-page>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { useQuasar } from 'quasar'
-import { useTransactionStore } from 'stores/transactionStore'
 import { useAccountStore } from 'stores/accountStore'
+import { useTransactionStore } from 'stores/transactionStore'
 import { useSettingsStore } from 'stores/settingsStore'
+import { Notify } from 'quasar'
 
+const { t } = useI18n()
 const router = useRouter()
-const $q = useQuasar()
-const transactions = useTransactionStore()
 const accounts = useAccountStore()
+const transactions = useTransactionStore()
 const settings = useSettingsStore()
-const saving = ref(false)
+const loading = ref(false)
 
-const now = new Date()
-const form = reactive({
-  fromAccountId: null,
-  toAccountId: null,
+const form = ref({
+  fromAccount: null,
+  toAccount: null,
   amount: null,
   fee: 0,
-  date: now.toISOString().slice(0, 10),
-  time: now.toTimeString().slice(0, 5),
-  notes: '',
+  date: new Date().toISOString().slice(0, 10),
+  note: '',
 })
 
-const accountOptions = computed(() => {
-  if (!accounts.accounts) return []
-  return accounts.accounts.map((a) => ({
-    label: `${a.name} (${settings.currency}${Number(a.balance || 0).toLocaleString()})`,
-    value: a.id
-  }))
-})
+const accountOptions = computed(() =>
+  accounts.accounts.map((a) => ({
+    label: a.name,
+    value: a.name,
+  })),
+)
 
-async function saveTransfer() {
-  if (!form.amount || form.amount <= 0) return
-  if (!form.fromAccountId || !form.toAccountId) {
-    $q.notify({ type: 'warning', message: 'উভয় অ্যাকাউন্ট নির্বাচন করুন', position: 'top' })
+async function onSubmit() {
+  if (!form.value.fromAccount || !form.value.toAccount) {
+    Notify.create({ message: t('transferPage.selectBothAccounts'), color: 'negative' })
     return
   }
-  if (form.fromAccountId === form.toAccountId) {
-    $q.notify({ type: 'warning', message: 'ভিন্ন অ্যাকাউন্ট নির্বাচন করুন', position: 'top' })
+  if (form.value.fromAccount === form.value.toAccount) {
+    Notify.create({ message: t('transferPage.selectDifferentAccounts'), color: 'negative' })
     return
   }
 
-  saving.value = true
+  loading.value = true
   try {
-    const feeAmount = form.fee ? Number(form.fee) : 0
-    await transactions.addTransaction({ ...form, fee: feeAmount, type: 'transfer' })
-    await accounts.updateBalance(form.fromAccountId, -(form.amount + feeAmount))
-    await accounts.updateBalance(form.toAccountId, form.amount)
-    $q.notify({ type: 'positive', message: 'ট্রান্সফার সফল হয়েছে', position: 'top' })
-    router.back()
-  } catch (err) {
-    $q.notify({ type: 'negative', message: 'ত্রুটি: ' + err.message, position: 'top' })
+    await transactions.addTransaction({
+      type: 'transfer',
+      amount: form.value.amount,
+      fee: form.value.fee || 0,
+      fromAccount: form.value.fromAccount,
+      toAccount: form.value.toAccount,
+      account: form.value.fromAccount,
+      date: form.value.date,
+      note: form.value.note,
+      category: t('common.transfer'),
+    })
+    Notify.create({ message: t('transferPage.transferSuccess'), color: 'positive' })
+    router.push('/')
+  } catch (e) {
+    Notify.create({ message: t('common.error') + e.message, color: 'negative' })
+  } finally {
+    loading.value = false
   }
-  saving.value = false
 }
 
 onMounted(() => {
-  transactions.listenTransactions()
   accounts.listenAccounts()
 })
 
 onUnmounted(() => {
-  transactions.stopListening()
   accounts.stopListening()
 })
 </script>

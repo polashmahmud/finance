@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="row items-center justify-between q-mb-md">
       <div>
-        <div class="text-h5 text-weight-bold">অ্যাকাউন্টস</div>
-        <div class="text-caption text-grey">{{ accountStore.accounts.length }}টি অ্যাকাউন্ট</div>
+        <div class="text-h5 text-weight-bold">{{ $t('accounts.title') }}</div>
+        <div class="text-caption text-grey">{{ accountStore.accounts.length }}{{ $t('accounts.countSuffix') }}</div>
       </div>
       <q-btn round flat icon="add_circle" color="dark" size="lg" @click="openAddDialog" />
     </div>
@@ -13,7 +13,7 @@
     <q-card class="finance-card q-mb-lg">
       <q-card-section class="bg-primary-gradient" style="border-radius: 16px">
         <div class="text-center">
-          <div class="text-body2" style="opacity: 0.9">মোট সম্পদ</div>
+          <div class="text-body2" style="opacity: 0.9">{{ $t('accounts.totalAssets') }}</div>
           <div class="stat-value text-white">{{ settings.currency }}{{ formatNumber(accountStore.totalBalance) }}</div>
         </div>
       </q-card-section>
@@ -52,7 +52,7 @@
                 </span>
                 <span class="text-grey-6 text-caption">- {{ getLastTx(account.id).date }}</span>
               </div>
-              <div v-else class="text-grey-6 text-caption q-mt-xs" style="font-size: 0.7rem">কোনো লেনদেন নেই</div>
+              <div v-else class="text-grey-6 text-caption q-mt-xs" style="font-size: 0.7rem">{{ $t('accounts.noTransactions') }}</div>
             </q-item-section>
             <q-item-section side>
               <q-item-label class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{
@@ -70,8 +70,8 @@
       <!-- Empty State -->
       <div v-if="!accountStore.accounts.length" class="text-center text-grey q-mt-xl">
         <q-icon name="account_balance_wallet" size="60px" class="q-mb-md" />
-        <div class="text-h6">কোনো অ্যাকাউন্ট নেই</div>
-        <div class="text-body2">+ চাপুন নতুন অ্যাকাউন্ট তৈরি করতে</div>
+        <div class="text-h6">{{ $t('accounts.noAccounts') }}</div>
+        <div class="text-body2">{{ $t('accounts.addPrompt') }}</div>
       </div>
     </template>
 
@@ -81,27 +81,23 @@
         style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
-            {{ isEditing ? 'অ্যাকাউন্ট সম্পাদনা' : 'নতুন অ্যাকাউন্ট' }}
+            {{ isEditing ? $t('accounts.editAccount') : $t('accounts.newAccount') }}
           </div>
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="saveAccount">
-            <q-input v-model="form.name" label="অ্যাকাউন্টের নাম" outlined dense autofocus color="dark"
-              :rules="[(val) => (val && val.length > 0) || 'নাম আবশ্যক']" style="margin-bottom: 10px;" />
+            <q-input v-model="form.name" :label="$t('accounts.accountName')" outlined dense autofocus color="dark"
+              :rules="[(val) => (val && val.length > 0) || $t('common.nameRequired')]" style="margin-bottom: 10px;" />
 
-            <q-select v-model="form.type" :options="[
-              { label: 'নগদ', value: 'Cash' },
-              { label: 'ব্যাংক', value: 'Bank' },
-              { label: 'মোবাইল ব্যাংকিং', value: 'Mobile Banking' },
-            ]" label="অ্যাকাউন্টের ধরন" outlined dense emit-value map-options color="dark"
+            <q-select v-model="form.type" :options="accountTypeOptions" :label="$t('accounts.accountType')" outlined dense emit-value map-options color="dark"
               style="margin-bottom: 10px;" />
 
-            <q-input v-model.number="form.balance" label="ব্যালেন্স" type="number" outlined dense color="dark"
+            <q-input v-model.number="form.balance" :label="$t('common.balance')" type="number" outlined dense color="dark"
               :prefix="settings.currency" style="margin-bottom: 10px;" />
 
             <!-- Icon Dropdown with visual previews -->
-            <q-select v-model="form.icon" :options="iconOptions" label="আইকন" outlined dense emit-value map-options
+            <q-select v-model="form.icon" :options="iconOptions" :label="$t('common.icon')" outlined dense emit-value map-options
               color="dark" style="margin-bottom: 10px;">
               <template v-slot:option="scope">
                 <q-item v-bind="scope.itemProps">
@@ -123,7 +119,7 @@
 
             <!-- Color Palette -->
             <div style="margin-bottom: 14px;">
-              <div class="text-caption text-grey-7 q-mb-sm">রং নির্বাচন করুন</div>
+              <div class="text-caption text-grey-7 q-mb-sm">{{ $t('common.selectColor') }}</div>
               <div class="row q-gutter-sm">
                 <div v-for="color in colorPalette" :key="color" class="cursor-pointer" :style="{
                   width: '32px',
@@ -137,7 +133,7 @@
             </div>
 
             <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
-              :label="isEditing ? 'আপডেট করুন' : 'অ্যাকাউন্ট যোগ করুন'" :loading="saving" />
+              :label="isEditing ? $t('common.update') : $t('accounts.addAccount')" :loading="saving" />
           </q-form>
         </q-card-section>
       </q-card>
@@ -146,12 +142,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useQuasar } from 'quasar'
+import { useI18n } from 'vue-i18n'
 import { useAccountStore } from 'stores/accountStore'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useSettingsStore } from 'stores/settingsStore'
 
+const { t } = useI18n()
 const $q = useQuasar()
 const accountStore = useAccountStore()
 const transactionStore = useTransactionStore()
@@ -170,16 +168,22 @@ const form = reactive({
   color: '#111111',
 })
 
-const iconOptions = [
-  { label: 'ওয়ালেট', value: 'account_balance_wallet' },
-  { label: 'ব্যাংক', value: 'account_balance' },
-  { label: 'মোবাইল', value: 'phone_android' },
-  { label: 'ক্রেডিট কার্ড', value: 'credit_card' },
-  { label: 'সঞ্চয়', value: 'savings' },
-  { label: 'টাকা', value: 'attach_money' },
-  { label: 'বিনিয়োগ', value: 'trending_up' },
-  { label: 'স্টোর', value: 'store' },
-]
+const iconOptions = computed(() => [
+  { label: t('accounts.iconWallet'), value: 'account_balance_wallet' },
+  { label: t('accounts.iconBank'), value: 'account_balance' },
+  { label: t('accounts.iconMobile'), value: 'phone_android' },
+  { label: t('accounts.iconCreditCard'), value: 'credit_card' },
+  { label: t('accounts.iconSavings'), value: 'savings' },
+  { label: t('accounts.iconMoney'), value: 'attach_money' },
+  { label: t('accounts.iconInvestment'), value: 'trending_up' },
+  { label: t('accounts.iconStore'), value: 'store' },
+])
+
+const accountTypeOptions = computed(() => [
+  { label: t('accounts.cashType'), value: 'Cash' },
+  { label: t('accounts.bankType'), value: 'Bank' },
+  { label: t('accounts.mobileBankingType'), value: 'Mobile Banking' },
+])
 
 const colorPalette = [
   '#111111', '#444444', '#777777',
@@ -188,14 +192,14 @@ const colorPalette = [
   '#8b5cf6', '#ec4899', '#6b7280',
 ]
 
-const typeLabels = {
-  Cash: 'নগদ অ্যাকাউন্ট',
-  Bank: 'ব্যাংক অ্যাকাউন্ট',
-  'Mobile Banking': 'মোবাইল অ্যাকাউন্ট',
-}
+const typeLabels = computed(() => ({
+  Cash: t('accounts.cashAccount'),
+  Bank: t('accounts.bankAccount'),
+  'Mobile Banking': t('accounts.mobileAccount'),
+}))
 
 function getTypeLabel(type) {
-  return typeLabels[type] || type
+  return typeLabels.value[type] || type
 }
 
 function formatNumber(n) {
@@ -204,15 +208,10 @@ function formatNumber(n) {
 
 function getLastTx(accountId) {
   if (!transactionStore.transactions || !transactionStore.transactions.length) return null
-
-  // Find the most recent transaction where this account was involved
   const accountTxs = transactionStore.transactions.filter(t =>
     t.accountId === accountId || t.fromAccountId === accountId || t.toAccountId === accountId
   )
-
   if (!accountTxs.length) return null
-
-  // They are already sorted by createdAt descending in the store
   return accountTxs[0]
 }
 
@@ -244,27 +243,27 @@ async function saveAccount() {
   try {
     if (isEditing.value) {
       await accountStore.updateAccount(editingId.value, { ...form })
-      $q.notify({ type: 'positive', message: 'অ্যাকাউন্ট আপডেট হয়েছে', position: 'top' })
+      $q.notify({ type: 'positive', message: t('accounts.accountUpdated'), position: 'top' })
     } else {
       await accountStore.addAccount({ ...form })
-      $q.notify({ type: 'positive', message: 'অ্যাকাউন্ট যোগ হয়েছে', position: 'top' })
+      $q.notify({ type: 'positive', message: t('accounts.accountAdded'), position: 'top' })
     }
     showDialog.value = false
   } catch (err) {
-    $q.notify({ type: 'negative', message: 'ত্রুটি: ' + err.message, position: 'top' })
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
   }
   saving.value = false
 }
 
 function confirmDelete(account) {
   $q.dialog({
-    title: 'অ্যাকাউন্ট মুছুন',
-    message: `"${account.name}" অ্যাকাউন্টটি মুছে ফেলতে চান?`,
-    ok: { label: 'মুছুন', color: 'negative', flat: true },
-    cancel: { label: 'বাতিল', flat: true },
+    title: t('accounts.deleteAccount'),
+    message: `"${account.name}" ${t('accounts.deleteConfirm')}`,
+    ok: { label: t('common.delete'), color: 'negative', flat: true },
+    cancel: { label: t('common.cancel'), flat: true },
   }).onOk(async () => {
     await accountStore.deleteAccount(account.id)
-    $q.notify({ type: 'positive', message: 'অ্যাকাউন্ট মুছে ফেলা হয়েছে', position: 'top' })
+    $q.notify({ type: 'positive', message: t('accounts.accountDeleted'), position: 'top' })
   })
 }
 

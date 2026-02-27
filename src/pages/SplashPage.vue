@@ -1,100 +1,67 @@
 <template>
-  <q-page class="flex flex-center column" style="padding-bottom: 0; background: linear-gradient(135deg, #43A047 0%, #26A69A 100%)">
-    <div class="text-center text-white q-pa-xl">
+  <q-page class="flex flex-center">
+    <div class="column items-center q-gutter-md text-center q-pa-lg" style="max-width: 320px">
       <!-- Logo -->
-      <q-icon name="account_balance_wallet" size="80px" class="q-mb-lg" />
+      <q-avatar size="80px" color="dark" text-color="white" icon="account_balance_wallet" />
 
-      <h4 class="q-mt-md q-mb-xs text-weight-bold">ব্যক্তিগত ফাইন্যান্স</h4>
-      <p class="text-subtitle1 q-mb-xl" style="opacity: 0.85">আপনার অর্থ স্মার্টভাবে পরিচালনা করুন</p>
-
-      <!-- PIN Input -->
-      <div v-if="settings.appLock && !authenticated" class="q-mt-xl">
-        <p class="text-body2 q-mb-md">চালিয়ে যেতে পিন দিন</p>
-        <div class="row justify-center q-gutter-sm q-mb-lg">
-          <q-input
-            v-for="i in 4"
-            :key="i"
-            v-model="pinDigits[i - 1]"
-            type="password"
-            maxlength="1"
-            dense
-            outlined
-            dark
-            input-class="text-center text-h5"
-            style="width: 56px"
-            @update:model-value="onPinInput(i - 1)"
-            :ref="(el) => (pinRefs[i - 1] = el)"
-          />
-        </div>
-        <q-btn
-          flat
-          label="আনলক"
-          text-color="white"
-          class="q-px-xl"
-          @click="verifyPin"
-        />
+      <div>
+        <div class="text-h5 text-weight-bold">{{ $t('splash.title') }}</div>
+        <div class="text-caption text-grey">{{ $t('splash.subtitle') }}</div>
       </div>
 
-      <!-- Regular entry -->
-      <div v-else class="q-mt-xl">
-        <q-btn
-          unelevated
-          rounded
-          color="white"
-          text-color="primary"
-          label="শুরু করুন"
-          class="q-px-xl q-py-sm text-weight-bold"
-          size="lg"
-          @click="enter"
-        />
-
-        <div class="q-mt-lg">
-          <q-toggle
-            v-model="isDark"
-            color="accent"
-            label="ডার্ক মোড"
-            dark
-            @update:model-value="settings.setDarkMode($event)"
-          />
-        </div>
+      <!-- Dark mode -->
+      <div class="row items-center q-gutter-sm">
+        <q-icon name="dark_mode" size="20px" />
+        <span class="text-body2">{{ $t('common.darkMode') }}</span>
+        <q-toggle v-model="isDark" color="dark" />
       </div>
+
+      <!-- PIN Lock -->
+      <template v-if="settings.pin">
+        <q-input v-model="pinInput" :label="$t('splash.enterPin')" outlined dense rounded type="password" mask="####"
+          class="full-width" @keyup.enter="unlockApp" />
+        <q-btn :label="$t('splash.unlock')" color="dark" unelevated rounded class="full-width" no-caps
+          @click="unlockApp" :disable="pinInput.length !== 4" />
+      </template>
+
+      <!-- No PIN -->
+      <q-btn v-else :label="$t('splash.start')" color="dark" unelevated rounded class="full-width" no-caps
+        @click="goHome" />
     </div>
   </q-page>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useSettingsStore } from 'stores/settingsStore'
+import { useQuasar, Notify } from 'quasar'
 
+useI18n()
 const router = useRouter()
 const settings = useSettingsStore()
+const $q = useQuasar()
 
-const isDark = ref(settings.darkMode)
-const authenticated = ref(!settings.appLock)
-const pinDigits = ref(['', '', '', ''])
-const pinRefs = ref([])
+const isDark = ref($q.dark.isActive)
+const pinInput = ref('')
 
-function onPinInput(index) {
-  if (pinDigits.value[index] && index < 3) {
-    pinRefs.value[index + 1]?.focus()
-  }
-}
+// Watch dark mode toggle
+import { watch } from 'vue'
+watch(isDark, (val) => {
+  $q.dark.set(val)
+})
 
-function verifyPin() {
-  const entered = pinDigits.value.join('')
-  if (entered === settings.pin) {
-    settings.authenticate()
-    authenticated.value = true
-    enter()
+function unlockApp() {
+  if (pinInput.value === settings.pin) {
+    router.push('/')
   } else {
-    pinDigits.value = ['', '', '', '']
-    pinRefs.value[0]?.focus()
+    Notify.create({ message: 'Incorrect PIN', color: 'negative' })
+    pinInput.value = ''
   }
 }
 
-function enter() {
-  settings.authenticate()
+function goHome() {
   router.push('/')
 }
 </script>

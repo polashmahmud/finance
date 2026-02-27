@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <div class="q-mb-md">
-      <div class="text-h5 text-weight-bold">সেটিংস</div>
+      <div class="text-h5 text-weight-bold">{{ $t('settings.title') }}</div>
     </div>
 
     <!-- Profile Section -->
@@ -14,15 +14,15 @@
             </q-avatar>
           </q-item-section>
           <q-item-section>
-            <q-item-label class="text-weight-medium">ব্যবহারকারী</q-item-label>
-            <q-item-label caption>আপনার প্রোফাইল পরিচালনা করুন</q-item-label>
+            <q-item-label class="text-weight-medium">{{ $t('settings.user') }}</q-item-label>
+            <q-item-label caption>{{ $t('settings.manageProfile') }}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
     </q-card>
 
     <!-- Preferences Section -->
-    <div class="section-title">পছন্দসমূহ</div>
+    <div class="section-title">{{ $t('settings.preferences') }}</div>
     <q-card class="finance-card q-mb-md">
       <q-list separator>
         <!-- Currency -->
@@ -31,7 +31,7 @@
             <q-icon name="payments" color="dark" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>মুদ্রা</q-item-label>
+            <q-item-label>{{ $t('settings.currency') }}</q-item-label>
             <q-item-label caption>{{ settings.currencyCode }} ({{ settings.currency }})</q-item-label>
           </q-item-section>
           <q-item-section side>
@@ -54,7 +54,7 @@
             <q-icon name="language" color="dark" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>ভাষা</q-item-label>
+            <q-item-label>{{ $t('settings.language') }}</q-item-label>
             <q-item-label caption>{{ settings.language === 'en' ? 'English' : 'বাংলা' }}</q-item-label>
           </q-item-section>
           <q-item-section side>
@@ -68,7 +68,7 @@
               borderless
               emit-value
               map-options
-              @update:model-value="settings.setLanguage($event)"
+              @update:model-value="onLanguageChange"
               style="min-width: 100px"
             />
           </q-item-section>
@@ -80,7 +80,7 @@
             <q-icon name="dark_mode" color="dark" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>ডার্ক মোড</q-item-label>
+            <q-item-label>{{ $t('common.darkMode') }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-toggle
@@ -94,7 +94,7 @@
     </q-card>
 
     <!-- Security Section -->
-    <div class="section-title">নিরাপত্তা</div>
+    <div class="section-title">{{ $t('settings.security') }}</div>
     <q-card class="finance-card q-mb-md">
       <q-list>
         <q-item class="touch-target">
@@ -102,14 +102,14 @@
             <q-icon name="lock" color="dark" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>অ্যাপ লক (পিন)</q-item-label>
-            <q-item-label caption>{{ settings.appLock ? 'সক্রিয়' : 'নিষ্ক্রিয়' }}</q-item-label>
+            <q-item-label>{{ $t('settings.appLockPin') }}</q-item-label>
+            <q-item-label caption>{{ settings.appLock ? $t('settings.active') : $t('settings.inactive') }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-btn
               flat
               dense
-              :label="settings.appLock ? 'পরিবর্তন' : 'পিন সেট করুন'"
+              :label="settings.appLock ? $t('settings.change') : $t('settings.setPin')"
               color="dark"
               @click="showPinDialog = true"
             />
@@ -119,7 +119,7 @@
     </q-card>
 
     <!-- Data Section -->
-    <div class="section-title">ডেটা</div>
+    <div class="section-title">{{ $t('settings.data') }}</div>
     <q-card class="finance-card q-mb-md">
       <q-list separator>
         <q-item clickable class="touch-target">
@@ -127,8 +127,8 @@
             <q-icon name="backup" color="dark" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>ব্যাকআপ</q-item-label>
-            <q-item-label caption>লোকাল ব্যাকআপ</q-item-label>
+            <q-item-label>{{ $t('settings.backup') }}</q-item-label>
+            <q-item-label caption>{{ $t('settings.localBackup') }}</q-item-label>
           </q-item-section>
         </q-item>
 
@@ -137,7 +137,7 @@
             <q-icon name="file_download" color="dark" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>ডেটা এক্সপোর্ট</q-item-label>
+            <q-item-label>{{ $t('settings.dataExport') }}</q-item-label>
             <q-item-label caption>CSV / PDF</q-item-label>
           </q-item-section>
         </q-item>
@@ -152,8 +152,8 @@
             <q-icon name="category" color="dark" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>ক্যাটাগরি ও বাজেট</q-item-label>
-            <q-item-label caption>ক্যাটাগরি ও বাজেট পরিচালনা</q-item-label>
+            <q-item-label>{{ $t('settings.categoryAndBudget') }}</q-item-label>
+            <q-item-label caption>{{ $t('settings.categoryAndBudgetManage') }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-icon name="chevron_right" />
@@ -165,8 +165,8 @@
             <q-icon name="info" color="grey" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>ব্যক্তিগত ফাইন্যান্স ম্যানেজার</q-item-label>
-            <q-item-label caption>সংস্করণ ১.০.০</q-item-label>
+            <q-item-label>{{ $t('settings.appName') }}</q-item-label>
+            <q-item-label caption>{{ $t('settings.version') }}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -180,7 +180,7 @@
             <q-icon name="logout" color="negative" />
           </q-item-section>
           <q-item-section>
-            <q-item-label class="text-weight-medium text-negative">লগআউট</q-item-label>
+            <q-item-label class="text-weight-medium text-negative">{{ $t('common.logout') }}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -190,12 +190,12 @@
     <q-dialog v-model="showPinDialog">
       <q-card style="min-width: 300px; border-radius: 16px">
         <q-card-section>
-          <div class="text-h6 text-weight-bold">পিন সেট করুন</div>
+          <div class="text-h6 text-weight-bold">{{ $t('settings.setPin') }}</div>
         </q-card-section>
         <q-card-section>
           <q-input
             v-model="newPin"
-            label="৪ সংখ্যার পিন দিন"
+            :label="$t('settings.enterPin')"
             type="password"
             maxlength="4"
             outlined
@@ -203,11 +203,11 @@
           />
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="বাতিল" v-close-popup />
+          <q-btn flat :label="$t('common.cancel')" v-close-popup />
           <q-btn
             unelevated
             color="dark"
-            label="সংরক্ষণ করুন"
+            :label="$t('common.save')"
             @click="savePin"
           />
         </q-card-actions>
@@ -219,10 +219,12 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useSettingsStore } from 'stores/settingsStore'
 import { useAuthStore } from 'stores/authStore'
 import { Notify } from 'quasar'
 
+const { t } = useI18n()
 const router = useRouter()
 const settings = useSettingsStore()
 const authStore = useAuthStore()
@@ -246,21 +248,25 @@ function onCurrencyChange(code) {
   settings.setCurrency(currencySymbols[code] || code, code)
 }
 
+function onLanguageChange(lang) {
+  settings.setLanguage(lang)
+}
+
 function savePin() {
   if (newPin.value.length !== 4) {
-    Notify.create({ type: 'warning', message: 'পিন অবশ্যই ৪ সংখ্যার হতে হবে' })
+    Notify.create({ type: 'warning', message: t('settings.pinMustBe4') })
     return
   }
   settings.setPin(newPin.value)
   newPin.value = ''
   showPinDialog.value = false
-  Notify.create({ type: 'positive', message: 'পিন সফলভাবে সেট হয়েছে' })
+  Notify.create({ type: 'positive', message: t('settings.pinSetSuccess') })
 }
 
 async function onLogout() {
   const result = await authStore.logout()
   if (result.success) {
-    Notify.create({ type: 'positive', icon: 'check_circle', message: 'লগআউট সফল হয়েছে', position: 'top' })
+    Notify.create({ type: 'positive', icon: 'check_circle', message: t('common.logoutSuccess'), position: 'top' })
     router.push('/login')
   }
 }

@@ -4,7 +4,7 @@
     <div class="row items-center justify-between q-mb-md">
       <div class="row items-center">
         <q-btn flat round icon="arrow_back" @click="$router.back()" />
-        <div class="text-h6 text-weight-bold q-ml-sm">ক্যাটাগরি ও বাজেট</div>
+        <div class="text-h6 text-weight-bold q-ml-sm">{{ $t('categories.title') }}</div>
       </div>
       <q-btn round flat icon="add" color="dark" @click="openAddDialog" />
     </div>
@@ -12,8 +12,8 @@
     <!-- Tabs -->
     <q-card class="finance-card q-mb-md">
       <q-tabs v-model="tab" dense active-color="dark" indicator-color="dark" class="text-grey-6" align="justify">
-        <q-tab name="expense" label="ব্যয়" />
-        <q-tab name="income" label="আয়" />
+        <q-tab name="expense" :label="$t('common.expense')" />
+        <q-tab name="income" :label="$t('common.income')" />
       </q-tabs>
     </q-card>
 
@@ -29,7 +29,7 @@
         <q-tab-panel name="expense" class="q-pa-none">
           <div v-if="categoryStore.expenseCategories.length === 0" class="text-center text-grey q-pa-xl">
             <q-icon name="category" size="48px" class="q-mb-sm" />
-            <div>কোনো ব্যয় ক্যাটাগরি নেই</div>
+            <div>{{ $t('categories.noExpenseCategories') }}</div>
           </div>
           <div class="q-gutter-sm">
             <q-card v-for="cat in categoryStore.expenseCategories" :key="cat.id" class="finance-card">
@@ -42,7 +42,7 @@
                 <q-item-section>
                   <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
                   <q-item-label caption v-if="cat.budget">
-                    বাজেট: {{ settings.currency }}{{ Number(cat.budget).toLocaleString() }}/মাস
+                    {{ $t('categories.budgetPrefix') }} {{ settings.currency }}{{ Number(cat.budget).toLocaleString() }}{{ $t('categories.perMonth') }}
                   </q-item-label>
                 </q-item-section>
                 <q-item-section side>
@@ -61,7 +61,7 @@
         <q-tab-panel name="income" class="q-pa-none">
           <div v-if="categoryStore.incomeCategories.length === 0" class="text-center text-grey q-pa-xl">
             <q-icon name="category" size="48px" class="q-mb-sm" />
-            <div>কোনো আয় ক্যাটাগরি নেই</div>
+            <div>{{ $t('categories.noIncomeCategories') }}</div>
           </div>
           <div class="q-gutter-sm">
             <q-card v-for="cat in categoryStore.incomeCategories" :key="cat.id" class="finance-card">
@@ -74,7 +74,7 @@
                 <q-item-section>
                   <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
                   <q-item-label caption v-if="cat.budget">
-                    বাজেট: {{ settings.currency }}{{ Number(cat.budget).toLocaleString() }}/মাস
+                    {{ $t('categories.budgetPrefix') }} {{ settings.currency }}{{ Number(cat.budget).toLocaleString() }}{{ $t('categories.perMonth') }}
                   </q-item-label>
                 </q-item-section>
                 <q-item-section side>
@@ -98,7 +98,7 @@
         <!-- Dialog Header -->
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
-            {{ isEditing ? 'ক্যাটাগরি সম্পাদনা' : 'নতুন ক্যাটাগরি' }}
+            {{ isEditing ? $t('categories.editCategory') : $t('categories.newCategory') }}
           </div>
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
@@ -107,16 +107,16 @@
           <q-form @submit.prevent="saveCategory" class="q-gutter-md">
             <!-- Type -->
             <q-select v-model="form.type" :options="[
-              { label: 'ব্যয়', value: 'expense' },
-              { label: 'আয়', value: 'income' },
-            ]" label="ক্যাটাগরি ধরন" outlined dense emit-value map-options color="dark" />
+              { label: $t('common.expense'), value: 'expense' },
+              { label: $t('common.income'), value: 'income' },
+            ]" :label="$t('categories.categoryType')" outlined dense emit-value map-options color="dark" />
 
             <!-- Name -->
-            <q-input v-model="form.name" label="ক্যাটাগরি নাম" outlined dense color="dark"
-              :rules="[(val) => (val && val.length > 0) || 'নাম আবশ্যক']" />
+            <q-input v-model="form.name" :label="$t('categories.categoryName')" outlined dense color="dark"
+              :rules="[(val) => (val && val.length > 0) || $t('common.nameRequired')]" />
 
             <!-- Icon Dropdown -->
-            <q-select v-model="form.icon" :options="iconOptions" label="আইকন" outlined dense emit-value map-options
+            <q-select v-model="form.icon" :options="iconOptions" :label="$t('common.icon')" outlined dense emit-value map-options
               color="dark">
               <template v-slot:option="scope">
                 <q-item v-bind="scope.itemProps">
@@ -138,7 +138,7 @@
 
             <!-- Color Palette -->
             <div>
-              <div class="text-caption text-grey-7 q-mb-sm">রং নির্বাচন করুন</div>
+              <div class="text-caption text-grey-7 q-mb-sm">{{ $t('common.selectColor') }}</div>
               <div class="row q-gutter-sm">
                 <div v-for="color in colorPalette" :key="color" class="cursor-pointer" :style="{
                   width: '36px',
@@ -152,11 +152,11 @@
             </div>
 
             <!-- Budget -->
-            <q-input v-model.number="form.budget" label="মাসিক বাজেট" type="number" outlined dense color="dark"
+            <q-input v-model.number="form.budget" :label="$t('categories.monthlyBudget')" type="number" outlined dense color="dark"
               :prefix="settings.currency" />
 
             <!-- Submit Button -->
-            <q-btn type="submit" :label="isEditing ? 'আপডেট করুন' : 'ক্যাটাগরি যোগ করুন'"
+            <q-btn type="submit" :label="isEditing ? $t('common.update') : $t('categories.addCategory')"
               class="full-width bg-primary-gradient" text-color="white" size="md" rounded unelevated
               :loading="saving" />
           </q-form>
@@ -167,11 +167,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useQuasar } from 'quasar'
+import { useI18n } from 'vue-i18n'
 import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
 
+const { t } = useI18n()
 const $q = useQuasar()
 const categoryStore = useCategoryStore()
 const settings = useSettingsStore()
@@ -191,36 +193,36 @@ const form = reactive({
 })
 
 // Available icons
-const iconOptions = [
-  { label: 'Restaurant', value: 'restaurant' },
-  { label: 'Shopping', value: 'shopping_bag' },
-  { label: 'Transport', value: 'directions_car' },
-  { label: 'Health', value: 'local_hospital' },
-  { label: 'Education', value: 'school' },
-  { label: 'Entertainment', value: 'movie' },
-  { label: 'Bills', value: 'receipt' },
-  { label: 'Home', value: 'home' },
-  { label: 'Work', value: 'work' },
-  { label: 'Laptop', value: 'laptop' },
-  { label: 'Phone', value: 'phone_android' },
-  { label: 'Savings', value: 'savings' },
-  { label: 'Trending Up', value: 'trending_up' },
-  { label: 'Gift', value: 'card_giftcard' },
-  { label: 'Money', value: 'attach_money' },
-  { label: 'Gym', value: 'fitness_center' },
-  { label: 'Flight', value: 'flight' },
-  { label: 'Pet', value: 'pets' },
-  { label: 'Coffee', value: 'local_cafe' },
-  { label: 'Sports', value: 'sports_soccer' },
-  { label: 'Music', value: 'music_note' },
-  { label: 'Book', value: 'menu_book' },
-  { label: 'Camera', value: 'camera_alt' },
-  { label: 'Electricity', value: 'bolt' },
-  { label: 'Water', value: 'water_drop' },
-  { label: 'Wifi', value: 'wifi' },
-  { label: 'Baby', value: 'child_care' },
-  { label: 'Other', value: 'more_horiz' },
-]
+const iconOptions = computed(() => [
+  { label: t('categories.iconRestaurant'), value: 'restaurant' },
+  { label: t('categories.iconShopping'), value: 'shopping_bag' },
+  { label: t('categories.iconTransport'), value: 'directions_car' },
+  { label: t('categories.iconHealth'), value: 'local_hospital' },
+  { label: t('categories.iconEducation'), value: 'school' },
+  { label: t('categories.iconEntertainment'), value: 'movie' },
+  { label: t('categories.iconBills'), value: 'receipt' },
+  { label: t('categories.iconHome'), value: 'home' },
+  { label: t('categories.iconWork'), value: 'work' },
+  { label: t('categories.iconLaptop'), value: 'laptop' },
+  { label: t('categories.iconPhone'), value: 'phone_android' },
+  { label: t('categories.iconSavings'), value: 'savings' },
+  { label: t('categories.iconTrendingUp'), value: 'trending_up' },
+  { label: t('categories.iconGift'), value: 'card_giftcard' },
+  { label: t('categories.iconMoney'), value: 'attach_money' },
+  { label: t('categories.iconGym'), value: 'fitness_center' },
+  { label: t('categories.iconFlight'), value: 'flight' },
+  { label: t('categories.iconPet'), value: 'pets' },
+  { label: t('categories.iconCoffee'), value: 'local_cafe' },
+  { label: t('categories.iconSports'), value: 'sports_soccer' },
+  { label: t('categories.iconMusic'), value: 'music_note' },
+  { label: t('categories.iconBook'), value: 'menu_book' },
+  { label: t('categories.iconCamera'), value: 'camera_alt' },
+  { label: t('categories.iconElectricity'), value: 'bolt' },
+  { label: t('categories.iconWater'), value: 'water_drop' },
+  { label: t('categories.iconWifi'), value: 'wifi' },
+  { label: t('categories.iconBaby'), value: 'child_care' },
+  { label: t('categories.iconOther'), value: 'more_horiz' },
+])
 
 // Color palette
 const colorPalette = [
@@ -258,27 +260,27 @@ async function saveCategory() {
   try {
     if (isEditing.value) {
       await categoryStore.updateCategory(editingId.value, { ...form })
-      $q.notify({ type: 'positive', message: 'ক্যাটাগরি আপডেট হয়েছে', position: 'top' })
+      $q.notify({ type: 'positive', message: t('categories.categoryUpdated'), position: 'top' })
     } else {
       await categoryStore.addCategory({ ...form })
-      $q.notify({ type: 'positive', message: 'ক্যাটাগরি যোগ হয়েছে', position: 'top' })
+      $q.notify({ type: 'positive', message: t('categories.categoryAdded'), position: 'top' })
     }
     showDialog.value = false
   } catch (err) {
-    $q.notify({ type: 'negative', message: 'ত্রুটি: ' + err.message, position: 'top' })
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
   }
   saving.value = false
 }
 
 function confirmDelete(cat) {
   $q.dialog({
-    title: 'ক্যাটাগরি মুছুন',
-    message: `"${cat.name}" ক্যাটাগরিটি মুছে ফেলতে চান?`,
-    ok: { label: 'মুছুন', color: 'negative', flat: true },
-    cancel: { label: 'বাতিল', flat: true },
+    title: t('categories.deleteCategory'),
+    message: `"${cat.name}" ${t('categories.deleteConfirm')}`,
+    ok: { label: t('common.delete'), color: 'negative', flat: true },
+    cancel: { label: t('common.cancel'), flat: true },
   }).onOk(async () => {
     await categoryStore.deleteCategory(cat.id)
-    $q.notify({ type: 'positive', message: 'ক্যাটাগরি মুছে ফেলা হয়েছে', position: 'top' })
+    $q.notify({ type: 'positive', message: t('categories.categoryDeleted'), position: 'top' })
   })
 }
 

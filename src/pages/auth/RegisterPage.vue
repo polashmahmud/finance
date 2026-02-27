@@ -1,95 +1,38 @@
 <template>
-  <q-page class="flex flex-center q-pa-md bg-white">
-    <div style="width: 100%; max-width: 400px">
-      <!-- Header -->
-      <div class="text-center q-mb-xl">
-        <q-btn flat round dense icon="arrow_back" color="grey-7" class="absolute-top-left q-ma-md" @click="$router.push('/login')" />
-        <div class="text-h5 text-weight-bold q-mt-lg" style="color: #111;">নতুন একাউন্ট</div>
-        <div class="text-subtitle1 text-grey-7">তথ্য দিয়ে একাউন্ট তৈরি করুন</div>
+  <q-page class="flex flex-center">
+    <div class="column items-center q-gutter-md q-pa-lg" style="max-width: 350px; width: 100%">
+      <q-avatar size="70px" color="dark" text-color="white" icon="person_add" />
+
+      <div class="text-center">
+        <div class="text-h5 text-weight-bold">{{ $t('auth.newAccount') }}</div>
+        <div class="text-caption text-grey">{{ $t('auth.registerSubtitle') }}</div>
       </div>
 
-      <!-- Registration Form -->
-      <q-form @submit="onSubmit" class="q-gutter-md">
-        <q-input
-          v-model="email"
-          type="email"
-          label="ইমেইল"
-          outlined
-          hide-bottom-space
-          color="primary"
-          bg-color="grey-1"
-          lazy-rules
-          :rules="[(val) => (val && val.length > 0) || 'ইমেইল আবশ্যক']"
-        >
-          <template v-slot:prepend>
-            <q-icon name="email" color="grey-6" />
-          </template>
-        </q-input>
+      <q-form @submit.prevent="onRegister" class="full-width q-gutter-sm">
+        <q-input v-model="email" :label="$t('auth.email')" outlined dense type="email"
+          :rules="[val => !!val || $t('auth.emailRequired')]" />
 
-        <q-input
-          v-model="password"
+        <q-input v-model="password" :label="$t('auth.password')" outlined dense
           :type="showPassword ? 'text' : 'password'"
-          label="পাসওয়ার্ড"
-          outlined
-          hide-bottom-space
-          color="primary"
-          bg-color="grey-1"
-          lazy-rules
-          :rules="[
-            (val) => (val && val.length > 0) || 'পাসওয়ার্ড আবশ্যক',
-            (val) => val.length >= 6 || 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে'
-          ]"
-        >
-          <template v-slot:prepend>
-            <q-icon name="lock" color="grey-6" />
-          </template>
+          :rules="[val => !!val || $t('auth.passwordRequired'), val => val.length >= 6 || $t('auth.passwordMinLength')]">
           <template v-slot:append>
-            <q-icon
-              :name="showPassword ? 'visibility_off' : 'visibility'"
-              class="cursor-pointer"
-              color="grey-6"
-              @click="showPassword = !showPassword"
-            />
+            <q-icon :name="showPassword ? 'visibility_off' : 'visibility'" class="cursor-pointer"
+              @click="showPassword = !showPassword" />
           </template>
         </q-input>
 
-        <q-input
-          v-model="confirmPassword"
+        <q-input v-model="confirmPassword" :label="$t('auth.confirmPassword')" outlined dense
           :type="showPassword ? 'text' : 'password'"
-          label="পাসওয়ার্ড নিশ্চিত করুন"
-          outlined
-          hide-bottom-space
-          color="primary"
-          bg-color="grey-1"
-          lazy-rules
-          :rules="[
-            (val) => (val && val.length > 0) || 'পাসওয়ার্ড নিশ্চিত করা আবশ্যক',
-            (val) => val === password || 'পাসওয়ার্ড মিলছে না'
-          ]"
-        >
-          <template v-slot:prepend>
-            <q-icon name="lock_outline" color="grey-6" />
-          </template>
-        </q-input>
+          :rules="[val => !!val || $t('auth.confirmPasswordRequired'), val => val === password || $t('auth.passwordMismatch')]" />
 
-        <div class="q-mt-lg">
-          <q-btn
-            label="একাউন্ট তৈরি করুন"
-            type="submit"
-            class="full-width bg-primary-gradient shadow-3"
-            text-color="white"
-            size="lg"
-            rounded
-            :loading="loading"
-          />
-        </div>
+        <q-btn type="submit" :label="$t('auth.createAccount')" color="dark" unelevated rounded
+          class="full-width q-mt-md" no-caps :loading="loading" />
       </q-form>
 
-      <!-- Login Link -->
-      <div class="text-center q-mt-lg">
-        <span class="text-grey-7">আগে থেকেই একাউন্ট আছে? </span>
-        <router-link to="/login" class="text-weight-bold text-primary" style="text-decoration: none">
-          লগইন করুন
+      <div class="text-center text-caption q-mt-sm">
+        {{ $t('auth.alreadyHaveAccount') }}
+        <router-link to="/auth/login" class="text-dark text-weight-bold" style="text-decoration: none">
+          {{ $t('auth.loginLink') }}
         </router-link>
       </div>
     </div>
@@ -98,13 +41,14 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from 'stores/authStore'
-import { useQuasar } from 'quasar'
+import { Notify } from 'quasar'
 
+const { t } = useI18n()
 const router = useRouter()
-const authStore = useAuthStore()
-const $q = useQuasar()
+const auth = useAuthStore()
 
 const email = ref('')
 const password = ref('')
@@ -112,26 +56,21 @@ const confirmPassword = ref('')
 const showPassword = ref(false)
 const loading = ref(false)
 
-async function onSubmit() {
-  loading.value = true
-  const result = await authStore.register(email.value, password.value)
-  loading.value = false
+async function onRegister() {
+  if (password.value !== confirmPassword.value) {
+    Notify.create({ message: t('auth.passwordMismatch'), color: 'negative' })
+    return
+  }
 
-  if (result.success) {
-    $q.notify({
-      color: 'positive',
-      icon: 'check_circle',
-      message: 'অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে',
-      position: 'top',
-    })
+  loading.value = true
+  try {
+    await auth.register(email.value, password.value)
+    Notify.create({ message: t('auth.registerSuccess'), color: 'positive' })
     router.push('/')
-  } else {
-    $q.notify({
-      color: 'negative',
-      icon: 'warning',
-      message: 'অ্যাকাউন্ট তৈরি ব্যর্থ হয়েছে: ' + result.error,
-      position: 'top',
-    })
+  } catch (e) {
+    Notify.create({ message: t('auth.registerFailed') + e.message, color: 'negative' })
+  } finally {
+    loading.value = false
   }
 }
 </script>

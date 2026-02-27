@@ -1,14 +1,8 @@
 <template>
   <q-page class="q-pa-md">
-    <!-- Search Input -->
-    <q-input
-      v-model="query"
-      placeholder="লেনদেন খুঁজুন..."
-      outlined
-      clearable
-      autofocus
-      class="q-mb-md"
-    >
+    <!-- Search Bar -->
+    <q-input v-model="searchQuery" :placeholder="$t('search.placeholder')" outlined dense rounded class="q-mb-md"
+      bg-color="white" clearable>
       <template v-slot:prepend>
         <q-icon name="search" />
       </template>
@@ -16,100 +10,102 @@
 
     <!-- Filter Chips -->
     <div class="row q-gutter-sm q-mb-md">
-      <q-chip
-        v-for="filter in filters"
-        :key="filter.value"
-        :color="activeFilter === filter.value ? 'primary' : 'grey-3'"
-        :text-color="activeFilter === filter.value ? 'white' : 'dark'"
-        clickable
-        @click="activeFilter = activeFilter === filter.value ? '' : filter.value"
-      >
+      <q-chip v-for="filter in filterOptions" :key="filter.value" :outline="activeFilter !== filter.value"
+        :color="activeFilter === filter.value ? 'dark' : 'grey-4'"
+        :text-color="activeFilter === filter.value ? 'white' : 'dark'" clickable
+        @click="activeFilter = filter.value" size="sm">
         {{ filter.label }}
       </q-chip>
     </div>
 
+    <!-- Loading -->
+    <div v-if="transactions.loading" class="text-center q-pa-xl">
+      <q-spinner-dots size="40px" color="dark" />
+    </div>
+
     <!-- Results -->
-    <q-list separator v-if="results.length">
-      <q-item v-for="tx in results" :key="tx.id" class="touch-target">
-        <q-item-section avatar>
-          <q-avatar
-            :style="{ background: getColor(tx) + '20' }"
-            size="40px"
-          >
-            <q-icon
-              :name="tx.type === 'transfer' ? 'swap_horiz' : tx.type === 'income' ? 'arrow_downward' : 'arrow_upward'"
-              :style="{ color: getColor(tx) }"
-              size="20px"
-            />
-          </q-avatar>
-        </q-item-section>
-        <q-item-section>
-          <q-item-label class="text-weight-medium">{{ tx.category || 'ট্রান্সফার' }}</q-item-label>
-          <q-item-label caption>{{ tx.notes }} &middot; {{ tx.date }}</q-item-label>
-        </q-item-section>
-        <q-item-section side>
-          <q-item-label :class="'amount-' + tx.type" class="transaction-amount">
-            {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ tx.amount.toLocaleString() }}
-          </q-item-label>
-          <q-badge :color="tx.type === 'income' ? 'positive' : tx.type === 'expense' ? 'negative' : 'info'" dense>
-            {{ getTypeLabel(tx.type) }}
-          </q-badge>
-        </q-item-section>
-      </q-item>
-    </q-list>
+    <template v-else>
+      <q-list v-if="filteredResults.length" separator>
+        <q-item v-for="tx in filteredResults" :key="tx.id" class="q-pa-md finance-card q-mb-sm rounded-borders">
+          <q-item-section avatar>
+            <q-avatar :color="tx.type === 'income' ? 'positive' : tx.type === 'expense' ? 'negative' : 'info'"
+              text-color="white" size="40px">
+              <q-icon
+                :name="tx.type === 'income' ? 'trending_up' : tx.type === 'expense' ? 'trending_down' : 'swap_horiz'"
+                size="20px" />
+            </q-avatar>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="text-weight-medium">{{ tx.category || tx.note || tx.type }}</q-item-label>
+            <q-item-label caption>{{ tx.account }} · {{ tx.date }}</q-item-label>
+            <q-item-label v-if="tx.note" caption class="text-grey-6">{{ tx.note }}</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <span :class="tx.type === 'income' ? 'text-positive' : tx.type === 'expense' ? 'text-negative' : ''"
+              class="text-weight-bold">
+              {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ Number(tx.amount || 0).toLocaleString() }}
+            </span>
+          </q-item-section>
+        </q-item>
+      </q-list>
 
-    <!-- Empty state -->
-    <div v-else-if="query" class="text-center text-grey q-mt-xl">
-      <q-icon name="search_off" size="60px" class="q-mb-md" />
-      <div class="text-h6">কোনো ফলাফল পাওয়া যায়নি</div>
-      <div class="text-body2">অন্য কিছু দিয়ে খুঁজুন</div>
-    </div>
-
-    <!-- Initial state -->
-    <div v-else class="text-center text-grey q-mt-xl">
-      <q-icon name="manage_search" size="60px" class="q-mb-md" />
-      <div class="text-body1">পরিমাণ, ক্যাটাগরি, নোট বা তারিখ দিয়ে খুঁজুন</div>
-    </div>
+      <!-- No results -->
+      <div v-else class="text-center text-grey q-pa-xl">
+        <q-icon name="search_off" size="60px" class="q-mb-md" />
+        <div class="text-h6">{{ $t('search.noResults') }}</div>
+        <div class="text-caption">{{ searchQuery ? $t('search.tryOther') : $t('search.searchHint') }}</div>
+      </div>
+    </template>
   </q-page>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useSettingsStore } from 'stores/settingsStore'
 
+const { t } = useI18n()
 const transactions = useTransactionStore()
 const settings = useSettingsStore()
 
-const query = ref('')
-const activeFilter = ref('')
-const filters = [
-  { label: 'আয়', value: 'income' },
-  { label: 'ব্যয়', value: 'expense' },
-  { label: 'ট্রান্সফার', value: 'transfer' },
-]
+const searchQuery = ref('')
+const activeFilter = ref('all')
 
-const typeLabels = {
-  income: 'আয়',
-  expense: 'ব্যয়',
-  transfer: 'ট্রান্সফার',
-}
+const filterOptions = computed(() => [
+  { label: t('common.income') + ' & ' + t('common.expense'), value: 'all' },
+  { label: t('common.income'), value: 'income' },
+  { label: t('common.expense'), value: 'expense' },
+  { label: t('common.transfer'), value: 'transfer' },
+])
 
-function getTypeLabel(type) {
-  return typeLabels[type] || type
-}
+const filteredResults = computed(() => {
+  let results = [...transactions.transactions]
 
-const results = computed(() => {
-  let list = query.value ? transactions.searchTransactions(query.value) : []
-  if (activeFilter.value) {
-    list = list.filter((t) => t.type === activeFilter.value)
+  if (activeFilter.value !== 'all') {
+    results = results.filter((t) => t.type === activeFilter.value)
   }
-  return list.sort((a, b) => b.date.localeCompare(a.date))
+
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase()
+    results = results.filter(
+      (t) =>
+        (t.category && t.category.toLowerCase().includes(q)) ||
+        (t.note && t.note.toLowerCase().includes(q)) ||
+        (t.account && t.account.toLowerCase().includes(q)) ||
+        (t.date && t.date.includes(q)) ||
+        (t.amount && t.amount.toString().includes(q)),
+    )
+  }
+
+  return results.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
 })
 
-function getColor(tx) {
-  if (tx.type === 'income') return '#388E3C'
-  if (tx.type === 'expense') return '#D32F2F'
-  return '#1976D2'
-}
+onMounted(() => {
+  transactions.listenTransactions()
+})
+
+onUnmounted(() => {
+  transactions.stopListening()
+})
 </script>

@@ -6,7 +6,7 @@
         <!-- Left: Logo + Name -->
         <div class="row items-center q-gutter-sm cursor-pointer" @click="$router.push('/')">
           <q-icon name="account_balance_wallet" size="28px" color="dark" />
-          <span class="text-weight-bold" style="font-size: 1.1rem; letter-spacing: -0.02em;">ফাইন্যান্স ম্যানেজার</span>
+          <span class="text-weight-bold" style="font-size: 1.1rem; letter-spacing: -0.02em;">{{ $t('layout.financeManager') }}</span>
         </div>
 
         <q-space />
@@ -26,7 +26,7 @@
                 <q-item-section avatar>
                   <q-icon name="logout" color="negative" />
                 </q-item-section>
-                <q-item-section class="text-negative">লগআউট</q-item-section>
+                <q-item-section class="text-negative">{{ $t('common.logout') }}</q-item-section>
               </q-item>
             </q-list>
           </q-menu>
@@ -48,7 +48,7 @@
         style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; padding: 12px 16px 32px; background: white;">
         <!-- Header -->
         <q-card-section class="row items-center justify-between no-wrap q-pb-md">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">দ্রুত যোগ করুন</div>
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('nav.quickAdd') }}</div>
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
 
@@ -73,11 +73,11 @@
     <q-footer v-if="showBottomNav" class="bg-white text-grey-8 finance-bottom-nav" bordered>
       <q-tabs v-model="currentTab" dense active-color="dark" indicator-color="dark" class="text-grey-6"
         narrow-indicator>
-        <q-route-tab name="home" icon="home" label="হোম" to="/" exact />
-        <q-route-tab name="accounts" icon="account_balance_wallet" label="অ্যাকাউন্ট" to="/accounts" />
-        <q-route-tab name="reports" icon="bar_chart" label="রিপোর্ট" to="/reports" />
-        <q-route-tab name="lists" icon="shopping_cart" label="তালিকা" to="/market-lists" />
-        <q-route-tab name="settings" icon="settings" label="সেটিংস" to="/settings" />
+        <q-route-tab name="home" icon="home" :label="$t('nav.home')" to="/" exact />
+        <q-route-tab name="accounts" icon="account_balance_wallet" :label="$t('nav.accounts')" to="/accounts" />
+        <q-route-tab name="reports" icon="bar_chart" :label="$t('nav.reports')" to="/reports" />
+        <q-route-tab name="lists" icon="shopping_cart" :label="$t('nav.lists')" to="/market-lists" />
+        <q-route-tab name="settings" icon="settings" :label="$t('nav.settings')" to="/settings" />
       </q-tabs>
     </q-footer>
   </q-layout>
@@ -87,8 +87,10 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from 'stores/authStore'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const $q = useQuasar()
@@ -103,13 +105,13 @@ const noBottomNavPages = ['/splash']
 const showFab = computed(() => !noFabPages.includes(route.path))
 const showBottomNav = computed(() => !noBottomNavPages.includes(route.path))
 
-const quickAddActions = [
-  { label: 'আয়', icon: 'trending_up', color: '#22c55e', bgColor: '#f0fdf4', route: '/add-income' },
-  { label: 'ব্যয়', icon: 'trending_down', color: '#ef4444', bgColor: '#fef2f2', route: '/add-expense' },
-  { label: 'ট্রান্সফার', icon: 'sync_alt', color: '#3b82f6', bgColor: '#eff6ff', route: '/transfer' },
-  { label: 'বাজার তালিকা', icon: 'shopping_cart', color: '#22c55e', bgColor: '#f0fdf4', route: '/market-lists' },
-  { label: 'নোট', icon: 'description', color: '#0f172a', bgColor: '#fffbeb', route: '/notes' }
-]
+const quickAddActions = computed(() => [
+  { label: t('common.income'), icon: 'trending_up', color: '#22c55e', bgColor: '#f0fdf4', route: '/add-income' },
+  { label: t('common.expense'), icon: 'trending_down', color: '#ef4444', bgColor: '#fef2f2', route: '/add-expense' },
+  { label: t('common.transfer'), icon: 'sync_alt', color: '#3b82f6', bgColor: '#eff6ff', route: '/transfer' },
+  { label: t('nav.marketList'), icon: 'shopping_cart', color: '#22c55e', bgColor: '#f0fdf4', route: '/market-lists' },
+  { label: t('nav.note'), icon: 'description', color: '#0f172a', bgColor: '#fffbeb', route: '/notes' }
+])
 
 function navigateTo(path) {
   quickAddOpen.value = false
@@ -119,7 +121,7 @@ function navigateTo(path) {
 async function onLogout() {
   const result = await authStore.logout()
   if (result.success) {
-    $q.notify({ type: 'positive', icon: 'check_circle', message: 'লগআউট সফল হয়েছে', position: 'top' })
+    $q.notify({ type: 'positive', icon: 'check_circle', message: t('common.logoutSuccess'), position: 'top' })
     router.push('/login')
   }
 }

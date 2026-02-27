@@ -1,23 +1,21 @@
 <template>
-  <div class="fullscreen bg-blue text-white text-center q-pa-md flex flex-center">
+  <div class="fullscreen bg-white text-dark text-center q-pa-md flex flex-center">
     <div>
-      <div style="font-size: 30vh">404</div>
+      <div style="font-size: 30vh">
+        4<span class="text-dark">0</span>4
+      </div>
 
-      <div class="text-h2" style="opacity: 0.4">Oops. Nothing here...</div>
+      <p class="text-h5" style="opacity:.4">
+        {{ $t('error.notFound') }}
+      </p>
 
-      <q-btn
-        class="q-mt-xl"
-        color="white"
-        text-color="blue"
-        unelevated
-        to="/"
-        label="Go Home"
-        no-caps
-      />
+      <q-btn class="q-mt-xl" color="dark" unelevated no-caps rounded :label="$t('error.goHome')" to="/" />
     </div>
   </div>
+
 </template>
 
 <script setup>
-//
+import { useI18n } from 'vue-i18n'
+useI18n()
 </script>
