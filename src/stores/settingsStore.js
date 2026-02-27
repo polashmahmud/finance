@@ -7,6 +7,7 @@ export const useSettingsStore = defineStore('settings', () => {
   const currency = ref('৳')
   const currencyCode = ref('BDT')
   const language = ref('bn')
+  const fontFamily = ref('Tiro Bangla')
   const darkMode = ref(false)
   const appLock = ref(false)
   const pin = ref('')
@@ -32,6 +33,10 @@ export const useSettingsStore = defineStore('settings', () => {
     i18n.global.locale.value = lang
   }
 
+  function setFont(font) {
+    fontFamily.value = font
+  }
+
   function setPin(newPin) {
     pin.value = newPin
     appLock.value = true
@@ -49,6 +54,7 @@ export const useSettingsStore = defineStore('settings', () => {
     currency,
     currencyCode,
     language,
+    fontFamily,
     darkMode,
     appLock,
     pin,
@@ -57,6 +63,7 @@ export const useSettingsStore = defineStore('settings', () => {
     setDarkMode,
     setCurrency,
     setLanguage,
+    setFont,
     setPin,
     authenticate,
     lock,

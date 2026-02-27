@@ -7,7 +7,7 @@
 
 // ---------- Body ----------
 body {
-  font-family: 'Tiro Bangla', 'Noto Sans Bengali', 'SolaimanLipi', Arial, sans-serif;
+  // Font is applied dynamically via App.vue based on settings
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #e8e8e8;

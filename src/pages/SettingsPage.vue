@@ -35,16 +35,8 @@
             <q-item-label caption>{{ settings.currencyCode }} ({{ settings.currency }})</q-item-label>
           </q-item-section>
           <q-item-section side>
-            <q-select
-              v-model="selectedCurrency"
-              :options="currencyOptions"
-              dense
-              borderless
-              emit-value
-              map-options
-              @update:model-value="onCurrencyChange"
-              style="min-width: 100px"
-            />
+            <q-select v-model="selectedCurrency" :options="currencyOptions" dense borderless emit-value map-options
+              @update:model-value="onCurrencyChange" style="min-width: 100px" />
           </q-item-section>
         </q-item>
 
@@ -58,19 +50,11 @@
             <q-item-label caption>{{ settings.language === 'en' ? 'English' : 'বাংলা' }}</q-item-label>
           </q-item-section>
           <q-item-section side>
-            <q-select
-              v-model="selectedLang"
-              :options="[
-                { label: 'English', value: 'en' },
-                { label: 'বাংলা', value: 'bn' },
-              ]"
-              dense
-              borderless
-              emit-value
-              map-options
-              @update:model-value="onLanguageChange"
-              style="min-width: 100px"
-            />
+            <q-select v-model="selectedLang" :options="[
+              { label: 'English', value: 'en' },
+              { label: 'বাংলা', value: 'bn' },
+            ]" dense borderless emit-value map-options @update:model-value="onLanguageChange"
+              style="min-width: 100px" />
           </q-item-section>
         </q-item>
 
@@ -83,11 +67,31 @@
             <q-item-label>{{ $t('common.darkMode') }}</q-item-label>
           </q-item-section>
           <q-item-section side>
-            <q-toggle
-              :model-value="settings.darkMode"
-              color="dark"
-              @update:model-value="settings.toggleDarkMode()"
-            />
+            <q-toggle :model-value="settings.darkMode" color="dark" @update:model-value="settings.toggleDarkMode()" />
+          </q-item-section>
+        </q-item>
+
+        <!-- Font -->
+        <q-item class="touch-target">
+          <q-item-section avatar>
+            <q-icon name="text_fields" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('settings.font') }}</q-item-label>
+            <q-item-label caption :style="{ fontFamily: settings.fontFamily }">{{ settings.fontFamily }}</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-select v-model="selectedFont" :options="fontOptions" dense borderless emit-value map-options
+              @update:model-value="onFontChange" style="min-width: 140px">
+              <template v-slot:option="scope">
+                <q-item v-bind="scope.itemProps">
+                  <q-item-section>
+                    <q-item-label :style="{ fontFamily: scope.opt.value + ', sans-serif' }">{{ scope.opt.label
+                      }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
           </q-item-section>
         </q-item>
       </q-list>
@@ -103,16 +107,12 @@
           </q-item-section>
           <q-item-section>
             <q-item-label>{{ $t('settings.appLockPin') }}</q-item-label>
-            <q-item-label caption>{{ settings.appLock ? $t('settings.active') : $t('settings.inactive') }}</q-item-label>
+            <q-item-label caption>{{ settings.appLock ? $t('settings.active') : $t('settings.inactive')
+              }}</q-item-label>
           </q-item-section>
           <q-item-section side>
-            <q-btn
-              flat
-              dense
-              :label="settings.appLock ? $t('settings.change') : $t('settings.setPin')"
-              color="dark"
-              @click="showPinDialog = true"
-            />
+            <q-btn flat dense :label="settings.appLock ? $t('settings.change') : $t('settings.setPin')" color="dark"
+              @click="showPinDialog = true" />
           </q-item-section>
         </q-item>
       </q-list>
@@ -193,23 +193,11 @@
           <div class="text-h6 text-weight-bold">{{ $t('settings.setPin') }}</div>
         </q-card-section>
         <q-card-section>
-          <q-input
-            v-model="newPin"
-            :label="$t('settings.enterPin')"
-            type="password"
-            maxlength="4"
-            outlined
-            autofocus
-          />
+          <q-input v-model="newPin" :label="$t('settings.enterPin')" type="password" maxlength="4" outlined autofocus />
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat :label="$t('common.cancel')" v-close-popup />
-          <q-btn
-            unelevated
-            color="dark"
-            :label="$t('common.save')"
-            @click="savePin"
-          />
+          <q-btn unelevated color="dark" :label="$t('common.save')" @click="savePin" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -231,6 +219,7 @@ const authStore = useAuthStore()
 
 const selectedCurrency = ref(settings.currencyCode)
 const selectedLang = ref(settings.language)
+const selectedFont = ref(settings.fontFamily)
 const showPinDialog = ref(false)
 const newPin = ref('')
 
@@ -242,6 +231,21 @@ const currencyOptions = [
   { label: 'INR (₹)', value: 'INR' },
 ]
 
+const fontOptions = [
+  { label: 'Tiro Bangla', value: 'Tiro Bangla' },
+  { label: 'Noto Sans Bengali', value: 'Noto Sans Bengali' },
+  { label: 'Hind Siliguri', value: 'Hind Siliguri' },
+  { label: 'Baloo Da 2', value: 'Baloo Da 2' },
+  { label: 'Galada', value: 'Galada' },
+  { label: 'Noto Serif Bengali', value: 'Noto Serif Bengali' },
+  { label: 'Inter', value: 'Inter' },
+  { label: 'Poppins', value: 'Poppins' },
+  { label: 'Nunito', value: 'Nunito' },
+  { label: 'Roboto', value: 'Roboto' },
+  { label: 'Open Sans', value: 'Open Sans' },
+  { label: 'Lato', value: 'Lato' },
+]
+
 const currencySymbols = { BDT: '৳', USD: '$', EUR: '€', GBP: '£', INR: '₹' }
 
 function onCurrencyChange(code) {
@@ -250,6 +254,10 @@ function onCurrencyChange(code) {
 
 function onLanguageChange(lang) {
   settings.setLanguage(lang)
+}
+
+function onFontChange(font) {
+  settings.setFont(font)
 }
 
 function savePin() {

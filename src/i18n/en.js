@@ -289,6 +289,8 @@ export default {
     version: 'Version 1.0.0',
     pinMustBe4: 'PIN must be exactly 4 digits',
     pinSetSuccess: 'PIN set successfully',
+    font: 'Font',
+    fontSubtitle: 'Change app font style',
   },
 
   // ========== Auth ==========
