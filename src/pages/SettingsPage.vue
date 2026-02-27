@@ -87,7 +87,7 @@
                 <q-item v-bind="scope.itemProps">
                   <q-item-section>
                     <q-item-label :style="{ fontFamily: scope.opt.value + ', sans-serif' }">{{ scope.opt.label
-                      }}</q-item-label>
+                    }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </template>
@@ -109,7 +109,7 @@
           <q-item-section>
             <q-item-label>{{ $t('settings.appLockPin') }}</q-item-label>
             <q-item-label caption>{{ settings.appLock ? $t('settings.active') : $t('settings.inactive')
-              }}</q-item-label>
+            }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-toggle :model-value="settings.appLock" color="dark" @update:model-value="onToggleAppLock" />
@@ -367,11 +367,18 @@ function removePinConfirm() {
 }
 
 async function onLogout() {
-  settings.lock()
-  const result = await authStore.logout()
-  if (result.success) {
-    Notify.create({ type: 'positive', icon: 'check_circle', message: t('common.logoutSuccess'), position: 'top' })
-    router.push('/login')
+  if (settings.appLock) {
+    // PIN is set → just lock the screen, don't sign out from Firebase
+    settings.lock()
+    Notify.create({ type: 'info', icon: 'lock', message: t('common.screenLocked'), position: 'top' })
+    router.push('/splash')
+  } else {
+    // No PIN → real Firebase logout
+    const result = await authStore.logout()
+    if (result.success) {
+      Notify.create({ type: 'positive', icon: 'check_circle', message: t('common.logoutSuccess'), position: 'top' })
+      router.push('/login')
+    }
   }
 }
 </script>

@@ -25,6 +25,7 @@ export default {
     icon: 'আইকন',
     logout: 'লগআউট',
     logoutSuccess: 'লগআউট সফল হয়েছে',
+    screenLocked: 'স্ক্রিন লক হয়েছে',
     darkMode: 'ডার্ক মোড',
     balance: 'ব্যালেন্স',
   },

@@ -25,6 +25,7 @@ export default {
     icon: 'Icon',
     logout: 'Logout',
     logoutSuccess: 'Logged out successfully',
+    screenLocked: 'Screen locked',
     darkMode: 'Dark Mode',
     balance: 'Balance',
   },

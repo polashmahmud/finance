@@ -98,12 +98,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from 'stores/authStore'
+import { useSettingsStore } from 'stores/settingsStore'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const $q = useQuasar()
 const authStore = useAuthStore()
+const settings = useSettingsStore()
 
 const currentTab = ref('home')
 const quickAddOpen = ref(false)
@@ -128,10 +130,18 @@ function navigateTo(path) {
 }
 
 async function onLogout() {
-    const result = await authStore.logout()
-    if (result.success) {
-        $q.notify({ type: 'positive', icon: 'check_circle', message: t('common.logoutSuccess'), position: 'top' })
-        router.push('/login')
+    if (settings.appLock) {
+        // PIN is set → just lock the screen, don't sign out from Firebase
+        settings.lock()
+        $q.notify({ type: 'info', icon: 'lock', message: t('common.screenLocked'), position: 'top' })
+        router.push('/splash')
+    } else {
+        // No PIN → real Firebase logout
+        const result = await authStore.logout()
+        if (result.success) {
+            $q.notify({ type: 'positive', icon: 'check_circle', message: t('common.logoutSuccess'), position: 'top' })
+            router.push('/login')
+        }
     }
 }
 </script>
