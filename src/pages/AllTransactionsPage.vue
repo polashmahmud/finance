@@ -1,11 +1,5 @@
 <template>
     <q-page class="q-pa-md q-pb-xl">
-        <!-- Header -->
-        <div class="row items-center q-mb-md">
-            <q-btn flat round icon="arrow_back" @click="$router.back()" />
-            <div class="text-h6 text-weight-bold q-ml-sm">{{ $t('allTransactions.title') }}</div>
-        </div>
-
         <!-- Month Filter -->
         <div class="row items-center justify-center q-mb-md">
             <q-btn flat round dense icon="chevron_left" color="dark" @click="goToPrevMonth" :disable="!canGoPrev" />
@@ -82,7 +76,7 @@
                         </q-item-section>
                         <q-item-section>
                             <q-item-label class="text-weight-medium">{{ tx.category || $t('common.transfer')
-                            }}</q-item-label>
+                                }}</q-item-label>
                             <q-item-label caption>{{ tx.notes }} &middot; {{ tx.date }}</q-item-label>
                         </q-item-section>
                         <q-item-section side>
@@ -203,7 +197,7 @@ const categories = useCategoryStore()
 const accounts = useAccountStore()
 const settings = useSettingsStore()
 
-const selectedMonth = ref('all')
+const selectedMonth = ref(new Date().toISOString().slice(0, 7))
 const selectedType = ref('all')
 const editDialogOpen = ref(false)
 const monthPickerOpen = ref(false)
