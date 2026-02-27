@@ -87,7 +87,7 @@
                 <q-item v-bind="scope.itemProps">
                   <q-item-section>
                     <q-item-label :style="{ fontFamily: scope.opt.value + ', sans-serif' }">{{ scope.opt.label
-                    }}</q-item-label>
+                      }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </template>
@@ -109,7 +109,7 @@
           <q-item-section>
             <q-item-label>{{ $t('settings.appLockPin') }}</q-item-label>
             <q-item-label caption>{{ settings.appLock ? $t('settings.active') : $t('settings.inactive')
-            }}</q-item-label>
+              }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-toggle :model-value="settings.appLock" color="dark" @update:model-value="onToggleAppLock" />
@@ -167,6 +167,19 @@
           <q-item-section>
             <q-item-label>{{ $t('settings.categoryAndBudget') }}</q-item-label>
             <q-item-label caption>{{ $t('settings.categoryAndBudgetManage') }}</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-icon name="chevron_right" />
+          </q-item-section>
+        </q-item>
+
+        <q-item clickable class="touch-target" @click="$router.push('/help')">
+          <q-item-section avatar>
+            <q-icon name="help_outline" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('help.title') }}</q-item-label>
+            <q-item-label caption>{{ $t('help.subtitle') }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-icon name="chevron_right" />

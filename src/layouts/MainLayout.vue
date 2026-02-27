@@ -29,6 +29,12 @@
                                 </q-item-section>
                                 <q-item-section>{{ $t('nav.settings') }}</q-item-section>
                             </q-item>
+                            <q-item clickable v-close-popup @click="$router.push('/help')">
+                                <q-item-section avatar>
+                                    <q-icon name="help_outline" color="dark" />
+                                </q-item-section>
+                                <q-item-section>{{ $t('help.title') }}</q-item-section>
+                            </q-item>
                             <q-separator />
                             <q-item clickable v-close-popup @click="onLogout">
                                 <q-item-section avatar>

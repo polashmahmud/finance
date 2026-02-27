@@ -32,6 +32,7 @@ const routes = [
       { path: 'reports', component: () => import('pages/ReportsPage.vue') },
       { path: 'search', component: () => import('pages/SearchPage.vue') },
       { path: 'settings', component: () => import('pages/SettingsPage.vue') },
+      { path: 'help', component: () => import('pages/HelpPage.vue') },
     ],
   },
 
