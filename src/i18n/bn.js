@@ -326,6 +326,16 @@ export default {
     registerFailed: 'অ্যাকাউন্ট তৈরি ব্যর্থ হয়েছে: ',
   },
 
+  // ========== All Transactions ==========
+  allTransactions: {
+    title: 'সকল লেনদেন',
+    viewAll: 'সব দেখুন',
+    allTime: 'সবসময়',
+    all: 'সব',
+    editTransaction: 'লেনদেন সম্পাদনা',
+    transactionUpdated: 'লেনদেন আপডেট হয়েছে',
+  },
+
   // ========== Error Page ==========
   error: {
     notFound: 'উফ! এখানে কিছু নেই...',

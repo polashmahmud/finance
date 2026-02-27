@@ -116,7 +116,7 @@ const settings = useSettingsStore()
 const currentTab = ref('home')
 const quickAddOpen = ref(false)
 
-const noFabPages = ['/splash', '/add-income', '/add-expense', '/transfer', '/search', '/categories']
+const noFabPages = ['/splash', '/add-income', '/add-expense', '/transfer', '/search', '/categories', '/all-transactions']
 const noBottomNavPages = ['/splash']
 
 const showFab = computed(() => !noFabPages.includes(route.path))

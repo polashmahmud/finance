@@ -33,6 +33,7 @@ const routes = [
       { path: 'search', component: () => import('pages/SearchPage.vue') },
       { path: 'settings', component: () => import('pages/SettingsPage.vue') },
       { path: 'help', component: () => import('pages/HelpPage.vue') },
+      { path: 'all-transactions', component: () => import('pages/AllTransactionsPage.vue') },
     ],
   },
 

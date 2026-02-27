@@ -326,6 +326,16 @@ export default {
     registerFailed: 'Account creation failed: ',
   },
 
+  // ========== All Transactions ==========
+  allTransactions: {
+    title: 'All Transactions',
+    viewAll: 'View All',
+    allTime: 'All Time',
+    all: 'All',
+    editTransaction: 'Edit Transaction',
+    transactionUpdated: 'Transaction updated',
+  },
+
   // ========== Error Page ==========
   error: {
     notFound: 'Oops. Nothing here...',

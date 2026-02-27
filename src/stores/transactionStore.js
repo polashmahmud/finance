@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { ref as dbRef, onValue, push, set, remove } from 'firebase/database'
+import { ref as dbRef, onValue, push, set, remove, update } from 'firebase/database'
 import { database, auth } from 'boot/firebase'
 
 export const useTransactionStore = defineStore('transactions', () => {
@@ -72,6 +72,13 @@ export const useTransactionStore = defineStore('transactions', () => {
     })
   }
 
+  async function updateTransaction(id, data) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const txRef = dbRef(database, `finance/users/${uid}/transactions/${id}`)
+    await update(txRef, data)
+  }
+
   async function deleteTransaction(id) {
     const uid = auth.currentUser?.uid
     if (!uid) return
@@ -104,6 +111,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     loading,
     listenTransactions,
     addTransaction,
+    updateTransaction,
     deleteTransaction,
     searchTransactions,
     stopListening,

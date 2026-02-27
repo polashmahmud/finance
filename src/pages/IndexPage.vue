@@ -87,11 +87,20 @@
     </div>
 
     <!-- Recent Transactions -->
-    <div class="section-title">{{ $t('dashboard.recentTransactions') }}</div>
+    <div class="row items-center justify-between q-mb-sm">
+      <div class="section-title q-mb-none">{{ $t('dashboard.recentTransactions') }}</div>
+      <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right" @click="$router.push('/all-transactions')" size="sm" />
+    </div>
     <q-card class="finance-card">
       <q-list separator>
         <q-slide-item v-for="tx in transactions.recentTransactions" :key="tx.id"
+          @left="({ reset }) => onEditTx(tx, reset)"
           @right="({ reset }) => onDeleteTx(tx.id, reset)">
+          <template v-slot:left>
+            <div class="row items-center">
+              <q-icon name="edit" color="info" />
+            </div>
+          </template>
           <template v-slot:right>
             <div class="row items-center">
               <q-icon name="delete" color="negative" />
@@ -124,11 +133,74 @@
         <div>{{ $t('dashboard.noTransactionsYet') }}</div>
       </q-card-section>
     </q-card>
+
+    <!-- Edit Transaction Dialog -->
+    <q-dialog v-model="editDialogOpen" position="bottom" transition-show="slide-up" transition-hide="slide-down">
+      <q-card style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px;">
+        <q-card-section class="row items-center justify-between">
+          <div class="text-h6 text-weight-bold">{{ $t('allTransactions.editTransaction') }}</div>
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-form @submit.prevent="saveEdit">
+            <q-input v-model.number="editForm.amount" :label="$t('common.amount')" type="number" outlined color="dark" :prefix="settings.currency" :rules="[val => val > 0 || $t('common.validAmount')]" input-class="text-h6 text-weight-bold" class="q-mb-sm" />
+
+            <q-select v-if="editForm.type !== 'transfer'" v-model="editForm.category" :options="editForm.type === 'income' ? incomeCategoryOptions : expenseCategoryOptions" :label="$t('common.category')" outlined color="dark" emit-value map-options class="q-mb-sm">
+              <template v-slot:option="scope">
+                <q-item v-bind="scope.itemProps">
+                  <q-item-section avatar>
+                    <q-avatar :style="{ background: scope.opt.color + '18' }" size="32px">
+                      <q-icon :name="scope.opt.icon" :style="{ color: scope.opt.color }" size="16px" />
+                    </q-avatar>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>{{ scope.opt.label }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
+
+            <q-select v-if="editForm.type !== 'transfer'" v-model="editForm.accountId" :options="accountOptions" :label="$t('common.account')" outlined color="dark" emit-value map-options class="q-mb-sm" />
+
+            <div class="row q-col-gutter-md q-mb-sm">
+              <div class="col-6">
+                <q-input v-model="editForm.date" :label="$t('common.date')" outlined color="dark" readonly>
+                  <template v-slot:append>
+                    <q-icon name="event" class="cursor-pointer">
+                      <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                        <q-date v-model="editForm.date" mask="YYYY-MM-DD" />
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+              <div class="col-6">
+                <q-input v-model="editForm.time" :label="$t('common.time')" outlined color="dark" readonly>
+                  <template v-slot:append>
+                    <q-icon name="access_time" class="cursor-pointer">
+                      <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                        <q-time v-model="editForm.time" mask="HH:mm" />
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+            </div>
+
+            <q-input v-model="editForm.notes" :label="$t('common.noteOptional')" outlined color="dark" type="textarea" rows="2" class="q-mb-sm" />
+
+            <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated size="lg" icon="check" :label="$t('common.update')" :loading="saving" />
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { useAccountStore } from 'stores/accountStore'
 import { useTransactionStore } from 'stores/transactionStore'
@@ -136,10 +208,26 @@ import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
 
 const { t } = useI18n()
+const $q = useQuasar()
 const accounts = useAccountStore()
 const transactions = useTransactionStore()
 const categories = useCategoryStore()
 const settings = useSettingsStore()
+
+const editDialogOpen = ref(false)
+const saving = ref(false)
+const editForm = reactive({
+  id: null,
+  type: '',
+  amount: null,
+  category: '',
+  accountId: null,
+  date: '',
+  time: '',
+  notes: '',
+  originalAmount: 0,
+  originalAccountId: null,
+})
 
 onMounted(() => {
   accounts.listenAccounts()
@@ -196,6 +284,76 @@ const balanceEmoji = computed(() => {
   if (bal <= 500) return '😟'
   return '🤩'
 })
+
+function onEditTx(tx, reset) {
+  reset()
+  editForm.id = tx.id
+  editForm.type = tx.type
+  editForm.amount = tx.amount
+  editForm.category = tx.category || ''
+  editForm.accountId = tx.accountId || null
+  editForm.date = tx.date || ''
+  editForm.time = tx.time || ''
+  editForm.notes = tx.notes || ''
+  editForm.originalAmount = tx.amount
+  editForm.originalAccountId = tx.accountId
+  editDialogOpen.value = true
+}
+
+async function saveEdit() {
+  if (!editForm.amount || editForm.amount <= 0) return
+  saving.value = true
+  try {
+    const updateData = {
+      amount: editForm.amount,
+      category: editForm.category,
+      accountId: editForm.accountId,
+      date: editForm.date,
+      time: editForm.time,
+      notes: editForm.notes,
+    }
+    if (editForm.type === 'income' || editForm.type === 'expense') {
+      const sign = editForm.type === 'income' ? 1 : -1
+      if (editForm.originalAccountId) {
+        await accounts.updateBalance(editForm.originalAccountId, -sign * editForm.originalAmount)
+      }
+      if (editForm.accountId) {
+        await accounts.updateBalance(editForm.accountId, sign * editForm.amount)
+      }
+    }
+    await transactions.updateTransaction(editForm.id, updateData)
+    $q.notify({ type: 'positive', message: t('allTransactions.transactionUpdated'), position: 'top' })
+    editDialogOpen.value = false
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  saving.value = false
+}
+
+const incomeCategoryOptions = computed(() =>
+  categories.incomeCategories.map((c) => ({
+    label: c.name,
+    value: c.name,
+    icon: c.icon,
+    color: c.color,
+  })),
+)
+
+const expenseCategoryOptions = computed(() =>
+  categories.expenseCategories.map((c) => ({
+    label: c.name,
+    value: c.name,
+    icon: c.icon,
+    color: c.color,
+  })),
+)
+
+const accountOptions = computed(() =>
+  accounts.accounts.map((a) => ({
+    label: `${a.name} (${settings.currency}${Number(a.balance || 0).toLocaleString()})`,
+    value: a.id,
+  })),
+)
 
 function onDeleteTx(id, reset) {
   transactions.deleteTransaction(id)
