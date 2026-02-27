@@ -8,27 +8,39 @@
 
     <!-- Total Balance Card -->
     <q-card class="finance-card q-mb-md cursor-pointer" @click="$router.push('/accounts')">
-      <q-card-section class="bg-primary-gradient" style="border-radius: 16px">
-        <div class="q-mb-sm">
-          <div class="text-body2" style="opacity: 0.9">মোট ব্যালেন্স</div>
-          <div class="stat-value text-white" style="font-size: 2rem">{{ settings.currency }}{{
-            formatNumber(accounts.totalBalance) }}</div>
-        </div>
-        <div class="row q-gutter-md q-mt-xs">
-          <div class="row items-center q-gutter-xs">
-            <q-icon name="trending_up" size="18px" style="opacity: 0.85" />
-            <div>
-              <div style="font-size: 0.7rem; opacity: 0.85">আয়</div>
-              <div class="text-weight-bold" style="font-size: 0.9rem">{{ settings.currency }}{{
-                formatNumber(transactions.totalIncome) }}</div>
+      <q-card-section class="bg-primary-gradient" style="border-radius: 16px; overflow: hidden; position: relative;">
+        <div class="row items-center no-wrap">
+          <!-- Left Content -->
+          <div class="col-6">
+            <div class="q-mb-sm">
+              <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">মোট ব্যালেন্স</div>
+              <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
+                formatNumber(accounts.totalBalance) }}</div>
+            </div>
+            <div class="row q-gutter-md q-mt-xs">
+              <div class="row items-center q-gutter-xs">
+                <q-icon name="trending_up" size="18px" style="color: #4ade80" />
+                <div>
+                  <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">আয়</div>
+                  <div class="text-white text-weight-bold" style="font-size: 0.85rem">{{ settings.currency }}{{
+                    formatShort(transactions.totalIncome) }}</div>
+                </div>
+              </div>
+              <div class="row items-center q-gutter-xs">
+                <q-icon name="trending_down" size="18px" style="color: #f87171" />
+                <div>
+                  <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">ব্যয়</div>
+                  <div class="text-white text-weight-bold" style="font-size: 0.85rem">{{ settings.currency }}{{
+                    formatShort(transactions.totalExpense) }}</div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="row items-center q-gutter-xs">
-            <q-icon name="trending_down" size="18px" style="opacity: 0.85" />
-            <div>
-              <div style="font-size: 0.7rem; opacity: 0.85">ব্যয়</div>
-              <div class="text-weight-bold" style="font-size: 0.9rem">{{ settings.currency }}{{
-                formatNumber(transactions.totalExpense) }}</div>
+
+          <!-- Right Chart / Emoji -->
+          <div class="col-6 flex justify-end items-center" style="height: 90px; overflow: visible;">
+            <div style="font-size: 4rem; user-select: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
+              {{ balanceEmoji }}
             </div>
           </div>
         </div>
@@ -168,8 +180,20 @@ function getCategoryIcon(categoryName) {
 }
 
 function formatNumber(n) {
-  return Number(n).toLocaleString()
+  return Number(n || 0).toLocaleString()
 }
+
+function formatShort(n) {
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'k'
+  return n.toLocaleString()
+}
+
+const balanceEmoji = computed(() => {
+  const bal = accounts.totalBalance || 0
+  if (bal < 0) return '😭'
+  if (bal <= 500) return '😟'
+  return '🤩'
+})
 
 function onDeleteTx(id, reset) {
   transactions.deleteTransaction(id)

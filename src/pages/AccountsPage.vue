@@ -38,6 +38,21 @@
             <q-item-section>
               <q-item-label class="text-subtitle1 text-weight-bold">{{ account.name }}</q-item-label>
               <q-item-label caption>{{ getTypeLabel(account.type) }}</q-item-label>
+
+              <!-- Last Transaction Info -->
+              <div v-if="getLastTx(account.id)" class="row items-center q-mt-xs q-gutter-x-xs"
+                style="font-size: 0.75rem">
+                <q-icon
+                  :name="getLastTx(account.id).type === 'income' ? 'arrow_downward' : (getLastTx(account.id).type === 'expense' ? 'arrow_upward' : 'sync_alt')"
+                  :color="getLastTx(account.id).type === 'income' ? 'positive' : (getLastTx(account.id).type === 'expense' ? 'negative' : 'blue')"
+                  size="12px" />
+                <span
+                  :class="getLastTx(account.id).type === 'income' ? 'text-positive' : (getLastTx(account.id).type === 'expense' ? 'text-negative' : 'text-blue')">
+                  {{ settings.currency }}{{ formatNumber(getLastTx(account.id).amount) }}
+                </span>
+                <span class="text-grey-6 text-caption">- {{ getLastTx(account.id).date }}</span>
+              </div>
+              <div v-else class="text-grey-6 text-caption q-mt-xs" style="font-size: 0.7rem">কোনো লেনদেন নেই</div>
             </q-item-section>
             <q-item-section side>
               <q-item-label class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{
@@ -134,10 +149,12 @@
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { useAccountStore } from 'stores/accountStore'
+import { useTransactionStore } from 'stores/transactionStore'
 import { useSettingsStore } from 'stores/settingsStore'
 
 const $q = useQuasar()
 const accountStore = useAccountStore()
+const transactionStore = useTransactionStore()
 const settings = useSettingsStore()
 
 const showDialog = ref(false)
@@ -183,6 +200,20 @@ function getTypeLabel(type) {
 
 function formatNumber(n) {
   return Number(n || 0).toLocaleString()
+}
+
+function getLastTx(accountId) {
+  if (!transactionStore.transactions || !transactionStore.transactions.length) return null
+
+  // Find the most recent transaction where this account was involved
+  const accountTxs = transactionStore.transactions.filter(t =>
+    t.accountId === accountId || t.fromAccountId === accountId || t.toAccountId === accountId
+  )
+
+  if (!accountTxs.length) return null
+
+  // They are already sorted by createdAt descending in the store
+  return accountTxs[0]
 }
 
 function openAddDialog() {
@@ -239,9 +270,11 @@ function confirmDelete(account) {
 
 onMounted(() => {
   accountStore.listenAccounts()
+  transactionStore.listenTransactions()
 })
 
 onUnmounted(() => {
   accountStore.stopListening()
+  transactionStore.stopListening()
 })
 </script>

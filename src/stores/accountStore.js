@@ -61,7 +61,12 @@ export const useAccountStore = defineStore('accounts', () => {
     const uid = auth.currentUser?.uid
     if (!uid) return
     const accRef = dbRef(database, `finance/users/${uid}/accounts/${accountId}`)
-    await update(accRef, { balance: (acc.balance || 0) + amount })
+
+    // Ensure both are treated as numbers to prevent string concatenation
+    const currentBalance = Number(acc.balance || 0)
+    const amountToUpdate = Number(amount || 0)
+
+    await update(accRef, { balance: currentBalance + amountToUpdate })
   }
 
   async function deleteAccount(id) {

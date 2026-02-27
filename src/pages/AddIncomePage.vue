@@ -17,7 +17,7 @@
           <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
             <div class="col-6">
               <q-select v-model="form.category" :options="incomeCategoryOptions" label="ক্যাটাগরি" outlined color="dark"
-                emit-value map-options>
+                emit-value map-options :rules="[val => !!val || 'ক্যাটাগরি আবশ্যক']">
                 <template v-slot:option="scope">
                   <q-item v-bind="scope.itemProps">
                     <q-item-section avatar>
@@ -34,14 +34,15 @@
             </div>
             <div class="col-6">
               <q-select v-model="form.accountId" :options="accountOptions" label="অ্যাকাউন্ট" outlined color="dark"
-                emit-value map-options />
+                emit-value map-options :rules="[val => !!val || 'অ্যাকাউন্ট আবশ্যক']" />
             </div>
           </div>
 
           <!-- Date & Time -->
           <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
             <div class="col-6">
-              <q-input v-model="form.date" label="তারিখ" outlined color="dark" readonly>
+              <q-input v-model="form.date" label="তারিখ" outlined color="dark" readonly
+                :rules="[val => !!val || 'তারিখ আবশ্যক']">
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -52,7 +53,8 @@
               </q-input>
             </div>
             <div class="col-6">
-              <q-input v-model="form.time" label="সময়" outlined color="dark" readonly>
+              <q-input v-model="form.time" label="সময়" outlined color="dark" readonly
+                :rules="[val => !!val || 'সময় আবশ্যক']">
                 <template v-slot:append>
                   <q-icon name="access_time" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -115,7 +117,10 @@ const incomeCategoryOptions = computed(() =>
 )
 
 const accountOptions = computed(() =>
-  accounts.accounts.map((a) => ({ label: a.name, value: a.id })),
+  accounts.accounts.map((a) => ({
+    label: `${a.name} (${settings.currency}${Number(a.balance || 0).toLocaleString()})`,
+    value: a.id
+  })),
 )
 
 async function saveIncome() {
