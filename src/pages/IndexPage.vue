@@ -14,7 +14,7 @@
           <div class="col-6">
             <div class="q-mb-sm">
               <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance')
-                }}</div>
+              }}</div>
               <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
                 formatNumber(accounts.totalBalance) }}</div>
             </div>
@@ -51,8 +51,9 @@
     <!-- Accounts Horizontal Scroll -->
     <div class="section-title">{{ $t('dashboard.accounts') }}</div>
     <div class="row q-gutter-md q-mb-md" style="overflow-x: auto; flex-wrap: nowrap; padding-bottom: 8px">
-      <q-card v-for="account in accounts.accounts" :key="account.id" class="finance-card"
-        style="min-width: 160px; flex-shrink: 0">
+      <q-card v-for="account in accounts.accounts" :key="account.id" class="finance-card cursor-pointer"
+        style="min-width: 160px; flex-shrink: 0" @click="$router.push('/account/' + account.id + '/transactions')"
+        v-ripple>
         <q-card-section class="q-pa-md">
           <div class="row items-center q-gutter-sm q-mb-sm">
             <q-icon :name="account.icon" :style="{ color: account.color }" size="20px" />

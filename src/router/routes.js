@@ -34,6 +34,10 @@ const routes = [
       { path: 'settings', component: () => import('pages/SettingsPage.vue') },
       { path: 'help', component: () => import('pages/HelpPage.vue') },
       { path: 'all-transactions', component: () => import('pages/AllTransactionsPage.vue') },
+      {
+        path: 'account/:id/transactions',
+        component: () => import('pages/AccountTransactionsPage.vue'),
+      },
     ],
   },
 
