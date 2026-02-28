@@ -115,7 +115,7 @@ export default {
 
   // ========== Categories ==========
   categories: {
-    title: 'Categories & Budget',
+    title: 'Categories',
     noExpenseCategories: 'No expense categories',
     noIncomeCategories: 'No income categories',
     budgetPrefix: 'Budget:',
@@ -131,6 +131,7 @@ export default {
     deleteCategory: 'Delete Category',
     deleteConfirm: 'Are you sure you want to delete this category?',
     categoryDeleted: 'Category deleted',
+    swipeHint: 'Swipe left or right to edit or delete',
     // Icon labels
     iconRestaurant: 'Restaurant',
     iconShopping: 'Shopping',

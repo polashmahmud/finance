@@ -115,7 +115,7 @@ export default {
 
   // ========== Categories ==========
   categories: {
-    title: 'ক্যাটাগরি ও বাজেট',
+    title: 'ক্যাটাগরি',
     noExpenseCategories: 'কোনো ব্যয় ক্যাটাগরি নেই',
     noIncomeCategories: 'কোনো আয় ক্যাটাগরি নেই',
     budgetPrefix: 'বাজেট:',
@@ -131,6 +131,7 @@ export default {
     deleteCategory: 'ক্যাটাগরি মুছুন',
     deleteConfirm: 'ক্যাটাগরিটি মুছে ফেলতে চান?',
     categoryDeleted: 'ক্যাটাগরি মুছে ফেলা হয়েছে',
+    swipeHint: 'এডিট বা ডিলিট করতে বামে বা ডানে সোয়াপ করুন',
     // Icon labels
     iconRestaurant: 'রেস্তোরাঁ',
     iconShopping: 'শপিং',

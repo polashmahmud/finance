@@ -22,7 +22,7 @@
       <q-spinner-dots size="40px" color="dark" />
     </div>
 
-    <!-- Category List -->
+    <!-- Category List with Swipe Hint -->
     <template v-else>
       <q-tab-panels v-model="tab" animated class="bg-transparent">
         <!-- Expense Categories -->
@@ -32,28 +32,31 @@
             <div>{{ $t('categories.noExpenseCategories') }}</div>
           </div>
           <div class="q-gutter-sm">
-            <q-card v-for="cat in categoryStore.expenseCategories" :key="cat.id" class="finance-card">
-              <q-item class="touch-target">
-                <q-item-section avatar>
-                  <q-avatar :style="{ background: cat.color + '18' }" size="44px">
-                    <q-icon :name="cat.icon" :style="{ color: cat.color }" size="22px" />
-                  </q-avatar>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
-                  <q-item-label caption v-if="cat.budget">
-                    {{ $t('categories.budgetPrefix') }} {{ settings.currency }}{{ Number(cat.budget).toLocaleString() }}{{ $t('categories.perMonth') }}
-                  </q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <div class="row q-gutter-xs">
-                    <q-btn flat round dense icon="edit" size="sm" color="grey-7" @click="openEditDialog(cat)" />
-                    <q-btn flat round dense icon="delete_outline" size="sm" color="negative"
-                      @click="confirmDelete(cat)" />
-                  </div>
-                </q-item-section>
-              </q-item>
-            </q-card>
+            <q-slide-item @left="(obj) => onSwipe(obj, 'edit', cat)" @right="(obj) => onSwipe(obj, 'delete', cat)"
+              v-for="cat in categoryStore.expenseCategories" :key="cat.id" class="finance-card">
+              <template v-slot:left>
+                <q-icon name="edit" color="dark" />
+              </template>
+              <template v-slot:right>
+                <q-icon name="delete" color="negative" />
+              </template>
+              <q-card class="finance-card" @click="goToCategory(cat)">
+                <q-item class="touch-target">
+                  <q-item-section avatar>
+                    <q-avatar :style="{ background: cat.color + '18' }" size="44px">
+                      <q-icon :name="cat.icon" :style="{ color: cat.color }" size="22px" />
+                    </q-avatar>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
+                    <q-item-label caption v-if="cat.budget">
+                      {{ $t('categories.budgetPrefix') }} {{ settings.currency }}{{ Number(cat.budget).toLocaleString()
+                      }}{{ $t('categories.perMonth') }}
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-card>
+            </q-slide-item>
           </div>
         </q-tab-panel>
 
@@ -64,31 +67,40 @@
             <div>{{ $t('categories.noIncomeCategories') }}</div>
           </div>
           <div class="q-gutter-sm">
-            <q-card v-for="cat in categoryStore.incomeCategories" :key="cat.id" class="finance-card">
-              <q-item class="touch-target">
-                <q-item-section avatar>
-                  <q-avatar :style="{ background: cat.color + '18' }" size="44px">
-                    <q-icon :name="cat.icon" :style="{ color: cat.color }" size="22px" />
-                  </q-avatar>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
-                  <q-item-label caption v-if="cat.budget">
-                    {{ $t('categories.budgetPrefix') }} {{ settings.currency }}{{ Number(cat.budget).toLocaleString() }}{{ $t('categories.perMonth') }}
-                  </q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <div class="row q-gutter-xs">
-                    <q-btn flat round dense icon="edit" size="sm" color="grey-7" @click="openEditDialog(cat)" />
-                    <q-btn flat round dense icon="delete_outline" size="sm" color="negative"
-                      @click="confirmDelete(cat)" />
-                  </div>
-                </q-item-section>
-              </q-item>
-            </q-card>
+            <q-slide-item @left="(obj) => onSwipe(obj, 'edit', cat)" @right="(obj) => onSwipe(obj, 'delete', cat)"
+              v-for="cat in categoryStore.incomeCategories" :key="cat.id" class="finance-card">
+              <template v-slot:left>
+                <q-icon name="edit" color="dark" />
+              </template>
+              <template v-slot:right>
+                <q-icon name="delete" color="negative" />
+              </template>
+              <q-card class="finance-card" @click="goToCategory(cat)">
+                <q-item class="touch-target">
+                  <q-item-section avatar>
+                    <q-avatar :style="{ background: cat.color + '18' }" size="44px">
+                      <q-icon :name="cat.icon" :style="{ color: cat.color }" size="22px" />
+                    </q-avatar>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
+                    <q-item-label caption v-if="cat.budget">
+                      {{ $t('categories.budgetPrefix') }} {{ settings.currency }}{{ Number(cat.budget).toLocaleString()
+                      }}{{ $t('categories.perMonth') }}
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-card>
+            </q-slide-item>
           </div>
         </q-tab-panel>
       </q-tab-panels>
+
+      <!-- Swipe Hint -->
+      <div class="text-center q-pa-md text-grey-6" style="font-size: 12px;">
+        <q-icon name="swipe" size="16px" class="q-mr-xs" />
+        {{ $t('categories.swipeHint') }}
+      </div>
     </template>
 
     <!-- Add/Edit Category Dialog -->
@@ -105,19 +117,20 @@
 
         <q-card-section>
           <q-form @submit.prevent="saveCategory" class="q-gutter-md">
-            <!-- Type -->
-            <q-select v-model="form.type" :options="[
-              { label: $t('common.expense'), value: 'expense' },
-              { label: $t('common.income'), value: 'income' },
-            ]" :label="$t('categories.categoryType')" outlined dense emit-value map-options color="dark" />
+            <!-- Type Tabs -->
+            <q-tabs v-model="form.type" dense active-color="dark" indicator-color="dark" class="text-grey-6"
+              align="justify" style="border-radius: 8px; background: #f8fafc;">
+              <q-tab name="expense" :label="$t('common.expense')" />
+              <q-tab name="income" :label="$t('common.income')" />
+            </q-tabs>
 
             <!-- Name -->
             <q-input v-model="form.name" :label="$t('categories.categoryName')" outlined dense color="dark"
               :rules="[(val) => (val && val.length > 0) || $t('common.nameRequired')]" />
 
             <!-- Icon Dropdown -->
-            <q-select v-model="form.icon" :options="iconOptions" :label="$t('common.icon')" outlined dense emit-value map-options
-              color="dark">
+            <q-select v-model="form.icon" :options="iconOptions" :label="$t('common.icon')" outlined dense emit-value
+              map-options color="dark">
               <template v-slot:option="scope">
                 <q-item v-bind="scope.itemProps">
                   <q-item-section avatar>
@@ -151,10 +164,6 @@
               </div>
             </div>
 
-            <!-- Budget -->
-            <q-input v-model.number="form.budget" :label="$t('categories.monthlyBudget')" type="number" outlined dense color="dark"
-              :prefix="settings.currency" />
-
             <!-- Submit Button -->
             <q-btn type="submit" :label="isEditing ? $t('common.update') : $t('categories.addCategory')"
               class="full-width bg-primary-gradient" text-color="white" size="md" rounded unelevated
@@ -170,11 +179,13 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
 
 const { t } = useI18n()
 const $q = useQuasar()
+const $router = useRouter()
 const categoryStore = useCategoryStore()
 const settings = useSettingsStore()
 
@@ -189,7 +200,6 @@ const form = reactive({
   name: '',
   icon: 'category',
   color: '#111111',
-  budget: 0,
 })
 
 // Available icons
@@ -239,7 +249,6 @@ function openAddDialog() {
   form.name = ''
   form.icon = 'category'
   form.color = '#111111'
-  form.budget = 0
   showDialog.value = true
 }
 
@@ -250,7 +259,6 @@ function openEditDialog(cat) {
   form.name = cat.name
   form.icon = cat.icon
   form.color = cat.color
-  form.budget = cat.budget || 0
   showDialog.value = true
 }
 
@@ -282,6 +290,25 @@ function confirmDelete(cat) {
     await categoryStore.deleteCategory(cat.id)
     $q.notify({ type: 'positive', message: t('categories.categoryDeleted'), position: 'top' })
   })
+}
+
+function goToCategory(cat) {
+  $router.push(`/category/${cat.name}/transactions`)
+}
+
+function onSwipe({ reset }, action, cat) {
+  // Delay the action to allow swipe animation to complete
+  setTimeout(() => {
+    if (action === 'edit') {
+      openEditDialog(cat)
+    } else if (action === 'delete') {
+      confirmDelete(cat)
+    }
+  }, 300)
+  // Reset the swipe item
+  setTimeout(() => {
+    reset()
+  }, 100)
 }
 
 onMounted(() => {
