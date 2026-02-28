@@ -31,10 +31,6 @@
             <q-icon name="category" size="48px" class="q-mb-sm" />
             <div>{{ $t('categories.noExpenseCategories') }}</div>
           </div>
-          <div v-else class="text-center text-caption text-grey q-mb-sm">
-            <q-icon name="swipe" size="16px" class="q-mr-xs" />
-            {{ $t('categories.swipeHint') }}
-          </div>
           <div class="q-gutter-sm">
             <q-slide-item @left="(obj) => onSwipe(obj, 'edit', cat)" @right="(obj) => onSwipe(obj, 'delete', cat)"
               v-for="cat in categoryStore.expenseCategories" :key="cat.id" class="finance-card">
@@ -54,8 +50,8 @@
                   <q-item-section>
                     <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
                     <q-item-label caption v-if="getLastTransaction(cat.name)">
-                      {{ getLastTransaction(cat.name).date }} &middot; {{ settings.currency }}{{
-                        formatAmount(getLastTransaction(cat.name).amount) }}
+                      {{ settings.formatDate(getLastTransaction(cat.name).date) }} &middot; {{ settings.currency }}{{
+                        settings.formatNumber(getLastTransaction(cat.name).amount) }}
                     </q-item-label>
                     <q-item-label caption v-else>
                       {{ $t('dashboard.noTransactionsYet') }}
@@ -72,10 +68,6 @@
           <div v-if="categoryStore.incomeCategories.length === 0" class="text-center text-grey q-pa-xl">
             <q-icon name="category" size="48px" class="q-mb-sm" />
             <div>{{ $t('categories.noIncomeCategories') }}</div>
-          </div>
-          <div v-else class="text-center text-caption text-grey q-mb-sm">
-            <q-icon name="swipe" size="16px" class="q-mr-xs" />
-            {{ $t('categories.swipeHint') }}
           </div>
           <div class="q-gutter-sm">
             <q-slide-item @left="(obj) => onSwipe(obj, 'edit', cat)" @right="(obj) => onSwipe(obj, 'delete', cat)"
