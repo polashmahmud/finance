@@ -21,7 +21,7 @@
               <span class="text-caption" :class="isOverBudget ? 'text-negative' : 'text-positive'">
                 {{ $t('common.expense') }}: {{ settings.currency }}{{ settings.formatNumber(totalSpent) }} / {{
                   settings.currency }}{{
-                  formatNumber(monthlyBudget) }}
+                  settings.formatNumber(monthlyBudget) }}
               </span>
             </div>
             <q-linear-progress :value="Math.min(totalSpent / monthlyBudget, 1)"
@@ -30,12 +30,12 @@
               {{ $t('categories.overBudget', {
                 amount: settings.currency + settings.formatNumber(totalSpent -
                   monthlyBudget)
-              }) }} }) }}
+              }) }}
             </div>
             <div v-else class="text-caption text-positive q-mt-xs">
               {{ $t('categoryTransactions.remaining', {
                 amount: settings.currency +
-                  formatNumber(monthlyBudget - totalSpent)
+                  settings.formatNumber(monthlyBudget - totalSpent)
               }) }}
             </div>
           </div>
