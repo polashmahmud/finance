@@ -380,6 +380,7 @@ export default {
     editTransaction: 'লেনদেন সম্পাদনা',
     transactionUpdated: 'লেনদেন আপডেট হয়েছে',
     selectMonth: 'মাস নির্বাচন করুন',
+    deleteConfirm: 'লেনদেনটি মুছে ফেলতে চান?',
   },
 
   // ========== Category Transactions ==========

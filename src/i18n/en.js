@@ -376,6 +376,7 @@ export default {
     editTransaction: 'Edit Transaction',
     transactionUpdated: 'Transaction updated',
     selectMonth: 'Select Month',
+    deleteConfirm: 'Are you sure you want to delete this transaction?',
   },
 
   // ========== Category Transactions ==========

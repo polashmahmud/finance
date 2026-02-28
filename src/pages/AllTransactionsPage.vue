@@ -496,8 +496,22 @@ async function saveEdit() {
 }
 
 function onDeleteTx(id, reset) {
-    transactions.deleteTransaction(id)
-    reset()
+    $q.dialog({
+        title: t('common.delete'),
+        message: t('allTransactions.deleteConfirm'),
+        ok: { label: t('common.delete'), color: 'negative', flat: true },
+        cancel: { label: t('common.cancel'), flat: true },
+    })
+        .onOk(async () => {
+            // Item will be removed from the list; no need to reset (can error if DOM is gone)
+            await transactions.deleteTransaction(id)
+        })
+        .onCancel(() => {
+            reset()
+        })
+        .onDismiss(() => {
+            reset()
+        })
 }
 
 onMounted(() => {
