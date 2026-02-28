@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { Dark } from 'quasar'
+import { Dark, date } from 'quasar'
 import i18n from 'src/i18n'
 
 export const useSettingsStore = defineStore('settings', () => {
@@ -96,7 +96,6 @@ export const useSettingsStore = defineStore('settings', () => {
     if (!dateString) return ''
     const dateObj = new Date(dateString)
     if (isNaN(dateObj)) return dateString
-    const { date } = require('quasar')
     return date.formatDate(dateObj, dateFormat.value)
   }
 
