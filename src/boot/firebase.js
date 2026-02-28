@@ -4,16 +4,16 @@ import { getAnalytics } from 'firebase/analytics'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { getDatabase } from 'firebase/database'
 
-// Your web app's Firebase configuration
+// Firebase configuration from environment variables
 const firebaseConfig = {
-  apiKey: 'VITE_FIREBASE_API_KEY_REMOVED',
-  authDomain: 'FIREBASE_AUTH_DOMAIN_REMOVED',
-  databaseURL: 'FIREBASE_DATABASE_URL_REMOVED',
-  projectId: 'FIREBASE_PROJECT_ID_REMOVED',
-  storageBucket: 'FIREBASE_STORAGE_BUCKET_REMOVED',
-  messagingSenderId: 'FIREBASE_SENDER_ID_REMOVED',
-  appId: '1:FIREBASE_SENDER_ID_REMOVED:web:FIREBASE_APP_HASH_REMOVED',
-  measurementId: 'FIREBASE_MEASUREMENT_ID_REMOVED',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 }
 
 // Initialize Firebase
