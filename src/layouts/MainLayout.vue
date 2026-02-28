@@ -14,7 +14,8 @@
 
                 <!-- Right: User Avatar -->
                 <q-avatar color="dark" text-color="white" size="36px" class="cursor-pointer">
-                    <q-icon name="person" size="20px" />
+                    <img v-if="authStore.userProfile?.avatar" :src="authStore.userProfile.avatar" />
+                    <q-icon v-else name="person" size="20px" />
                     <q-menu>
                         <q-list style="min-width: 180px">
                             <q-item>

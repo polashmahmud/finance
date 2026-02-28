@@ -3,6 +3,7 @@ import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { getDatabase } from 'firebase/database'
+import { getFirestore } from 'firebase/firestore'
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -22,6 +23,7 @@ const app = initializeApp(firebaseConfig)
 const analytics = getAnalytics(app)
 const auth = getAuth(app)
 const database = getDatabase(app)
+const firestore = getFirestore(app)
 
 // We export a promise to delay the Vue app boot process until Firebase Auth has initialized.
 export default boot(() => {
@@ -33,4 +35,4 @@ export default boot(() => {
   })
 })
 
-export { auth, database }
+export { auth, database, firestore }
