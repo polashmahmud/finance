@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { ref as dbRef, onValue, push, set, remove, update } from 'firebase/database'
-import { database, auth } from 'boot/firebase'
+import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
+import { firestore, auth } from 'boot/firebase'
 
 export const useNoteStore = defineStore('notes', () => {
   const notes = ref([])
@@ -11,7 +11,7 @@ export const useNoteStore = defineStore('notes', () => {
   function getUserNotesRef() {
     const uid = auth.currentUser?.uid
     if (!uid) return null
-    return dbRef(database, `finance/users/${uid}/notes`)
+    return collection(firestore, `users/${uid}/notes`)
   }
 
   function listenNotes() {
@@ -21,24 +21,25 @@ export const useNoteStore = defineStore('notes', () => {
     loading.value = true
     if (unsubscribe) unsubscribe()
 
-    unsubscribe = onValue(notesRef, (snapshot) => {
-      const data = snapshot.val()
-      if (data) {
-        notes.value = Object.entries(data)
-          .map(([id, val]) => ({ id, ...val }))
+    unsubscribe = onSnapshot(
+      notesRef,
+      (snapshot) => {
+        notes.value = snapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
           .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-      } else {
-        notes.value = []
-      }
-      loading.value = false
-    })
+        loading.value = false
+      },
+      (error) => {
+        console.error('Error fetching notes:', error)
+        loading.value = false
+      },
+    )
   }
 
   async function addNote(note) {
     const notesRef = getUserNotesRef()
     if (!notesRef) return
-    const newRef = push(notesRef)
-    await set(newRef, {
+    await addDoc(notesRef, {
       title: note.title,
       description: note.description || '',
       pinned: false,
@@ -49,8 +50,8 @@ export const useNoteStore = defineStore('notes', () => {
   async function updateNote(id, data) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    const noteRef = dbRef(database, `finance/users/${uid}/notes/${id}`)
-    await update(noteRef, {
+    const noteRef = doc(firestore, `users/${uid}/notes/${id}`)
+    await updateDoc(noteRef, {
       title: data.title,
       description: data.description || '',
     })
@@ -59,14 +60,14 @@ export const useNoteStore = defineStore('notes', () => {
   async function deleteNote(id) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await remove(dbRef(database, `finance/users/${uid}/notes/${id}`))
+    await deleteDoc(doc(firestore, `users/${uid}/notes/${id}`))
   }
 
   async function togglePin(id, currentValue) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    const noteRef = dbRef(database, `finance/users/${uid}/notes/${id}`)
-    await update(noteRef, { pinned: !currentValue })
+    const noteRef = doc(firestore, `users/${uid}/notes/${id}`)
+    await updateDoc(noteRef, { pinned: !currentValue })
   }
 
   function stopListening() {

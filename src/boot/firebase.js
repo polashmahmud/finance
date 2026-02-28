@@ -2,8 +2,11 @@ import { boot } from 'quasar/wrappers'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { getDatabase } from 'firebase/database'
-import { getFirestore } from 'firebase/firestore'
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from 'firebase/firestore'
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -22,8 +25,12 @@ const app = initializeApp(firebaseConfig)
 // eslint-disable-next-line no-unused-vars
 const analytics = getAnalytics(app)
 const auth = getAuth(app)
-const database = getDatabase(app)
-const firestore = getFirestore(app)
+
+// Initialize Firestore with specific database ID and offline persistence
+const firestore = initializeFirestore(app, {
+  databaseId: 'finance',
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+})
 
 // We export a promise to delay the Vue app boot process until Firebase Auth has initialized.
 export default boot(() => {
@@ -35,4 +42,4 @@ export default boot(() => {
   })
 })
 
-export { auth, database, firestore }
+export { auth, firestore }

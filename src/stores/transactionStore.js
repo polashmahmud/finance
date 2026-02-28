@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { ref as dbRef, onValue, push, set, remove, update } from 'firebase/database'
-import { database, auth } from 'boot/firebase'
+import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
+import { firestore, auth } from 'boot/firebase'
 
 export const useTransactionStore = defineStore('transactions', () => {
   const transactions = ref([])
@@ -30,7 +30,7 @@ export const useTransactionStore = defineStore('transactions', () => {
   function getUserTransactionsRef() {
     const uid = auth.currentUser?.uid
     if (!uid) return null
-    return dbRef(database, `finance/users/${uid}/transactions`)
+    return collection(firestore, `users/${uid}/transactions`)
   }
 
   function listenTransactions() {
@@ -40,24 +40,25 @@ export const useTransactionStore = defineStore('transactions', () => {
     loading.value = true
     if (unsubscribe) unsubscribe()
 
-    unsubscribe = onValue(txRef, (snapshot) => {
-      const data = snapshot.val()
-      if (data) {
-        transactions.value = Object.entries(data)
-          .map(([id, val]) => ({ id, ...val }))
+    unsubscribe = onSnapshot(
+      txRef,
+      (snapshot) => {
+        transactions.value = snapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
           .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-      } else {
-        transactions.value = []
-      }
-      loading.value = false
-    })
+        loading.value = false
+      },
+      (error) => {
+        console.error('Error fetching transactions:', error)
+        loading.value = false
+      },
+    )
   }
 
   async function addTransaction(tx) {
     const txRef = getUserTransactionsRef()
     if (!txRef) return
-    const newRef = push(txRef)
-    await set(newRef, {
+    await addDoc(txRef, {
       type: tx.type,
       amount: tx.amount || 0,
       category: tx.category || '',
@@ -75,14 +76,14 @@ export const useTransactionStore = defineStore('transactions', () => {
   async function updateTransaction(id, data) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    const txRef = dbRef(database, `finance/users/${uid}/transactions/${id}`)
-    await update(txRef, data)
+    const txRef = doc(firestore, `users/${uid}/transactions/${id}`)
+    await updateDoc(txRef, data)
   }
 
   async function deleteTransaction(id) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await remove(dbRef(database, `finance/users/${uid}/transactions/${id}`))
+    await deleteDoc(doc(firestore, `users/${uid}/transactions/${id}`))
   }
 
   function searchTransactions(query) {

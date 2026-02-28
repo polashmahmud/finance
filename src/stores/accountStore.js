@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { ref as dbRef, onValue, push, set, remove, update } from 'firebase/database'
-import { database, auth } from 'boot/firebase'
+import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
+import { firestore, auth } from 'boot/firebase'
 
 export const useAccountStore = defineStore('accounts', () => {
   const accounts = ref([])
@@ -13,7 +13,7 @@ export const useAccountStore = defineStore('accounts', () => {
   function getUserAccountsRef() {
     const uid = auth.currentUser?.uid
     if (!uid) return null
-    return dbRef(database, `finance/users/${uid}/accounts`)
+    return collection(firestore, `users/${uid}/accounts`)
   }
 
   function listenAccounts() {
@@ -23,22 +23,23 @@ export const useAccountStore = defineStore('accounts', () => {
     loading.value = true
     if (unsubscribe) unsubscribe()
 
-    unsubscribe = onValue(accountsRef, (snapshot) => {
-      const data = snapshot.val()
-      if (data) {
-        accounts.value = Object.entries(data).map(([id, val]) => ({ id, ...val }))
-      } else {
-        accounts.value = []
-      }
-      loading.value = false
-    })
+    unsubscribe = onSnapshot(
+      accountsRef,
+      (snapshot) => {
+        accounts.value = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        loading.value = false
+      },
+      (error) => {
+        console.error('Error fetching accounts:', error)
+        loading.value = false
+      },
+    )
   }
 
   async function addAccount(account) {
     const accountsRef = getUserAccountsRef()
     if (!accountsRef) return
-    const newRef = push(accountsRef)
-    await set(newRef, {
+    await addDoc(accountsRef, {
       name: account.name,
       type: account.type,
       balance: account.balance || 0,
@@ -51,8 +52,8 @@ export const useAccountStore = defineStore('accounts', () => {
   async function updateAccount(id, data) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    const accRef = dbRef(database, `finance/users/${uid}/accounts/${id}`)
-    await update(accRef, data)
+    const accRef = doc(firestore, `users/${uid}/accounts/${id}`)
+    await updateDoc(accRef, data)
   }
 
   async function updateBalance(accountId, amount) {
@@ -60,19 +61,19 @@ export const useAccountStore = defineStore('accounts', () => {
     if (!acc) return
     const uid = auth.currentUser?.uid
     if (!uid) return
-    const accRef = dbRef(database, `finance/users/${uid}/accounts/${accountId}`)
+    const accRef = doc(firestore, `users/${uid}/accounts/${accountId}`)
 
     // Ensure both are treated as numbers to prevent string concatenation
     const currentBalance = Number(acc.balance || 0)
     const amountToUpdate = Number(amount || 0)
 
-    await update(accRef, { balance: currentBalance + amountToUpdate })
+    await updateDoc(accRef, { balance: currentBalance + amountToUpdate })
   }
 
   async function deleteAccount(id) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await remove(dbRef(database, `finance/users/${uid}/accounts/${id}`))
+    await deleteDoc(doc(firestore, `users/${uid}/accounts/${id}`))
   }
 
   function stopListening() {

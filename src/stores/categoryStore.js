@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { ref as dbRef, onValue, push, set, remove, update } from 'firebase/database'
-import { database, auth } from 'boot/firebase'
+import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
+import { firestore, auth } from 'boot/firebase'
 
 export const useCategoryStore = defineStore('categories', () => {
   const categories = ref([])
@@ -14,7 +14,7 @@ export const useCategoryStore = defineStore('categories', () => {
   function getUserCategoriesRef() {
     const uid = auth.currentUser?.uid
     if (!uid) return null
-    return dbRef(database, `finance/users/${uid}/categories`)
+    return collection(firestore, `users/${uid}/categories`)
   }
 
   function listenCategories() {
@@ -26,22 +26,23 @@ export const useCategoryStore = defineStore('categories', () => {
     // Clean up any previous listener
     if (unsubscribe) unsubscribe()
 
-    unsubscribe = onValue(catRef, (snapshot) => {
-      const data = snapshot.val()
-      if (data) {
-        categories.value = Object.entries(data).map(([id, val]) => ({ id, ...val }))
-      } else {
-        categories.value = []
-      }
-      loading.value = false
-    })
+    unsubscribe = onSnapshot(
+      catRef,
+      (snapshot) => {
+        categories.value = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        loading.value = false
+      },
+      (error) => {
+        console.error('Error fetching categories:', error)
+        loading.value = false
+      },
+    )
   }
 
   async function addCategory(cat) {
     const catRef = getUserCategoriesRef()
     if (!catRef) return
-    const newRef = push(catRef)
-    await set(newRef, {
+    await addDoc(catRef, {
       type: cat.type,
       name: cat.name,
       icon: cat.icon || 'category',
@@ -53,8 +54,8 @@ export const useCategoryStore = defineStore('categories', () => {
   async function updateCategory(id, cat) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    const catRef = dbRef(database, `finance/users/${uid}/categories/${id}`)
-    await update(catRef, {
+    const catRef = doc(firestore, `users/${uid}/categories/${id}`)
+    await updateDoc(catRef, {
       type: cat.type,
       name: cat.name,
       icon: cat.icon,
@@ -66,18 +67,17 @@ export const useCategoryStore = defineStore('categories', () => {
   async function deleteCategory(id) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    const catRef = dbRef(database, `finance/users/${uid}/categories/${id}`)
-    await remove(catRef)
+    const catRef = doc(firestore, `users/${uid}/categories/${id}`)
+    await deleteDoc(catRef)
   }
 
   async function setMonthlyBudget(categoryId, yearMonth, amount) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    const budgetRef = dbRef(
-      database,
-      `finance/users/${uid}/categories/${categoryId}/budgets/${yearMonth}`,
-    )
-    await set(budgetRef, amount)
+    const catRef = doc(firestore, `users/${uid}/categories/${categoryId}`)
+    await updateDoc(catRef, {
+      [`budgets.${yearMonth}`]: amount,
+    })
   }
 
   function getMonthlyBudget(category, yearMonth) {
