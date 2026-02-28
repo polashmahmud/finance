@@ -9,7 +9,7 @@ import {
   reauthenticateWithCredential,
   EmailAuthProvider,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, collection, addDoc } from 'firebase/firestore'
 import { auth, firestore } from 'boot/firebase'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -127,6 +127,53 @@ export const useAuthStore = defineStore('auth', () => {
         email: email,
         createdAt: new Date().toISOString(),
       })
+
+      // Create default accounts
+      const accountsRef = collection(firestore, `users/${userCredential.user.uid}/accounts`)
+      await Promise.all([
+        addDoc(accountsRef, {
+          name: 'Cash',
+          type: 'Cash',
+          balance: 0,
+          icon: 'wallet',
+          color: '#111111',
+          createdAt: Date.now(),
+        }),
+        addDoc(accountsRef, {
+          name: 'Bank',
+          type: 'Bank',
+          balance: 0,
+          icon: 'account_balance',
+          color: '#111111',
+          createdAt: Date.now(),
+        }),
+      ])
+
+      // Create default categories
+      const categoriesRef = collection(firestore, `users/${userCredential.user.uid}/categories`)
+
+      const defaultCategories = [
+        { type: 'expense', name: 'Groceries', icon: 'shopping_cart', color: '#f44336' },
+        { type: 'expense', name: 'Restaurant', icon: 'restaurant', color: '#ff9800' },
+        { type: 'expense', name: 'Transport', icon: 'directions_bus', color: '#2196f3' },
+        { type: 'expense', name: 'Health', icon: 'local_hospital', color: '#e91e63' },
+        { type: 'expense', name: 'Gifts', icon: 'card_giftcard', color: '#9c27b0' },
+        { type: 'expense', name: 'Family', icon: 'family_restroom', color: '#4caf50' },
+        { type: 'expense', name: 'Shopping', icon: 'shopping_bag', color: '#3f51b5' },
+        { type: 'income', name: 'Salary', icon: 'attach_money', color: '#4caf50' },
+      ]
+
+      await Promise.all(
+        defaultCategories.map((cat) =>
+          addDoc(categoriesRef, {
+            type: cat.type,
+            name: cat.name,
+            icon: cat.icon,
+            color: cat.color,
+            budget: 0,
+          }),
+        ),
+      )
 
       await fetchUserProfile(userCredential.user.uid)
       return { success: true }
