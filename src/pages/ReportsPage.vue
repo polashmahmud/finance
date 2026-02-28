@@ -1,8 +1,22 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="q-mb-md">
-      <div class="text-h5 text-weight-bold">{{ $t('reports.title') }}</div>
-      <div class="text-caption text-grey">{{ $t('reports.subtitle') }}</div>
+    <div class="row items-center justify-between q-mb-md">
+      <div>
+        <div class="text-h5 text-weight-bold">{{ $t('reports.title') }}</div>
+        <div class="text-caption text-grey">{{ $t('reports.subtitle') }}</div>
+      </div>
+
+      <q-btn flat no-caps class="finance-card q-px-md text-weight-medium bg-white" style="border-radius: 12px">
+        <div class="row items-center q-gutter-x-sm">
+          <q-icon name="calendar_month" size="18px" color="primary" />
+          <span>{{ displayMonth }}</span>
+          <q-icon name="arrow_drop_down" size="18px" color="grey-7" />
+        </div>
+        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+          <q-date v-model="currentMonth" mask="YYYY-MM" minimal emit-immediately default-view="Months"
+            years-in-month-view />
+        </q-popup-proxy>
+      </q-btn>
     </div>
 
     <!-- Loading -->
@@ -15,12 +29,12 @@
       <div class="row q-col-gutter-sm q-mb-md">
         <div class="col-auto">
           <q-chip color="dark" text-color="white" icon="trending_up" class="q-ma-none shadow-1">
-            {{ $t('common.income') }} {{ settings.currency }}{{ formatShort(transactions.totalIncome) }}
+            {{ $t('common.income') }} {{ settings.currency }}{{ formatShort(totalIncome) }}
           </q-chip>
         </div>
         <div class="col-auto">
           <q-chip color="dark" text-color="white" icon="trending_down" class="q-ma-none shadow-1">
-            {{ $t('common.expense') }} {{ settings.currency }}{{ formatShort(transactions.totalExpense) }}
+            {{ $t('common.expense') }} {{ settings.currency }}{{ formatShort(totalExpense) }}
           </q-chip>
         </div>
         <div class="col-auto">
@@ -56,7 +70,7 @@
                     </q-circular-progress>
                     <div class="text-caption q-mt-sm">{{ $t('common.income') }}</div>
                     <div class="text-weight-bold text-positive">{{ settings.currency }}{{
-                      formatNumber(transactions.totalIncome) }}</div>
+                      formatNumber(totalIncome) }}</div>
                   </div>
                 </div>
                 <div class="col">
@@ -67,7 +81,7 @@
                     </q-circular-progress>
                     <div class="text-caption q-mt-sm">{{ $t('common.expense') }}</div>
                     <div class="text-weight-bold text-negative">{{ settings.currency }}{{
-                      formatNumber(transactions.totalExpense) }}</div>
+                      formatNumber(totalExpense) }}</div>
                   </div>
                 </div>
               </div>
@@ -161,6 +175,7 @@ import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
 import VueApexCharts from 'vue3-apexcharts'
+import { date } from 'quasar'
 
 const { t } = useI18n()
 const transactions = useTransactionStore()
@@ -168,10 +183,32 @@ const categories = useCategoryStore()
 const settings = useSettingsStore()
 const reportTab = ref('overview')
 
-const total = computed(() => transactions.totalIncome + transactions.totalExpense || 1)
-const incomePercent = computed(() => Math.round((transactions.totalIncome / total.value) * 100))
-const expensePercent = computed(() => Math.round((transactions.totalExpense / total.value) * 100))
-const netSavings = computed(() => transactions.totalIncome - transactions.totalExpense)
+const now = new Date()
+const currentMonth = ref(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
+
+const displayMonth = computed(() => {
+  if (!currentMonth.value) return ''
+  const parts = currentMonth.value.split('-')
+  const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, 1)
+  return date.formatDate(d, 'MMMM YYYY')
+})
+
+const totalIncome = computed(() => {
+  return transactions.transactions
+    .filter(t => t.type === 'income' && t.date && t.date.startsWith(currentMonth.value))
+    .reduce((sum, t) => sum + (t.amount || 0), 0)
+})
+
+const totalExpense = computed(() => {
+  return transactions.transactions
+    .filter(t => t.type === 'expense' && t.date && t.date.startsWith(currentMonth.value))
+    .reduce((sum, t) => sum + (t.amount || 0), 0)
+})
+
+const total = computed(() => totalIncome.value + totalExpense.value || 1)
+const incomePercent = computed(() => Math.round((totalIncome.value / total.value) * 100))
+const expensePercent = computed(() => Math.round((totalExpense.value / total.value) * 100))
+const netSavings = computed(() => totalIncome.value - totalExpense.value)
 
 function formatShort(n) {
   if (n >= 1000) return (n / 1000).toFixed(1) + 'k'
@@ -180,10 +217,18 @@ function formatShort(n) {
 
 // Category breakdown
 const categoryBreakdown = computed(() => {
-  const totalExp = transactions.totalExpense || 1
+  const currentTxs = transactions.transactions.filter(
+    (t) => t.date && t.date.startsWith(currentMonth.value)
+  )
+
+  const currentTotalExpense = currentTxs
+    .filter((t) => t.type === 'expense')
+    .reduce((sum, t) => sum + (t.amount || 0), 0)
+
+  const totalExp = currentTotalExpense || 1
   const catMap = {}
 
-  transactions.transactions
+  currentTxs
     .filter((t) => t.type === 'expense')
     .forEach((t) => {
       if (!catMap[t.category]) catMap[t.category] = 0
@@ -208,18 +253,19 @@ const categoryBreakdown = computed(() => {
 // Budget comparison
 const budgetComparison = computed(() =>
   categories.expenseCategories
-    .filter((c) => c.budget)
+    .filter((c) => c.budgets && c.budgets[currentMonth.value])
     .map((cat) => {
+      const budgetAmount = cat.budgets[currentMonth.value]
       const spent = transactions.transactions
-        .filter((t) => t.type === 'expense' && t.category === cat.name)
+        .filter((t) => t.type === 'expense' && t.category === cat.name && t.date && t.date.startsWith(currentMonth.value))
         .reduce((sum, t) => sum + (t.amount || 0), 0)
-      const usage = spent / cat.budget
+      const usage = spent / budgetAmount
       return {
         name: cat.name,
-        budget: cat.budget,
+        budget: budgetAmount,
         spent,
         usage,
-        over: spent > cat.budget,
+        over: spent > budgetAmount,
       }
     }),
 )
