@@ -63,6 +63,15 @@ export const useMarketListStore = defineStore('marketLists', () => {
     await update(dbRef(database, `finance/users/${uid}/marketLists/${id}`), data)
   }
 
+  async function updateItem(listId, itemId, data) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    await update(
+      dbRef(database, `finance/users/${uid}/marketLists/${listId}/items/${itemId}`),
+      data,
+    )
+  }
+
   async function addItem(listId, item) {
     const uid = auth.currentUser?.uid
     if (!uid) return
@@ -110,6 +119,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
     updateList,
     deleteList,
     addItem,
+    updateItem,
     toggleBought,
     removeItem,
     getListTotal,

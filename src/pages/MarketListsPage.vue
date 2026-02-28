@@ -46,25 +46,34 @@
 
             <!-- Items -->
             <q-list dense separator>
-              <q-item v-for="item in list.items" :key="item.id" class="touch-target q-pl-none">
-                <q-item-section avatar>
-                  <q-checkbox :model-value="item.bought" color="dark"
-                    @update:model-value="marketLists.toggleBought(list.id, item.id, item.bought)" />
-                </q-item-section>
-                <q-item-section :class="{ 'text-strike text-grey': item.bought }">
-                  <q-item-label>{{ item.name }}</q-item-label>
-                  <q-item-label caption>{{ $t('marketLists.quantityPrefix') }} {{ item.quantity }}</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <div class="row items-center q-gutter-xs">
-                    <span class="text-weight-medium">
-                      {{ settings.currency }}{{ settings.formatNumber(item.price || 0) }}
-                    </span>
-                    <q-btn flat round dense icon="close" size="xs" color="grey"
-                      @click="marketLists.removeItem(list.id, item.id)" />
-                  </div>
-                </q-item-section>
-              </q-item>
+              <q-slide-item v-for="item in list.items" :key="item.id" @left="onLeftSwipe(list, item, $event)"
+                @right="onRightSwipe(list, item, $event)" left-color="primary" right-color="negative"
+                class="touch-target q-mb-sm" style="border-radius: 8px;">
+                <template v-slot:left>
+                  <q-icon name="edit" />
+                </template>
+                <template v-slot:right>
+                  <q-icon name="delete" />
+                </template>
+
+                <q-item class="q-pl-none q-py-none">
+                  <q-item-section avatar>
+                    <q-checkbox :model-value="item.bought" color="dark"
+                      @update:model-value="marketLists.toggleBought(list.id, item.id, item.bought)" />
+                  </q-item-section>
+                  <q-item-section :class="{ 'text-strike text-grey': item.bought }">
+                    <q-item-label>{{ item.name }}</q-item-label>
+                    <q-item-label caption>{{ $t('marketLists.quantityPrefix') }} {{ item.quantity }}</q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <div class="row items-center q-gutter-xs">
+                      <span class="text-weight-medium">
+                        {{ settings.currency }}{{ settings.formatNumber(item.price || 0) }}
+                      </span>
+                    </div>
+                  </q-item-section>
+                </q-item>
+              </q-slide-item>
             </q-list>
 
             <!-- Empty items -->
@@ -184,6 +193,37 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <!-- Edit Item Dialog -->
+    <q-dialog v-model="showEditItem" position="bottom" transition-show="slide-up" transition-hide="slide-down">
+      <q-card
+        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; padding: 0 16px 24px; background: white;">
+        <q-card-section class="row items-center justify-between no-wrap q-pb-none">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.editItemTitle') }}
+          </div>
+          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+        </q-card-section>
+        <q-card-section>
+          <q-form @submit.prevent="submitEditItem">
+            <q-input v-model="editItemData.name" :label="$t('marketLists.itemName')" outlined dense autofocus
+              color="dark" :rules="[(val) => (val && val.length > 0) || $t('common.nameRequired')]"
+              style="margin-bottom: 10px;" />
+            <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
+              <div class="col-6">
+                <q-input v-model="editItemData.quantity" :label="$t('common.amount')" outlined dense color="dark"
+                  :hint="$t('marketLists.quantityHint')" />
+              </div>
+              <div class="col-6">
+                <q-input v-model.number="editItemData.price" :label="$t('marketLists.estimatedPrice')" type="number"
+                  outlined dense color="dark" :prefix="settings.currency" />
+              </div>
+            </div>
+            <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
+              :label="$t('marketLists.edit')" :loading="saving" />
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -207,14 +247,17 @@ const showNewList = ref(false)
 const showCopyList = ref(false)
 const showRenameList = ref(false)
 const showAddItem = ref(false)
+const showEditItem = ref(false)
 const newListName = ref('')
 const copyListName = ref('')
 const renameListName = ref('')
 const listToCopy = ref(null)
 const listToRename = ref(null)
 const activeListId = ref(null)
+const activeItemId = ref(null)
 const saving = ref(false)
 const newItem = reactive({ name: '', quantity: 1, price: 0 })
+const editItemData = reactive({ name: '', quantity: 1, price: 0 })
 
 function getCompletedCount(list) {
   return list.items.filter((i) => i.bought).length
@@ -400,4 +443,45 @@ onMounted(() => {
 onUnmounted(() => {
   marketLists.stopListening()
 })
+
+function onLeftSwipe(list, item, { reset }) {
+  activeListId.value = list.id
+  activeItemId.value = item.id
+  editItemData.name = item.name
+  editItemData.quantity = item.quantity
+  editItemData.price = item.price || 0
+  showEditItem.value = true
+  reset()
+}
+
+function onRightSwipe(list, item, { reset }) {
+  $q.dialog({
+    title: t('common.delete'),
+    message: t('common.areYouSure'),
+    ok: { label: t('common.delete'), color: 'negative', flat: true },
+    cancel: { label: t('common.cancel'), flat: true },
+  }).onOk(() => {
+    marketLists.removeItem(list.id, item.id)
+  }).onCancel(() => {
+    reset()
+  })
+}
+
+async function submitEditItem() {
+  if (!editItemData.name) return
+  saving.value = true
+  try {
+    await marketLists.updateItem(activeListId.value, activeItemId.value, {
+      name: editItemData.name,
+      quantity: editItemData.quantity,
+      price: editItemData.price
+    })
+    showEditItem.value = false
+    $q.notify({ type: 'positive', message: t('marketLists.itemUpdateSuccess'), position: 'top' })
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  saving.value = false
+}
+
 </script>
