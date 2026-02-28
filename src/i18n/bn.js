@@ -176,6 +176,10 @@ export default {
     noItems: 'কোনো আইটেম নেই',
     estimatedTotal: 'আনুমানিক মোট',
     convertToExpense: 'খরচে রূপান্তর করুন',
+    convertToExpenseTitle: 'খরচে রূপান্তর করবেন?',
+    convertToExpenseConfirm:
+      'এটি আপনার ডিফল্ট অ্যাকাউন্টে {amount} এর একটি নতুন খরচ হিসেবে যোগ করবে। আপনি কি এগিয়ে যেতে চান?',
+    expenseCreated: '{amount} এর একটি নতুন খরচ লেনদেনে রূপান্তরিত হয়েছে',
     noLists: 'এখনো কোনো তালিকা নেই',
     addPrompt: '+ চাপুন নতুন তালিকা তৈরি করতে',
     newMarketList: 'নতুন বাজার তালিকা',
@@ -191,7 +195,6 @@ export default {
     deleteConfirm: 'তালিকাটি মুছে ফেলতে চান?',
     listDeleted: 'তালিকা মুছে ফেলা হয়েছে',
     marketListNotePrefix: 'বাজার তালিকা: ',
-    expenseCreated: 'থেকে {amount} খরচ তৈরি হয়েছে',
   },
 
   // ========== Notes ==========

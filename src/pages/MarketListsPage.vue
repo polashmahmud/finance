@@ -25,7 +25,8 @@
                   <q-icon name="shopping_cart" color="dark" size="20px" />
                   <div class="text-subtitle1 text-weight-bold">{{ list.name }}</div>
                 </div>
-                <div class="text-caption text-grey q-ml-lg">{{ getCompletedCount(list) }}/{{ list.items.length }} {{ $t('marketLists.items') }}
+                <div class="text-caption text-grey q-ml-lg">{{ getCompletedCount(list) }}/{{ list.items.length }} {{
+                  $t('marketLists.items') }}
                 </div>
               </div>
               <div class="row q-gutter-xs">
@@ -77,8 +78,8 @@
             </div>
 
             <!-- Convert to Expense -->
-            <q-btn flat dense color="dark" :label="$t('marketLists.convertToExpense')" icon="receipt" class="q-mt-sm full-width"
-              @click="convertToExpense(list)" :disable="!list.items.length" />
+            <q-btn flat dense color="dark" :label="$t('marketLists.convertToExpense')" icon="receipt"
+              class="q-mt-sm full-width" @click="convertToExpense(list)" :disable="!list.items.length" />
           </q-card-section>
         </q-card>
       </div>
@@ -128,8 +129,8 @@
                   :hint="$t('marketLists.quantityHint')" />
               </div>
               <div class="col-6">
-                <q-input v-model.number="newItem.price" :label="$t('marketLists.estimatedPrice')" type="number" outlined dense color="dark"
-                  :prefix="settings.currency" />
+                <q-input v-model.number="newItem.price" :label="$t('marketLists.estimatedPrice')" type="number" outlined
+                  dense color="dark" :prefix="settings.currency" />
               </div>
             </div>
             <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
@@ -220,17 +221,25 @@ async function addItem() {
 function convertToExpense(list) {
   const total = marketLists.getListTotal(list.id)
   if (total <= 0) return
-  transactions.addTransaction({
-    type: 'expense',
-    amount: total,
-    category: 'Shopping',
-    accountId: accounts.accounts[0]?.id,
-    date: new Date().toISOString().slice(0, 10),
-    time: new Date().toTimeString().slice(0, 5),
-    notes: `${t('marketLists.marketListNotePrefix')}${list.name}`,
+
+  $q.dialog({
+    title: t('marketLists.convertToExpenseTitle'),
+    message: t('marketLists.convertToExpenseConfirm', { amount: settings.currency + total.toLocaleString() }),
+    ok: { label: t('common.save'), color: 'negative', flat: true },
+    cancel: { label: t('common.cancel'), flat: true },
+  }).onOk(() => {
+    transactions.addTransaction({
+      type: 'expense',
+      amount: total,
+      category: 'Shopping',
+      accountId: accounts.accounts[0]?.id,
+      date: new Date().toISOString().slice(0, 10),
+      time: new Date().toTimeString().slice(0, 5),
+      notes: `${t('marketLists.marketListNotePrefix')}${list.name}`,
+    })
+    accounts.updateBalance(accounts.accounts[0]?.id, -total)
+    $q.notify({ type: 'positive', message: `"${list.name}" ${t('marketLists.expenseCreated', { amount: settings.currency + total.toLocaleString() })}`, position: 'top' })
   })
-  accounts.updateBalance(accounts.accounts[0]?.id, -total)
-  $q.notify({ type: 'positive', message: `"${list.name}" ${t('marketLists.expenseCreated', { amount: settings.currency + total.toLocaleString() })}`, position: 'top' })
 }
 
 onMounted(() => {

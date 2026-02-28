@@ -176,6 +176,10 @@ export default {
     noItems: 'No items',
     estimatedTotal: 'Estimated Total',
     convertToExpense: 'Convert to Expense',
+    convertToExpenseTitle: 'Convert to Expense?',
+    convertToExpenseConfirm:
+      'This will add a new expense transaction of {amount} to your default account. Proceed?',
+    expenseCreated: 'converted to a new expense transaction of {amount}',
     noLists: 'No lists yet',
     addPrompt: 'Tap + to create a new list',
     newMarketList: 'New Market List',
@@ -191,7 +195,6 @@ export default {
     deleteConfirm: 'Are you sure you want to delete this list?',
     listDeleted: 'List deleted',
     marketListNotePrefix: 'Market List: ',
-    expenseCreated: 'from {amount} expense created',
   },
 
   // ========== Notes ==========
