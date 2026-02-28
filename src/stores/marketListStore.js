@@ -41,13 +41,14 @@ export const useMarketListStore = defineStore('marketLists', () => {
 
   async function addList(data) {
     const listsRef = getUserListsRef()
-    if (!listsRef) return
+    if (!listsRef) return null
     const newRef = push(listsRef)
     await set(newRef, {
       name: data.name,
       date: new Date().toISOString().slice(0, 10),
       createdAt: Date.now(),
     })
+    return newRef.key
   }
 
   async function deleteList(id) {
