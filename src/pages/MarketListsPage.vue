@@ -53,7 +53,7 @@
                 <q-item-section side>
                   <div class="row items-center q-gutter-xs">
                     <span class="text-weight-medium">
-                      {{ settings.currency }}{{ settings.formatNumber(item.price * item.quantity) }}
+                      {{ settings.currency }}{{ settings.formatNumber(item.price || 0) }}
                     </span>
                     <q-btn flat round dense icon="close" size="xs" color="grey"
                       @click="marketLists.removeItem(list.id, item.id)" />
