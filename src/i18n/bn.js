@@ -45,6 +45,7 @@ export default {
     reports: 'রিপোর্ট',
     lists: 'তালিকা',
     settings: 'সেটিংস',
+    categories: 'ক্যাটাগরি',
     quickAdd: 'দ্রুত যোগ করুন',
     marketList: 'বাজার তালিকা',
     note: 'নোট',

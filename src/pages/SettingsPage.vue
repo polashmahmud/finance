@@ -157,22 +157,9 @@
       </q-list>
     </q-card>
 
-    <!-- Category & About -->
+    <!-- About Section -->
     <q-card class="finance-card q-mb-md">
       <q-list separator>
-        <q-item clickable class="touch-target" @click="$router.push('/categories')">
-          <q-item-section avatar>
-            <q-icon name="category" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('settings.categoryAndBudget') }}</q-item-label>
-            <q-item-label caption>{{ $t('settings.categoryAndBudgetManage') }}</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-icon name="chevron_right" />
-          </q-item-section>
-        </q-item>
-
         <q-item clickable class="touch-target" @click="$router.push('/help')">
           <q-item-section avatar>
             <q-icon name="help_outline" color="dark" />
@@ -198,19 +185,6 @@
       </q-list>
     </q-card>
 
-    <!-- Logout -->
-    <q-card class="finance-card q-mb-md cursor-pointer" @click="onLogout" v-ripple>
-      <q-list>
-        <q-item class="touch-target">
-          <q-item-section avatar>
-            <q-icon name="logout" color="negative" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label class="text-weight-medium text-negative">{{ $t('common.logout') }}</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-card>
 
     <!-- Set PIN Dialog -->
     <q-dialog v-model="showPinDialog">
@@ -270,16 +244,12 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useSettingsStore } from 'stores/settingsStore'
-import { useAuthStore } from 'stores/authStore'
 import { Notify } from 'quasar'
 
 const { t } = useI18n()
-const router = useRouter()
 const settings = useSettingsStore()
-const authStore = useAuthStore()
 
 const selectedCurrency = ref(settings.currencyCode)
 const selectedLang = ref(settings.language)
@@ -379,19 +349,4 @@ function removePinConfirm() {
   Notify.create({ type: 'positive', message: t('settings.pinRemoved') })
 }
 
-async function onLogout() {
-  if (settings.appLock) {
-    // PIN is set → just lock the screen, don't sign out from Firebase
-    settings.lock()
-    Notify.create({ type: 'info', icon: 'lock', message: t('common.screenLocked'), position: 'top' })
-    router.push('/splash')
-  } else {
-    // No PIN → real Firebase logout
-    const result = await authStore.logout()
-    if (result.success) {
-      Notify.create({ type: 'positive', icon: 'check_circle', message: t('common.logoutSuccess'), position: 'top' })
-      router.push('/login')
-    }
-  }
-}
 </script>

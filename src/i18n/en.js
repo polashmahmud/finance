@@ -45,6 +45,7 @@ export default {
     reports: 'Reports',
     lists: 'Lists',
     settings: 'Settings',
+    categories: 'Categories',
     quickAdd: 'Quick Add',
     marketList: 'Market List',
     note: 'Note',
