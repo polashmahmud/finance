@@ -1,38 +1,50 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="q-mb-md">
-      <div class="text-h5 text-weight-bold">{{ $t('transferPage.title') }}</div>
+    <div class="row items-center q-mb-md">
+      <q-btn flat round icon="arrow_back" @click="$router.back()" />
+      <div class="text-h6 text-weight-bold q-ml-sm">{{ $t('transferPage.title') }}</div>
     </div>
 
-    <q-form @submit.prevent="onSubmit" class="q-gutter-md">
-      <!-- From Account -->
-      <q-select v-model="form.fromAccount" :options="accounts.accounts" option-value="id"
-        :option-label="(opt) => opt.name + ' (' + settings.currency + settings.formatNumber(opt.balance) + ')'" dense
-        emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
+    <q-card class="finance-card">
+      <q-card-section>
+        <q-form @submit.prevent="onSubmit">
+          <!-- Amount -->
+          <q-input v-model.number="form.amount" :label="$t('transferPage.transferAmount')" type="number" outlined
+            color="dark" :prefix="settings.currency" :rules="[val => val > 0 || $t('common.validAmount')]" autofocus
+            input-class="text-h5 text-weight-bold" style="margin-bottom: 10px;" />
 
-      <!-- To Account -->
-      <q-select v-model="form.toAccount" :options="accountOptions" :label="$t('transferPage.toAccount')" outlined dense
-        emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
+          <!-- From & To Accounts -->
+          <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
+            <div class="col-6">
+              <q-select v-model="form.fromAccount" :options="accounts.accounts" option-value="id"
+                :option-label="(opt) => opt.name + ' (' + settings.currency + settings.formatNumber(opt.balance || 0) + ')'"
+                :label="$t('common.account')" outlined color="dark" emit-value map-options
+                :rules="[val => !!val || $t('common.accountRequired')]" />
+            </div>
+            <div class="col-6">
+              <q-select v-model="form.toAccount" :options="accountOptions" :label="$t('transferPage.toAccount')" outlined
+                color="dark" emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
+            </div>
+          </div>
 
-      <!-- Transfer Amount -->
-      <q-input v-model.number="form.amount" type="number" :label="$t('transferPage.transferAmount')" outlined dense
-        :prefix="settings.currency" :rules="[val => val > 0 || $t('common.validAmount')]" />
+          <!-- Transfer Fee -->
+          <q-input v-model.number="form.fee" type="number" :label="$t('transferPage.transferFee')" outlined color="dark"
+            :prefix="settings.currency" style="margin-bottom: 10px;" />
 
-      <!-- Transfer Fee -->
-      <q-input v-model.number="form.fee" type="number" :label="$t('transferPage.transferFee')" outlined dense
-        :prefix="settings.currency" />
+          <!-- Date -->
+          <q-input v-model="form.date" :label="$t('common.date')" outlined color="dark" type="date"
+            :rules="[val => !!val || $t('common.dateRequired')]" style="margin-bottom: 10px;" />
 
-      <!-- Date -->
-      <q-input v-model="form.date" :label="$t('common.date')" outlined dense type="date"
-        :rules="[val => !!val || $t('common.dateRequired')]" />
+          <!-- Note -->
+          <q-input v-model="form.note" :label="$t('common.noteOptional')" outlined color="dark" type="textarea" rows="2"
+            style="margin-bottom: 10px;" />
 
-      <!-- Note -->
-      <q-input v-model="form.note" :label="$t('common.noteOptional')" outlined dense autogrow />
-
-      <!-- Submit -->
-      <q-btn type="submit" :label="$t('transferPage.transferBtn')" color="dark" class="full-width" unelevated rounded
-        no-caps :loading="loading" />
-    </q-form>
+          <!-- Submit -->
+          <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated size="lg"
+            icon="sync_alt" :label="$t('transferPage.transferBtn')" :loading="loading" />
+        </q-form>
+      </q-card-section>
+    </q-card>
   </q-page>
 </template>
 
@@ -63,8 +75,8 @@ const form = ref({
 
 const accountOptions = computed(() =>
   accounts.accounts.map((a) => ({
-    label: a.name,
-    value: a.id, // Changed from a.name to a.id to match option-value="id"
+    label: `${a.name} (${settings.currency}${settings.formatNumber(a.balance || 0)})`,
+    value: a.id,
   })),
 )
 
@@ -80,17 +92,21 @@ async function onSubmit() {
 
   loading.value = true
   try {
+    const fee = form.value.fee || 0
     await transactions.addTransaction({
       type: 'transfer',
       amount: form.value.amount,
-      fee: form.value.fee || 0,
-      fromAccount: form.value.fromAccount,
-      toAccount: form.value.toAccount,
-      account: form.value.fromAccount,
+      fee,
+      fromAccountId: form.value.fromAccount,
+      toAccountId: form.value.toAccount,
+      accountId: form.value.fromAccount,
       date: form.value.date,
-      note: form.value.note,
+      notes: form.value.note,
       category: t('common.transfer'),
     })
+    // Update account balances: subtract from source (amount + fee), add to destination (amount only)
+    await accounts.updateBalance(form.value.fromAccount, -(form.value.amount + fee))
+    await accounts.updateBalance(form.value.toAccount, form.value.amount)
     Notify.create({ message: t('transferPage.transferSuccess'), color: 'positive' })
     router.push('/')
   } catch (e) {

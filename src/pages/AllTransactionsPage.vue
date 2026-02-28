@@ -143,6 +143,24 @@
                             :options="accountOptions" :label="$t('common.account')" outlined color="dark" emit-value
                             map-options class="q-mb-sm" />
 
+                        <!-- From/To Accounts & Fee (for transfer) -->
+                        <div v-if="editForm.type === 'transfer'" class="q-mb-sm">
+                            <div class="row q-col-gutter-md q-mb-sm">
+                                <div class="col-6">
+                                    <q-select v-model="editForm.fromAccountId" :options="accountOptions"
+                                        :label="$t('transferPage.fromAccount')" outlined color="dark" emit-value
+                                        map-options />
+                                </div>
+                                <div class="col-6">
+                                    <q-select v-model="editForm.toAccountId" :options="accountOptions"
+                                        :label="$t('transferPage.toAccount')" outlined color="dark" emit-value
+                                        map-options />
+                                </div>
+                            </div>
+                            <q-input v-model.number="editForm.fee" :label="$t('transferPage.transferFee')" type="number"
+                                outlined color="dark" :prefix="settings.currency" />
+                        </div>
+
                         <!-- Date & Time -->
                         <div class="row q-col-gutter-md q-mb-sm">
                             <div class="col-6">
@@ -216,11 +234,17 @@ const editForm = reactive({
     amount: null,
     category: '',
     accountId: null,
+    fromAccountId: null,
+    toAccountId: null,
+    fee: 0,
     date: '',
     time: '',
     notes: '',
     originalAmount: 0,
     originalAccountId: null,
+    originalFromAccountId: null,
+    originalToAccountId: null,
+    originalFee: 0,
 })
 
 const typeFilters = computed(() => [
@@ -373,11 +397,17 @@ function onEditTx(tx, reset) {
     editForm.amount = tx.amount
     editForm.category = tx.category || ''
     editForm.accountId = tx.accountId || null
+    editForm.fromAccountId = tx.fromAccountId || null
+    editForm.toAccountId = tx.toAccountId || null
+    editForm.fee = tx.fee || 0
     editForm.date = tx.date || ''
     editForm.time = tx.time || ''
     editForm.notes = tx.notes || ''
     editForm.originalAmount = tx.amount
     editForm.originalAccountId = tx.accountId
+    editForm.originalFromAccountId = tx.fromAccountId || null
+    editForm.originalToAccountId = tx.toAccountId || null
+    editForm.originalFee = tx.fee || 0
     editDialogOpen.value = true
 }
 
@@ -385,16 +415,40 @@ async function saveEdit() {
     if (!editForm.amount || editForm.amount <= 0) return
     saving.value = true
     try {
-        const updateData = {
-            amount: editForm.amount,
-            category: editForm.category,
-            accountId: editForm.accountId,
-            date: editForm.date,
-            time: editForm.time,
-            notes: editForm.notes,
+        if (editForm.type === 'transfer') {
+            if (!editForm.fromAccountId || !editForm.toAccountId) {
+                $q.notify({ type: 'negative', message: t('transferPage.selectBothAccounts'), position: 'top' })
+                saving.value = false
+                return
+            }
+            if (editForm.fromAccountId === editForm.toAccountId) {
+                $q.notify({ type: 'negative', message: t('transferPage.selectDifferentAccounts'), position: 'top' })
+                saving.value = false
+                return
+            }
         }
 
-        // Adjust account balances if amount or account changed (income/expense only)
+        const updateData = editForm.type === 'transfer'
+            ? {
+                amount: editForm.amount,
+                fee: editForm.fee || 0,
+                fromAccountId: editForm.fromAccountId,
+                toAccountId: editForm.toAccountId,
+                accountId: editForm.fromAccountId,
+                date: editForm.date,
+                time: editForm.time,
+                notes: editForm.notes,
+            }
+            : {
+                amount: editForm.amount,
+                category: editForm.category,
+                accountId: editForm.accountId,
+                date: editForm.date,
+                time: editForm.time,
+                notes: editForm.notes,
+            }
+
+        // Adjust account balances if amount or account changed
         if (editForm.type === 'income' || editForm.type === 'expense') {
             const sign = editForm.type === 'income' ? 1 : -1
             const oldAmount = editForm.originalAmount || 0
@@ -408,6 +462,27 @@ async function saveEdit() {
             // Apply new amount to new account
             if (editForm.accountId) {
                 await accounts.updateBalance(editForm.accountId, sign * newAmount)
+            }
+        } else if (editForm.type === 'transfer') {
+            const oldAmount = editForm.originalAmount || 0
+            const oldFee = editForm.originalFee || 0
+            const newAmount = editForm.amount
+            const newFee = editForm.fee || 0
+
+            // Revert old transfer effect
+            if (editForm.originalFromAccountId) {
+                await accounts.updateBalance(editForm.originalFromAccountId, oldAmount + oldFee)
+            }
+            if (editForm.originalToAccountId) {
+                await accounts.updateBalance(editForm.originalToAccountId, -oldAmount)
+            }
+
+            // Apply new transfer effect
+            if (editForm.fromAccountId) {
+                await accounts.updateBalance(editForm.fromAccountId, -(newAmount + newFee))
+            }
+            if (editForm.toAccountId) {
+                await accounts.updateBalance(editForm.toAccountId, newAmount)
             }
         }
 
