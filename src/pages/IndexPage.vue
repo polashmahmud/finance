@@ -14,7 +14,7 @@
           <div class="col-6">
             <div class="q-mb-sm">
               <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance')
-              }}</div>
+                }}</div>
               <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
                 formatNumber(accounts.totalBalance) }}</div>
             </div>
@@ -142,7 +142,7 @@
       <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right"
         @click="$router.push('/all-transactions')" size="sm" />
     </div>
-    <q-card class="finance-card">
+    <q-card class="finance-card" style="border-radius: 16px; overflow: hidden;">
       <q-list separator>
         <q-slide-item v-for="tx in transactions.recentTransactions" :key="tx.id"
           @left="({ reset }) => onEditTx(tx, reset)" @right="({ reset }) => onDeleteTx(tx.id, reset)">
