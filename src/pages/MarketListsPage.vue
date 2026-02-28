@@ -31,6 +31,8 @@
               </div>
               <div class="row q-gutter-xs">
                 <q-btn flat round dense icon="add" color="dark" @click="openAddItem(list.id)" />
+                <q-btn flat round dense icon="content_copy" color="primary" @click="duplicateList(list)" />
+                <q-btn flat round dense icon="share" color="info" @click="shareList(list)" />
                 <q-btn flat round dense icon="delete_outline" color="negative" @click="confirmDeleteList(list)" />
               </div>
             </div>
@@ -240,6 +242,72 @@ function convertToExpense(list) {
     accounts.updateBalance(accounts.accounts[0]?.id, -total)
     $q.notify({ type: 'positive', message: `"${list.name}" ${t('marketLists.expenseCreated', { amount: settings.currency + total.toLocaleString() })}`, position: 'top' })
   })
+}
+
+async function duplicateList(list) {
+  saving.value = true
+  try {
+    const copyNameSuffix = settings.language === 'bn' ? ' (কপি)' : ' (Copy)'
+    const newListRef = await marketLists.addList({ name: list.name + copyNameSuffix })
+
+    // addList returns the document reference in marketListStore.js, but the store implementation
+    // might not return the ID directly depending on how it's written. We will fetch the lists again
+    // and find the newest one with this name if we didn't get an ID, but assuming addList adds
+    // it locally or we can just iterate.
+    // To be safe and simple, we can add items if we have the new list's ID.
+    // However, looking at marketListStore.js, addList likely pushes to Firebase.
+    // Let's implement a clean duplicate by first getting the ID.
+    // If addList returns the new ID, we can use it:
+    const newListId = newListRef?.id || newListRef
+
+    if (newListId && list.items && list.items.length > 0) {
+      for (const item of list.items) {
+        await marketLists.addItem(newListId, {
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          bought: false
+        })
+      }
+    }
+
+    $q.notify({ type: 'positive', message: t('marketLists.copySuccess'), position: 'top' })
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  saving.value = false
+}
+
+async function shareList(list) {
+  let text = `${list.name}\n\n`
+  if (list.items && list.items.length > 0) {
+    list.items.forEach(item => {
+      text += `- ${item.name} (${item.quantity})\n`
+    })
+  } else {
+    text += t('marketLists.emptyStateMessage')
+  }
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: list.name,
+        text: text,
+      })
+      $q.notify({ type: 'positive', message: t('marketLists.shareSuccess'), position: 'top' })
+    } catch (err) {
+      // User cancelled share or it failed
+      console.error('Error sharing:', err)
+    }
+  } else {
+    // Fallback to clipboard
+    try {
+      await navigator.clipboard.writeText(text)
+      $q.notify({ type: 'positive', message: t('marketLists.shareSuccess'), position: 'top' })
+    } catch {
+      $q.notify({ type: 'negative', message: t('marketLists.shareError'), position: 'top' })
+    }
+  }
 }
 
 onMounted(() => {
