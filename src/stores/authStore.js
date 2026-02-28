@@ -5,6 +5,9 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { auth, firestore } from 'boot/firebase'
@@ -26,14 +29,14 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = currentUser
     isAuthenticated.value = !!currentUser
     isAuthReady.value = true
-    
+
     // Fetch user profile when auth state changes
     if (currentUser) {
       await fetchUserProfile(currentUser.uid)
     } else {
       userProfile.value = null
     }
-    
+
     _authReadyResolve()
   })
 
@@ -52,7 +55,7 @@ export const useAuthStore = defineStore('auth', () => {
           uid: uid,
           name: '',
           avatar: null,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         }
       }
     } catch (error) {
@@ -63,26 +66,26 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function updateUserProfile(updates) {
     if (!user.value) return { success: false, error: 'Not authenticated' }
-    
+
     try {
       const userRef = doc(firestore, 'users', user.value.uid)
       const currentProfile = await getDoc(userRef)
-      
+
       if (currentProfile.exists()) {
         await updateDoc(userRef, updates)
       } else {
         await setDoc(userRef, {
           uid: user.value.uid,
           ...updates,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         })
       }
-      
+
       // Update local state
       if (userProfile.value) {
         userProfile.value = { ...userProfile.value, ...updates }
       }
-      
+
       return { success: true }
     } catch (error) {
       console.error('Error updating user profile:', error)
@@ -115,16 +118,16 @@ export const useAuthStore = defineStore('auth', () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       user.value = userCredential.user
       isAuthenticated.value = true
-      
+
       // Create initial user profile
       await setDoc(doc(firestore, 'users', userCredential.user.uid), {
         uid: userCredential.user.uid,
         name: '',
         avatar: null,
         email: email,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       })
-      
+
       await fetchUserProfile(userCredential.user.uid)
       return { success: true }
     } catch (error) {
@@ -144,6 +147,26 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function changePassword(currentPassword, newPassword) {
+    if (!user.value) {
+      return { success: false, error: 'Not authenticated' }
+    }
+
+    try {
+      // Re-authenticate user with current password
+      const credential = EmailAuthProvider.credential(user.value.email, currentPassword)
+      await reauthenticateWithCredential(user.value, credential)
+
+      // Update password
+      await updatePassword(user.value, newPassword)
+
+      return { success: true }
+    } catch (error) {
+      console.error('Error changing password:', error)
+      return { success: false, error: error.message }
+    }
+  }
+
   return {
     user,
     userProfile,
@@ -157,5 +180,6 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
+    changePassword,
   }
 })

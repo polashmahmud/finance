@@ -307,6 +307,17 @@ export default {
     removePinConfirm: 'Enter current PIN to remove lock',
     font: 'Font',
     fontSubtitle: 'Change app font style',
+    changePassword: 'Change Password',
+    currentPassword: 'Current Password',
+    newPassword: 'New Password',
+    confirmNewPassword: 'Confirm New Password',
+    enterCurrentPassword: 'Enter current password',
+    enterNewPassword: 'Enter new password',
+    confirmPasswordChange: 'Confirm new password',
+    passwordChanged: 'Password changed successfully',
+    wrongPassword: 'Current password is incorrect',
+    passwordMinChars: 'Password must be at least 6 characters',
+    passwordNotMatch: 'Passwords do not match',
   },
 
   // ========== Auth ==========

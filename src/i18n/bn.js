@@ -307,6 +307,17 @@ export default {
     removePinConfirm: 'লক মুছতে বর্তমান পিন দিন',
     font: 'ফন্ট',
     fontSubtitle: 'অ্যাপের ফন্ট স্টাইল পরিবর্তন করুন',
+    changePassword: 'পাসওয়ার্ড পরিবর্তন',
+    currentPassword: 'বর্তমান পাসওয়ার্ড',
+    newPassword: 'নতুন পাসওয়ার্ড',
+    confirmNewPassword: 'নতুন পাসওয়ার্ড নিশ্চিত করুন',
+    enterCurrentPassword: 'বর্তমান পাসওয়ার্ড লিখুন',
+    enterNewPassword: 'নতুন পাসওয়ার্ড লিখুন',
+    confirmPasswordChange: 'নতুন পাসওয়ার্ড নিশ্চিত করুন',
+    passwordChanged: 'পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে',
+    wrongPassword: 'বর্তমান পাসওয়ার্ড ভুল',
+    passwordMinChars: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে',
+    passwordNotMatch: 'পাসওয়ার্ড মিলছে না',
   },
 
   // ========== Auth ==========

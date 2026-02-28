@@ -93,7 +93,7 @@
                 <q-item v-bind="scope.itemProps">
                   <q-item-section>
                     <q-item-label :style="{ fontFamily: scope.opt.value + ', sans-serif' }">{{ scope.opt.label
-                    }}</q-item-label>
+                      }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </template>
@@ -115,7 +115,7 @@
           <q-item-section>
             <q-item-label>{{ $t('settings.appLockPin') }}</q-item-label>
             <q-item-label caption>{{ settings.appLock ? $t('settings.active') : $t('settings.inactive')
-            }}</q-item-label>
+              }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-toggle :model-value="settings.appLock" color="dark" @update:model-value="onToggleAppLock" />
@@ -129,6 +129,19 @@
           </q-item-section>
           <q-item-section>
             <q-item-label>{{ $t('settings.change') }} PIN</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-icon name="chevron_right" />
+          </q-item-section>
+        </q-item>
+
+        <!-- Change Password -->
+        <q-item clickable class="touch-target" @click="showChangePasswordDialog = true">
+          <q-item-section avatar>
+            <q-icon name="key" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('settings.changePassword') }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-icon name="chevron_right" />
@@ -299,6 +312,46 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <!-- Change Password Dialog -->
+    <q-dialog v-model="showChangePasswordDialog" persistent>
+      <q-card style="min-width: 350px; border-radius: 16px">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6 text-weight-bold">{{ $t('settings.changePassword') }}</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup @click="resetPasswordForm" />
+        </q-card-section>
+
+        <q-card-section class="q-gutter-md q-pt-md">
+          <q-input v-model="currentPassword" :label="$t('settings.currentPassword')"
+            :placeholder="$t('settings.enterCurrentPassword')" type="password" outlined autofocus>
+            <template v-slot:prepend>
+              <q-icon name="lock" />
+            </template>
+          </q-input>
+
+          <q-input v-model="newPassword" :label="$t('settings.newPassword')"
+            :placeholder="$t('settings.enterNewPassword')" type="password" outlined>
+            <template v-slot:prepend>
+              <q-icon name="key" />
+            </template>
+          </q-input>
+
+          <q-input v-model="confirmNewPassword" :label="$t('settings.confirmNewPassword')"
+            :placeholder="$t('settings.confirmPasswordChange')" type="password" outlined>
+            <template v-slot:prepend>
+              <q-icon name="key" />
+            </template>
+          </q-input>
+        </q-card-section>
+
+        <q-card-actions align="right" class="q-px-md q-pb-md">
+          <q-btn flat :label="$t('common.cancel')" v-close-popup @click="resetPasswordForm" />
+          <q-btn unelevated color="dark" :label="$t('common.save')" @click="changePassword"
+            :loading="changingPassword" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -332,6 +385,13 @@ const showChangePinDialog = ref(false)
 const showRemovePinDialog = ref(false)
 const newPin = ref('')
 const currentPinInput = ref('')
+
+// Password change refs
+const showChangePasswordDialog = ref(false)
+const currentPassword = ref('')
+const newPassword = ref('')
+const confirmNewPassword = ref('')
+const changingPassword = ref(false)
 
 // Select refs
 const selectedCurrency = ref(settings.currencyCode)
@@ -404,6 +464,12 @@ function resetForm() {
   selectedFile.value = null
   showCropper.value = false
   imageElement.value = null
+}
+
+function resetPasswordForm() {
+  currentPassword.value = ''
+  newPassword.value = ''
+  confirmNewPassword.value = ''
 }
 
 function triggerFileInput() {
@@ -596,6 +662,50 @@ function removePinConfirm() {
   currentPinInput.value = ''
   showRemovePinDialog.value = false
   Notify.create({ type: 'positive', message: t('settings.pinRemoved') })
+}
+
+async function changePassword() {
+  // Validate password
+  if (!currentPassword.value) {
+    Notify.create({ type: 'warning', message: t('settings.enterCurrentPassword') })
+    return
+  }
+
+  if (!newPassword.value || newPassword.value.length < 6) {
+    Notify.create({ type: 'warning', message: t('settings.passwordMinChars') })
+    return
+  }
+
+  if (newPassword.value !== confirmNewPassword.value) {
+    Notify.create({ type: 'warning', message: t('settings.passwordNotMatch') })
+    return
+  }
+
+  changingPassword.value = true
+
+  try {
+    const result = await authStore.changePassword(currentPassword.value, newPassword.value)
+
+    if (result.success) {
+      Notify.create({ type: 'positive', message: t('settings.passwordChanged') })
+      showChangePasswordDialog.value = false
+      resetPasswordForm()
+    } else {
+      // Handle specific Firebase auth errors
+      if (result.error && result.error.includes('wrong-password')) {
+        Notify.create({ type: 'negative', message: t('settings.wrongPassword') })
+      } else if (result.error && result.error.includes('requires-recent-authentication')) {
+        Notify.create({ type: 'negative', message: t('settings.wrongPassword') })
+      } else {
+        Notify.create({ type: 'negative', message: result.error || t('common.error') })
+      }
+    }
+  } catch (error) {
+    console.error('Password change error:', error)
+    Notify.create({ type: 'negative', message: t('common.error') + error.message })
+  } finally {
+    changingPassword.value = false
+  }
 }
 
 </script>
