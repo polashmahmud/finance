@@ -14,7 +14,7 @@
           <div class="col-6">
             <div class="q-mb-sm">
               <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance')
-                }}</div>
+              }}</div>
               <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
                 formatNumber(accounts.totalBalance) }}</div>
             </div>
@@ -183,6 +183,12 @@
         <div>{{ $t('dashboard.noTransactionsYet') }}</div>
       </q-card-section>
     </q-card>
+
+    <!-- Swipe Hint -->
+    <div class="text-center q-pa-md text-grey-6" style="font-size: 12px;" v-if="transactions.recentTransactions.length">
+      <q-icon name="swipe" size="16px" class="q-mr-xs" />
+      {{ $t('categories.swipeHint') }}
+    </div>
 
     <!-- Edit Transaction Dialog -->
     <q-dialog v-model="editDialogOpen" position="bottom" transition-show="slide-up" transition-hide="slide-down">

@@ -31,18 +31,16 @@
             </q-card>
         </q-dialog>
 
-        <!-- Type Filter -->
-        <div class="row q-gutter-sm q-mb-md">
-            <q-chip v-for="f in typeFilters" :key="f.value" :selected="selectedType === f.value"
-                :color="selectedType === f.value ? 'dark' : 'grey-3'"
-                :text-color="selectedType === f.value ? 'white' : 'dark'" clickable @click="selectedType = f.value"
-                dense>
-                {{ f.label }}
-            </q-chip>
-        </div>
+        <!-- Type Filter (Tabs) -->
+        <q-card class="finance-card q-mb-md">
+            <q-tabs v-model="selectedType" dense active-color="dark" indicator-color="dark" class="text-grey-6"
+                align="justify">
+                <q-tab v-for="f in typeFilters" :key="f.value" :name="f.value" :label="f.label" />
+            </q-tabs>
+        </q-card>
 
         <!-- Summary -->
-        <div class="row q-gutter-sm q-mb-md" v-if="filteredTransactions.length">
+        <div class="row q-gutter-sm q-mb-md justify-center" v-if="filteredTransactions.length">
             <q-chip color="green-1" text-color="green-9" icon="trending_up" dense>
                 {{ $t('common.income') }}: {{ settings.currency }}{{ formatNumber(filteredIncome) }}
             </q-chip>
@@ -52,7 +50,7 @@
         </div>
 
         <!-- Transaction List -->
-        <q-card class="finance-card" v-if="filteredTransactions.length">
+        <q-card class="finance-card" style="border-radius: 16px; overflow: hidden;" v-if="filteredTransactions.length">
             <q-list separator>
                 <q-slide-item v-for="tx in filteredTransactions" :key="tx.id" @left="({ reset }) => onEditTx(tx, reset)"
                     @right="({ reset }) => onDeleteTx(tx.id, reset)">
@@ -97,6 +95,12 @@
         <div v-else class="text-center text-grey q-pa-xl">
             <q-icon name="receipt_long" size="56px" class="q-mb-md" />
             <div class="text-body1">{{ $t('dashboard.noTransactionsYet') }}</div>
+        </div>
+
+        <!-- Swipe Hint -->
+        <div class="text-center q-pa-md text-grey-6" style="font-size: 12px;" v-if="filteredTransactions.length">
+            <q-icon name="swipe" size="16px" class="q-mr-xs" />
+            {{ $t('categories.swipeHint') }}
         </div>
 
         <!-- Edit Dialog -->
