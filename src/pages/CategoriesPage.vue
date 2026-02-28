@@ -49,9 +49,12 @@
                   </q-item-section>
                   <q-item-section>
                     <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
-                    <q-item-label caption v-if="cat.budget">
-                      {{ $t('categories.budgetPrefix') }} {{ settings.currency }}{{ Number(cat.budget).toLocaleString()
-                      }}{{ $t('categories.perMonth') }}
+                    <q-item-label caption v-if="getLastTransaction(cat.name)">
+                      {{ getLastTransaction(cat.name).date }} &middot; {{ settings.currency }}{{
+                        formatAmount(getLastTransaction(cat.name).amount) }}
+                    </q-item-label>
+                    <q-item-label caption v-else>
+                      {{ $t('dashboard.noTransactionsYet') }}
                     </q-item-label>
                   </q-item-section>
                 </q-item>
@@ -84,9 +87,12 @@
                   </q-item-section>
                   <q-item-section>
                     <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
-                    <q-item-label caption v-if="cat.budget">
-                      {{ $t('categories.budgetPrefix') }} {{ settings.currency }}{{ Number(cat.budget).toLocaleString()
-                      }}{{ $t('categories.perMonth') }}
+                    <q-item-label caption v-if="getLastTransaction(cat.name)">
+                      {{ getLastTransaction(cat.name).date }} &middot; {{ settings.currency }}{{
+                        formatAmount(getLastTransaction(cat.name).amount) }}
+                    </q-item-label>
+                    <q-item-label caption v-else>
+                      {{ $t('dashboard.noTransactionsYet') }}
                     </q-item-label>
                   </q-item-section>
                 </q-item>
@@ -182,12 +188,14 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
+import { useTransactionStore } from 'stores/transactionStore'
 
 const { t } = useI18n()
 const $q = useQuasar()
 const $router = useRouter()
 const categoryStore = useCategoryStore()
 const settings = useSettingsStore()
+const transactionStore = useTransactionStore()
 
 const tab = ref('expense')
 const showDialog = ref(false)
@@ -296,6 +304,20 @@ function goToCategory(cat) {
   $router.push(`/category/${cat.name}/transactions`)
 }
 
+function getLastTransaction(categoryName) {
+  const txs = transactionStore.transactions.filter(t => t.category === categoryName)
+  if (!txs.length) return null
+  return txs.sort((a, b) => {
+    const timeA = a.createdAt || 0
+    const timeB = b.createdAt || 0
+    return timeB - timeA
+  })[0]
+}
+
+function formatAmount(amount) {
+  return Number(amount || 0).toLocaleString()
+}
+
 function onSwipe({ reset }, action, cat) {
   // Delay the action to allow swipe animation to complete
   setTimeout(() => {
@@ -313,9 +335,11 @@ function onSwipe({ reset }, action, cat) {
 
 onMounted(() => {
   categoryStore.listenCategories()
+  transactionStore.listenTransactions()
 })
 
 onUnmounted(() => {
   categoryStore.stopListening()
+  transactionStore.stopListening()
 })
 </script>
