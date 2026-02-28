@@ -28,6 +28,7 @@ export default {
     screenLocked: 'স্ক্রিন লক হয়েছে',
     darkMode: 'ডার্ক মোড',
     balance: 'ব্যালেন্স',
+    month: 'মাস',
   },
 
   // ========== Greetings ==========
@@ -62,6 +63,8 @@ export default {
     budgetStatus: 'বাজেট স্ট্যাটাস',
     recentTransactions: 'সাম্প্রতিক লেনদেন',
     noTransactionsYet: 'এখনো কোনো লেনদেন হয়নি',
+    budgetAmount: 'বাজেট পরিমাণ',
+    details: 'বিস্তারিত',
   },
 
   // ========== Accounts ==========
@@ -365,6 +368,7 @@ export default {
     remaining: 'বাকি আছে {amount}',
     totalAmount: 'মোট পরিমাণ',
     transactions: 'টি লেনদেন',
+    noBudgetSet: 'এই মাসের জন্য কোনো বাজেট সেট করা হয়নি',
   },
 
   // ========== Error Page ==========

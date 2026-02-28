@@ -28,6 +28,7 @@ export default {
     screenLocked: 'Screen locked',
     darkMode: 'Dark Mode',
     balance: 'Balance',
+    month: 'Month',
   },
 
   // ========== Greetings ==========
@@ -62,6 +63,8 @@ export default {
     budgetStatus: 'Budget Status',
     recentTransactions: 'Recent Transactions',
     noTransactionsYet: 'No transactions yet',
+    budgetAmount: 'Budget Amount',
+    details: 'Details',
   },
 
   // ========== Accounts ==========
@@ -365,6 +368,7 @@ export default {
     remaining: '{amount} remaining',
     totalAmount: 'Total Amount',
     transactions: 'transactions',
+    noBudgetSet: 'No budget set for this month',
   },
 
   // ========== Error Page ==========

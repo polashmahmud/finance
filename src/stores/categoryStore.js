@@ -70,6 +70,21 @@ export const useCategoryStore = defineStore('categories', () => {
     await remove(catRef)
   }
 
+  async function setMonthlyBudget(categoryId, yearMonth, amount) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const budgetRef = dbRef(
+      database,
+      `finance/users/${uid}/categories/${categoryId}/budgets/${yearMonth}`,
+    )
+    await set(budgetRef, amount)
+  }
+
+  function getMonthlyBudget(category, yearMonth) {
+    if (!category.budgets || !category.budgets[yearMonth]) return null
+    return category.budgets[yearMonth]
+  }
+
   function stopListening() {
     if (unsubscribe) {
       unsubscribe()
@@ -86,6 +101,8 @@ export const useCategoryStore = defineStore('categories', () => {
     addCategory,
     updateCategory,
     deleteCategory,
+    setMonthlyBudget,
+    getMonthlyBudget,
     stopListening,
   }
 })

@@ -69,26 +69,64 @@
 
     <!-- Budget Status -->
     <div class="section-title">{{ $t('dashboard.budgetStatus') }}</div>
-    <div class="q-gutter-md q-mb-md">
-      <q-card v-for="cat in topBudgetCategories" :key="cat.id" class="finance-card cursor-pointer" v-ripple
-        @click="$router.push('/category/' + encodeURIComponent(cat.name) + '/transactions')">
-        <q-card-section>
-          <div class="row justify-between items-center q-mb-xs">
-            <div class="row items-center q-gutter-sm">
-              <q-icon :name="cat.icon" :style="{ color: cat.color }" size="20px" />
-              <span class="text-body2 text-weight-medium">{{ cat.name }}</span>
-            </div>
-            <span class="text-caption text-grey">
-              {{ settings.currency }}{{ formatNumber(getCategorySpent(cat.name)) }} / {{ settings.currency }}{{
-                formatNumber(cat.budget) }}
-            </span>
+    <div class="row q-col-gutter-sm q-mb-md">
+      <div v-for="cat in categories.expenseCategories" :key="cat.id" class="col-3">
+        <q-card class="finance-card cursor-pointer column items-center q-pa-sm" style="min-height: 110px;"
+          @click="openBudgetModal(cat)">
+          <q-avatar :style="{ background: cat.color + '18' }" size="36px" class="q-mb-xs">
+            <q-icon :name="cat.icon" :style="{ color: cat.color }" size="18px" />
+          </q-avatar>
+          <div class="text-body2 text-weight-medium text-center ellipsis" style="font-size: 11px; width: 100%;">
+            {{ cat.name }}
           </div>
-          <q-linear-progress :value="Math.min(getCategorySpent(cat.name) / cat.budget, 1)"
-            :color="getCategorySpent(cat.name) > cat.budget ? 'negative' : 'positive'" rounded size="8px"
-            track-color="grey-3" />
+          <div v-if="getCurrentMonthBudget(cat)" class="text-caption q-mt-xs" style="font-size: 10px;">
+            {{ settings.currency }}{{ formatNumber(getCategorySpent(cat.name)) }} / {{ settings.currency }}{{
+              formatNumber(getCurrentMonthBudget(cat)) }}
+          </div>
+          <div v-if="getCurrentMonthBudget(cat)" class="q-mt-xs" style="width: 100%;">
+            <q-linear-progress :value="Math.min(getCategorySpent(cat.name) / getCurrentMonthBudget(cat), 1)"
+              :color="getCategorySpent(cat.name) > getCurrentMonthBudget(cat) ? 'negative' : 'positive'" rounded
+              size="6px" track-color="grey-3" />
+          </div>
+          <div v-else class="text-caption text-grey-5 q-mt-xs">
+            -
+          </div>
+        </q-card>
+      </div>
+    </div>
+
+    <!-- Budget Modal -->
+    <q-dialog v-model="budgetModalOpen" position="bottom" transition-show="slide-up" transition-hide="slide-down">
+      <q-card
+        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
+        <q-card-section class="row items-center justify-between no-wrap q-pb-none">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
+            {{ budgetModalCategory?.name }}
+          </div>
+          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+        </q-card-section>
+
+        <q-card-section>
+          <q-form @submit.prevent="saveBudget" class="q-gutter-md">
+            <!-- Month Selector -->
+            <q-select v-model="budgetForm.month" :options="monthOptions" :label="$t('common.month')" outlined dense
+              emit-value map-options color="dark" />
+
+            <!-- Budget Amount -->
+            <q-input v-model.number="budgetForm.amount" :label="$t('dashboard.budgetAmount')" outlined dense
+              type="number" color="dark" :prefix="settings.currency" />
+
+            <!-- Buttons -->
+            <div class="row q-gutter-md">
+              <q-btn type="button" :label="$t('dashboard.details')" class="col bg-grey-2 text-dark" unelevated size="md"
+                @click="goToCategoryDetails" :loading="saving" />
+              <q-btn type="submit" :label="$t('common.save')" class="col bg-primary-gradient text-white" unelevated
+                size="md" :loading="saving" />
+            </div>
+          </q-form>
         </q-card-section>
       </q-card>
-    </div>
+    </q-dialog>
 
     <!-- Recent Transactions -->
     <div class="row items-center justify-between q-mb-sm">
@@ -213,6 +251,7 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useAccountStore } from 'stores/accountStore'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
@@ -220,6 +259,7 @@ import { useSettingsStore } from 'stores/settingsStore'
 
 const { t } = useI18n()
 const $q = useQuasar()
+const $router = useRouter()
 const accounts = useAccountStore()
 const transactions = useTransactionStore()
 const categories = useCategoryStore()
@@ -227,6 +267,66 @@ const settings = useSettingsStore()
 
 const editDialogOpen = ref(false)
 const saving = ref(false)
+
+// Budget Modal
+const budgetModalOpen = ref(false)
+const budgetModalCategory = ref(null)
+const budgetForm = reactive({
+  month: '',
+  amount: null,
+})
+
+// Get current month in YYYY-MM format
+const currentMonth = computed(() => {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+})
+
+// Month options for selector
+const monthOptions = computed(() => {
+  const options = []
+  const now = new Date()
+  // Generate last 12 months
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    const label = d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
+    options.push({ label, value })
+  }
+  return options
+})
+
+function getCurrentMonthBudget(cat) {
+  if (!cat.budgets || !cat.budgets[currentMonth.value]) return null
+  return cat.budgets[currentMonth.value]
+}
+
+function openBudgetModal(cat) {
+  budgetModalCategory.value = cat
+  const existingBudget = getCurrentMonthBudget(cat)
+  budgetForm.month = currentMonth.value
+  budgetForm.amount = existingBudget || null
+  budgetModalOpen.value = true
+}
+
+async function saveBudget() {
+  if (!budgetModalCategory.value || !budgetForm.month) return
+  saving.value = true
+  try {
+    await categories.setMonthlyBudget(budgetModalCategory.value.id, budgetForm.month, budgetForm.amount || 0)
+    $q.notify({ type: 'positive', message: t('categories.categoryUpdated'), position: 'top' })
+    budgetModalOpen.value = false
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  saving.value = false
+}
+
+function goToCategoryDetails() {
+  if (budgetModalCategory.value) {
+    $router.push(`/category/${encodeURIComponent(budgetModalCategory.value.name)}/transactions`)
+  }
+}
 const editForm = reactive({
   id: null,
   type: '',
@@ -260,9 +360,9 @@ const greeting = computed(() => {
   return t('greetings.night')
 })
 
-const topBudgetCategories = computed(() =>
-  categories.expenseCategories.filter((c) => c.budget).slice(0, 4),
-)
+function formatNumber(n) {
+  return Number(n || 0).toLocaleString()
+}
 
 function getCategorySpent(categoryName) {
   return transactions.transactions
@@ -278,10 +378,6 @@ function getCategoryColor(categoryName) {
 function getCategoryIcon(categoryName) {
   const all = [...categories.incomeCategories, ...categories.expenseCategories]
   return all.find((c) => c.name === categoryName)?.icon || 'receipt'
-}
-
-function formatNumber(n) {
-  return Number(n || 0).toLocaleString()
 }
 
 function formatShort(n) {
