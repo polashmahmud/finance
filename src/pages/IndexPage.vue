@@ -14,7 +14,7 @@
           <div class="col-6">
             <div class="q-mb-sm">
               <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance')
-              }}</div>
+                }}</div>
               <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
                 formatNumber(accounts.totalBalance) }}</div>
             </div>
@@ -88,8 +88,9 @@
               :color="getCategorySpent(cat.name) > getCurrentMonthBudget(cat) ? 'negative' : 'positive'" rounded
               size="6px" track-color="grey-3" />
           </div>
-          <div v-else class="text-caption text-grey-5 q-mt-xs">
-            -
+          <div v-else class="text-caption text-grey-5 q-mt-xs text-center leading-tight"
+            style="font-size: 10px; line-height: 1.1;">
+            {{ $t('dashboard.tapToSetBudget') }}
           </div>
         </q-card>
       </div>

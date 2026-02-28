@@ -65,6 +65,7 @@ export default {
     noTransactionsYet: 'এখনো কোনো লেনদেন হয়নি',
     budgetAmount: 'বাজেট পরিমাণ',
     details: 'বিস্তারিত',
+    tapToSetBudget: 'বাজেট সেট করতে ট্যাপ করুন',
   },
 
   // ========== Accounts ==========

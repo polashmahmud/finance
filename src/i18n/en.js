@@ -65,6 +65,7 @@ export default {
     noTransactionsYet: 'No transactions yet',
     budgetAmount: 'Budget Amount',
     details: 'Details',
+    tapToSetBudget: 'Tap to set budget',
   },
 
   // ========== Accounts ==========
