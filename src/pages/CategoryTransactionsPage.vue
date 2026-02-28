@@ -15,32 +15,35 @@
             </div>
           </div>
           <!-- Budget Info -->
-          <div v-if="monthlyBudget" class="q-mt-sm">
-            <div class="row justify-between items-center q-mb-xs">
-              <span class="text-caption text-grey">{{ $t('categoryTransactions.budgetUsed') }}</span>
-              <span class="text-caption" :class="isOverBudget ? 'text-negative' : 'text-positive'">
-                {{ $t('common.expense') }}: {{ settings.currency }}{{ settings.formatNumber(totalSpent) }} / {{
-                  settings.currency }}{{
-                  settings.formatNumber(monthlyBudget) }}
-              </span>
+          <div v-if="category.type === 'expense'" class="q-mt-sm cursor-pointer q-pa-sm rounded-borders"
+            :class="monthlyBudget ? '' : 'bg-grey-1'" @click="openBudgetModal" v-ripple>
+            <div v-if="monthlyBudget">
+              <div class="row justify-between items-center q-mb-xs">
+                <span class="text-caption text-grey">{{ $t('categoryTransactions.budgetUsed') }}</span>
+                <span class="text-caption" :class="isOverBudget ? 'text-negative' : 'text-positive'">
+                  {{ $t('common.expense') }}: {{ settings.currency }}{{ settings.formatNumber(totalSpent) }} / {{
+                    settings.currency }}{{
+                    settings.formatNumber(monthlyBudget) }}
+                </span>
+              </div>
+              <q-linear-progress :value="Math.min(totalSpent / monthlyBudget, 1)"
+                :color="isOverBudget ? 'negative' : 'positive'" rounded size="10px" track-color="grey-3" />
+              <div v-if="isOverBudget" class="text-caption text-negative q-mt-xs">
+                {{ $t('categories.overBudget', {
+                  amount: settings.currency + settings.formatNumber(totalSpent -
+                    monthlyBudget)
+                }) }}
+              </div>
+              <div v-else class="text-caption text-positive q-mt-xs">
+                {{ $t('categoryTransactions.remaining', {
+                  amount: settings.currency +
+                    settings.formatNumber(monthlyBudget - totalSpent)
+                }) }}
+              </div>
             </div>
-            <q-linear-progress :value="Math.min(totalSpent / monthlyBudget, 1)"
-              :color="isOverBudget ? 'negative' : 'positive'" rounded size="10px" track-color="grey-3" />
-            <div v-if="isOverBudget" class="text-caption text-negative q-mt-xs">
-              {{ $t('categories.overBudget', {
-                amount: settings.currency + settings.formatNumber(totalSpent -
-                  monthlyBudget)
-              }) }}
+            <div v-else class="text-center">
+              <div class="text-caption text-grey-7">{{ $t('dashboard.tapToSetBudget') }}</div>
             </div>
-            <div v-else class="text-caption text-positive q-mt-xs">
-              {{ $t('categoryTransactions.remaining', {
-                amount: settings.currency +
-                  settings.formatNumber(monthlyBudget - totalSpent)
-              }) }}
-            </div>
-          </div>
-          <div v-else class="q-mt-sm text-caption text-grey">
-            {{ $t('categoryTransactions.noBudgetSet') }}
           </div>
         </q-card-section>
       </q-card>
@@ -132,6 +135,43 @@
       <div class="text-body1">{{ $t('dashboard.noTransactionsYet') }}</div>
     </div>
 
+    <!-- Budget Modal -->
+    <q-dialog v-model="budgetModalOpen" position="bottom" transition-show="slide-up" transition-hide="slide-down">
+      <q-card
+        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
+        <q-card-section class="row items-center justify-between no-wrap q-pb-none">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
+            {{ category?.name }}
+          </div>
+          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+        </q-card-section>
+
+        <q-card-section>
+          <q-form @submit.prevent="saveBudget" class="q-gutter-md">
+            <!-- Month Selector -->
+            <q-input v-model="budgetForm.month" :label="$t('common.month')" outlined dense color="dark" readonly>
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy ref="budgetMonthProxy" cover transition-show="scale" transition-hide="scale">
+                    <q-date v-model="budgetForm.month" emit-immediately minimal years-in-month-view
+                      default-view="Months" mask="YYYY-MM" @update:model-value="onBudgetMonthSelect" />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+
+            <!-- Budget Amount -->
+            <q-input v-model.number="budgetForm.amount" :label="$t('dashboard.budgetAmount')" outlined dense
+              type="number" color="dark" :prefix="settings.currency" />
+
+            <!-- Buttons -->
+            <q-btn type="submit" :label="$t('common.save')" class="full-width bg-primary-gradient text-white" unelevated
+              size="md" :loading="saving" />
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
     <!-- Edit Dialog -->
     <q-dialog v-model="editDialogOpen" position="bottom" transition-show="slide-up" transition-hide="slide-down">
       <q-card style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px;">
@@ -216,6 +256,52 @@ const monthPickerOpen = ref(false)
 const saving = ref(false)
 
 const pickerMonth = ref(new Date().toISOString().slice(0, 7).replace('-', '/'))
+
+// Budget Modal
+const budgetModalOpen = ref(false)
+const budgetMonthProxy = ref(null)
+const budgetForm = reactive({
+  month: '',
+  amount: null,
+})
+
+const currentMonth = computed(() => {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+})
+
+function getMonthBudget(month) {
+  if (!category.value || !category.value.budgets) return null
+  return category.value.budgets[month] || null
+}
+
+function openBudgetModal() {
+  budgetForm.month = displayMonth.value !== 'all' ? displayMonth.value : currentMonth.value
+  budgetForm.amount = getMonthBudget(budgetForm.month)
+  budgetModalOpen.value = true
+}
+
+function onBudgetMonthSelect(val) {
+  if (val) {
+    budgetForm.amount = getMonthBudget(val) || null
+  }
+  if (budgetMonthProxy.value) {
+    budgetMonthProxy.value.hide()
+  }
+}
+
+async function saveBudget() {
+  if (!category.value || !budgetForm.month) return
+  saving.value = true
+  try {
+    await categories.setMonthlyBudget(category.value.id, budgetForm.month, budgetForm.amount || 0)
+    $q.notify({ type: 'positive', message: t('categories.categoryUpdated'), position: 'top' })
+    budgetModalOpen.value = false
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  saving.value = false
+}
 
 const editForm = reactive({
   id: null,
