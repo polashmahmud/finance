@@ -27,10 +27,13 @@ const analytics = getAnalytics(app)
 const auth = getAuth(app)
 
 // Initialize Firestore with specific database ID and offline persistence
-const firestore = initializeFirestore(app, {
-  databaseId: 'finance',
-  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
-})
+const firestore = initializeFirestore(
+  app,
+  {
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+  },
+  'finance',
+)
 
 // We export a promise to delay the Vue app boot process until Firebase Auth has initialized.
 export default boot(() => {
