@@ -14,6 +14,13 @@ export const useSettingsStore = defineStore('settings', () => {
   const pin = ref('')
   const isAuthenticated = ref(false)
 
+  // Balance Emojis Configuration
+  const balanceEmojis = ref({
+    negative: { emoji: '😭', threshold: 0 },
+    low: { emoji: '😟', threshold: 500 },
+    high: { emoji: '🤩' },
+  })
+
   // Map English to Bengali numerals
   const engToBnNumerals = {
     0: '০',
@@ -48,6 +55,9 @@ export const useSettingsStore = defineStore('settings', () => {
           darkMode.value = s.darkMode
           Dark.set(s.darkMode)
         }
+        if (s.balanceEmojis) {
+          balanceEmojis.value = s.balanceEmojis
+        }
         if (s.language) i18n.global.locale.value = s.language
       } catch {
         /* ignore parse errors */
@@ -71,6 +81,7 @@ export const useSettingsStore = defineStore('settings', () => {
         fontFamily: fontFamily.value,
         dateFormat: dateFormat.value,
         darkMode: darkMode.value,
+        balanceEmojis: balanceEmojis.value,
       }),
     )
   }
@@ -108,6 +119,11 @@ export const useSettingsStore = defineStore('settings', () => {
 
   function setDateFormat(format) {
     dateFormat.value = format
+    saveSettings()
+  }
+
+  function setBalanceEmojis(newEmojis) {
+    balanceEmojis.value = newEmojis
     saveSettings()
   }
 
@@ -211,12 +227,14 @@ export const useSettingsStore = defineStore('settings', () => {
     appLock,
     pin,
     isAuthenticated,
+    balanceEmojis,
     toggleDarkMode,
     setDarkMode,
     setCurrency,
     setLanguage,
     setFont,
     setDateFormat,
+    setBalanceEmojis,
     formatDate,
     formatNumber,
     toBengaliNumerals,

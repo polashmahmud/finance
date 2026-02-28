@@ -165,6 +165,25 @@
       </q-list>
     </q-card>
 
+    <!-- Dashboard Settings Section -->
+    <div class="section-title">{{ $t('dashboard.myFinance') }}</div>
+    <q-card class="finance-card q-mb-md">
+      <q-list separator>
+        <!-- Dashboard Emojis -->
+        <q-item clickable class="touch-target" @click="openEmojisModal">
+          <q-item-section avatar>
+            <q-icon name="sentiment_satisfied_alt" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('settings.dashboardEmojis') }}</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-icon name="chevron_right" />
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-card>
+
     <!-- Data Section -->
     <div class="section-title">{{ $t('settings.data') }}</div>
     <q-card class="finance-card q-mb-md">
@@ -367,6 +386,57 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <!-- Dashboard Emojis Dialog -->
+    <q-dialog v-model="showEmojisDialog" persistent>
+      <q-card style="min-width: 350px; border-radius: 16px">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6 text-weight-bold">{{ $t('settings.dashboardEmojis') }}</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup @click="resetEmojisForm" />
+        </q-card-section>
+
+        <q-card-section class="q-pt-md">
+          <div class="text-caption text-grey q-mb-md">{{ $t('settings.dashboardEmojisDesc') }}</div>
+
+          <!-- Negative Balance -->
+          <div class="text-subtitle2 q-mb-sm">{{ $t('settings.level1', { amount: emojisForm.negative.threshold }) }}
+          </div>
+          <div class="row q-col-gutter-sm q-mb-md">
+            <div class="col-8">
+              <q-input v-model.number="emojisForm.negative.threshold" :label="$t('settings.thresholdAmount')"
+                type="number" outlined dense :prefix="settings.currency" />
+            </div>
+            <div class="col-4">
+              <q-input v-model="emojisForm.negative.emoji" :label="$t('settings.emoji')" outlined dense />
+            </div>
+          </div>
+
+          <!-- Low Balance -->
+          <div class="text-subtitle2 q-mb-sm">{{ $t('settings.level2', {
+            min: emojisForm.negative.threshold, max:
+              emojisForm.low.threshold }) }}</div>
+          <div class="row q-col-gutter-sm q-mb-md">
+            <div class="col-8">
+              <q-input v-model.number="emojisForm.low.threshold" :label="$t('settings.thresholdAmount')" type="number"
+                outlined dense :prefix="settings.currency" />
+            </div>
+            <div class="col-4">
+              <q-input v-model="emojisForm.low.emoji" :label="$t('settings.emoji')" outlined dense />
+            </div>
+          </div>
+
+          <!-- High Balance -->
+          <div class="text-subtitle2 q-mb-sm">{{ $t('settings.level3', { amount: emojisForm.low.threshold }) }}</div>
+          <q-input v-model="emojisForm.high.emoji" :label="$t('settings.emoji')" outlined dense />
+
+        </q-card-section>
+        <q-card-actions align="right" class="q-px-md q-pb-md">
+          <q-btn flat :label="$t('common.cancel')" v-close-popup @click="resetEmojisForm" />
+          <q-btn unelevated color="dark" :label="$t('common.save')" @click="saveEmojis" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -407,6 +477,14 @@ const currentPassword = ref('')
 const newPassword = ref('')
 const confirmNewPassword = ref('')
 const changingPassword = ref(false)
+
+// Dashboard emojis config
+const showEmojisDialog = ref(false)
+const emojisForm = ref({
+  negative: { emoji: '😭', threshold: 0 },
+  low: { emoji: '😟', threshold: 500 },
+  high: { emoji: '🤩' }
+})
 
 const selectedCurrency = ref(settings.currencyCode)
 const selectedLang = ref(settings.language)
@@ -497,6 +575,31 @@ function resetPasswordForm() {
   currentPassword.value = ''
   newPassword.value = ''
   confirmNewPassword.value = ''
+}
+
+function openEmojisModal() {
+  emojisForm.value = JSON.parse(JSON.stringify(settings.balanceEmojis))
+  showEmojisDialog.value = true
+}
+
+function resetEmojisForm() {
+  emojisForm.value = JSON.parse(JSON.stringify(settings.balanceEmojis))
+  showEmojisDialog.value = false
+}
+
+function saveEmojis() {
+  if (!emojisForm.value.negative.emoji || !emojisForm.value.low.emoji || !emojisForm.value.high.emoji) {
+    Notify.create({ type: 'warning', message: t('settings.emojisEmpty') })
+    return
+  }
+  if (emojisForm.value.negative.threshold >= emojisForm.value.low.threshold) {
+    Notify.create({ type: 'warning', message: t('settings.thresholdError') })
+    return
+  }
+
+  settings.setBalanceEmojis(JSON.parse(JSON.stringify(emojisForm.value)))
+  Notify.create({ type: 'positive', message: t('settings.emojisUpdated') })
+  showEmojisDialog.value = false
 }
 
 function triggerFileInput() {

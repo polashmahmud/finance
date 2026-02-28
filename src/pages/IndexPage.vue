@@ -14,7 +14,7 @@
           <div class="col-6">
             <div class="q-mb-sm">
               <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance')
-              }}</div>
+                }}</div>
               <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
                 settings.formatNumber(accounts.totalBalance) }}</div>
             </div>
@@ -63,7 +63,7 @@
           </div>
           <div class="text-body2 text-weight-medium">{{ account.name }}</div>
           <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{ settings.formatNumber(account.balance)
-          }}</div>
+            }}</div>
         </q-card-section>
       </q-card>
     </div>
@@ -161,12 +161,13 @@
             <div class="row q-col-gutter-md q-mb-sm">
               <div class="col-6">
                 <q-input v-model.number="quickEntryForm.amount" :label="$t('common.amount')" type="number" outlined
-                  color="dark" :prefix="settings.currency"
-                  :rules="[val => val > 0 || $t('common.validAmount')]" autofocus input-class="text-h6 text-weight-bold" />
+                  color="dark" :prefix="settings.currency" :rules="[val => val > 0 || $t('common.validAmount')]"
+                  autofocus input-class="text-h6 text-weight-bold" />
               </div>
               <div class="col-6">
                 <q-select v-model="quickEntryForm.accountId" :options="accountOptions" :label="$t('common.account')"
-                  outlined color="dark" emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
+                  outlined color="dark" emit-value map-options
+                  :rules="[val => !!val || $t('common.accountRequired')]" />
               </div>
             </div>
 
@@ -181,8 +182,8 @@
             <!-- Buttons (aligned with amount & account columns) -->
             <div class="row q-col-gutter-md">
               <div class="col-6">
-                <q-btn type="button" :label="$t('dashboard.details')" class="full-width bg-grey-2 text-dark"
-                  unelevated size="md" @click="goToQuickEntryDetails" />
+                <q-btn type="button" :label="$t('dashboard.details')" class="full-width bg-grey-2 text-dark" unelevated
+                  size="md" @click="goToQuickEntryDetails" />
               </div>
               <div class="col-6">
                 <q-btn type="submit" :label="$t('common.save')" class="full-width bg-primary-gradient text-white"
@@ -512,9 +513,15 @@ function getCategoryIcon(categoryName) {
 
 const balanceEmoji = computed(() => {
   const bal = accounts.totalBalance || 0
-  if (bal < 0) return '😭'
-  if (bal <= 500) return '😟'
-  return '🤩'
+  const emojis = settings.balanceEmojis || {
+    negative: { emoji: '😭', threshold: 0 },
+    low: { emoji: '😟', threshold: 500 },
+    high: { emoji: '🤩' }
+  }
+
+  if (bal < emojis.negative.threshold) return emojis.negative.emoji
+  if (bal <= emojis.low.threshold) return emojis.low.emoji
+  return emojis.high.emoji
 })
 
 function onEditTx(tx, reset) {

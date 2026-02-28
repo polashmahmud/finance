@@ -344,6 +344,17 @@ export default {
     wrongPassword: 'বর্তমান পাসওয়ার্ড ভুল',
     passwordMinChars: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে',
     passwordNotMatch: 'পাসওয়ার্ড মিলছে না',
+    dashboardEmojis: 'ড্যাশবোর্ড ইমোজি',
+    dashboardEmojisDesc:
+      'আপনার মোট ব্যালেন্সের ওপর ভিত্তি করে ড্যাশবোর্ডে প্রদর্শিত ইমোজি সেট করুন।',
+    level1: 'লেভেল ১ ({amount} এর নিচে)',
+    level2: 'লেভেল ২ ({min} - {max})',
+    level3: 'লেভেল ৩ ({amount} এর উপরে)',
+    thresholdAmount: 'থ্রেশহোল্ড পরিমাণ',
+    emoji: 'ইমোজি',
+    emojisEmpty: 'ইমোজি খালি রাখা যাবে না',
+    thresholdError: 'লেভেল ১ থ্রেশহোল্ড লেভেল ২ থ্রেশহোল্ডের চেয়ে কম হতে হবে',
+    emojisUpdated: 'ড্যাশবোর্ড ইমোজি সফলভাবে আপডেট হয়েছে',
   },
 
   // ========== Auth ==========

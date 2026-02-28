@@ -340,6 +340,16 @@ export default {
     wrongPassword: 'Current password is incorrect',
     passwordMinChars: 'Password must be at least 6 characters',
     passwordNotMatch: 'Passwords do not match',
+    dashboardEmojis: 'Dashboard Emojis',
+    dashboardEmojisDesc: 'Set the emojis that appear on the dashboard based on your total balance.',
+    level1: 'Level 1 (Below {amount})',
+    level2: 'Level 2 ({min} - {max})',
+    level3: 'Level 3 (Above {amount})',
+    thresholdAmount: 'Threshold Amount',
+    emoji: 'Emoji',
+    emojisEmpty: 'Emojis cannot be empty',
+    thresholdError: 'Level 1 threshold must be less than Level 2 threshold',
+    emojisUpdated: 'Dashboard emojis updated successfully',
   },
 
   // ========== Auth ==========
