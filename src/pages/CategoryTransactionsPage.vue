@@ -235,15 +235,21 @@ const categoryTransactions = computed(() =>
   transactions.transactions.filter((tx) => tx.category === categoryName.value),
 )
 
-// Total spent this month for budget tracking
+const displayMonth = computed(() => selectedMonth.value === 'all' ? new Date().toISOString().slice(0, 7) : selectedMonth.value)
+
+const monthlyBudget = computed(() => {
+  if (!category.value || !category.value.budgets) return null
+  return category.value.budgets[displayMonth.value] || null
+})
+
+// Total spent for the displayed month budget tracking
 const totalSpent = computed(() => {
-  const currentMonth = new Date().toISOString().slice(0, 7)
   return categoryTransactions.value
-    .filter((tx) => tx.date && tx.date.startsWith(currentMonth))
+    .filter((tx) => tx.date && tx.date.startsWith(displayMonth.value))
     .reduce((sum, tx) => sum + (tx.amount || 0), 0)
 })
 
-const isOverBudget = computed(() => category.value?.budget && totalSpent.value > category.value.budget)
+const isOverBudget = computed(() => monthlyBudget.value && totalSpent.value > monthlyBudget.value)
 
 const availableMonths = computed(() => {
   const months = new Set()

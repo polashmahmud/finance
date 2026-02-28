@@ -14,7 +14,7 @@
           <div class="col-6">
             <div class="q-mb-sm">
               <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance')
-                }}</div>
+              }}</div>
               <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
                 formatNumber(accounts.totalBalance) }}</div>
             </div>
@@ -109,8 +109,16 @@
         <q-card-section>
           <q-form @submit.prevent="saveBudget" class="q-gutter-md">
             <!-- Month Selector -->
-            <q-select v-model="budgetForm.month" :options="monthOptions" :label="$t('common.month')" outlined dense
-              emit-value map-options color="dark" />
+            <q-input v-model="budgetForm.month" :label="$t('common.month')" outlined dense color="dark" readonly>
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy ref="budgetMonthProxy" cover transition-show="scale" transition-hide="scale">
+                    <q-date v-model="budgetForm.month" emit-immediately minimal years-in-month-view
+                      default-view="Months" mask="YYYY-MM" @update:model-value="onBudgetMonthSelect" />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
 
             <!-- Budget Amount -->
             <q-input v-model.number="budgetForm.amount" :label="$t('dashboard.budgetAmount')" outlined dense
@@ -282,29 +290,31 @@ const currentMonth = computed(() => {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 })
 
-// Month options for selector
-const monthOptions = computed(() => {
-  const options = []
-  const now = new Date()
-  // Generate last 12 months
-  for (let i = 0; i < 12; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-    const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-    const label = d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
-    options.push({ label, value })
+const budgetMonthProxy = ref(null)
+
+function onBudgetMonthSelect(val) {
+  if (val && budgetModalCategory.value) {
+    const existingBudget = getMonthBudget(budgetModalCategory.value, val)
+    budgetForm.amount = existingBudget || null
   }
-  return options
-})
+  if (budgetMonthProxy.value) {
+    budgetMonthProxy.value.hide()
+  }
+}
+
+function getMonthBudget(cat, month) {
+  if (!cat.budgets || !cat.budgets[month]) return null
+  return cat.budgets[month]
+}
 
 function getCurrentMonthBudget(cat) {
-  if (!cat.budgets || !cat.budgets[currentMonth.value]) return null
-  return cat.budgets[currentMonth.value]
+  return getMonthBudget(cat, currentMonth.value)
 }
 
 function openBudgetModal(cat) {
   budgetModalCategory.value = cat
-  const existingBudget = getCurrentMonthBudget(cat)
   budgetForm.month = currentMonth.value
+  const existingBudget = getMonthBudget(cat, budgetForm.month)
   budgetForm.amount = existingBudget || null
   budgetModalOpen.value = true
 }
