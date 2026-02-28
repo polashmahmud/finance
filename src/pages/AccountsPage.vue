@@ -27,44 +27,57 @@
     <template v-else>
       <!-- Account Cards -->
       <div class="q-gutter-sm">
-        <q-card v-for="account in accountStore.accounts" :key="account.id" class="finance-card">
-          <q-item class="touch-target">
-            <q-item-section avatar>
-              <q-avatar :style="{ background: (account.color || '#111') + '18' }" size="48px">
-                <q-icon :name="account.icon || 'account_balance_wallet'" :style="{ color: account.color || '#111' }"
-                  size="24px" />
-              </q-avatar>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="text-subtitle1 text-weight-bold">{{ account.name }}</q-item-label>
-              <q-item-label caption>{{ getTypeLabel(account.type) }}</q-item-label>
+        <q-slide-item @left="(obj) => onSwipe(obj, 'edit', account)" @right="(obj) => onSwipe(obj, 'delete', account)"
+          v-for="account in accountStore.accounts" :key="account.id" class="finance-card">
+          <template v-slot:left>
+            <q-icon name="edit" color="dark" />
+          </template>
+          <template v-slot:right>
+            <q-icon name="delete" color="negative" />
+          </template>
 
-              <!-- Last Transaction Info -->
-              <div v-if="getLastTx(account.id)" class="row items-center q-mt-xs q-gutter-x-xs"
-                style="font-size: 0.75rem">
-                <q-icon
-                  :name="getLastTx(account.id).type === 'income' ? 'arrow_downward' : (getLastTx(account.id).type === 'expense' ? 'arrow_upward' : 'sync_alt')"
-                  :color="getLastTx(account.id).type === 'income' ? 'positive' : (getLastTx(account.id).type === 'expense' ? 'negative' : 'blue')"
-                  size="12px" />
-                <span
-                  :class="getLastTx(account.id).type === 'income' ? 'text-positive' : (getLastTx(account.id).type === 'expense' ? 'text-negative' : 'text-blue')">
-                  {{ settings.currency }}{{ formatNumber(getLastTx(account.id).amount) }}
-                </span>
-                <span class="text-grey-6 text-caption">- {{ getLastTx(account.id).date }}</span>
-              </div>
-              <div v-else class="text-grey-6 text-caption q-mt-xs" style="font-size: 0.7rem">{{ $t('accounts.noTransactions') }}</div>
-            </q-item-section>
-            <q-item-section side>
-              <q-item-label class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{
-                formatNumber(account.balance) }}</q-item-label>
-              <div class="row q-gutter-xs justify-end q-mt-xs">
-                <q-btn flat round dense icon="edit" size="xs" color="grey-7" @click="openEditDialog(account)" />
-                <q-btn flat round dense icon="delete_outline" size="xs" color="negative"
-                  @click="confirmDelete(account)" />
-              </div>
-            </q-item-section>
-          </q-item>
-        </q-card>
+          <q-card class="finance-card">
+            <q-item class="touch-target">
+              <q-item-section avatar>
+                <q-avatar :style="{ background: (account.color || '#111') + '18' }" size="48px">
+                  <q-icon :name="account.icon || 'account_balance_wallet'" :style="{ color: account.color || '#111' }"
+                    size="24px" />
+                </q-avatar>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-subtitle1 text-weight-bold">{{ account.name }}</q-item-label>
+                <q-item-label caption>{{ getTypeLabel(account.type) }}</q-item-label>
+
+                <!-- Last Transaction Info -->
+                <div v-if="getLastTx(account.id)" class="row items-center q-mt-xs q-gutter-x-xs"
+                  style="font-size: 0.75rem">
+                  <q-icon
+                    :name="getLastTx(account.id).type === 'income' ? 'arrow_downward' : (getLastTx(account.id).type === 'expense' ? 'arrow_upward' : 'sync_alt')"
+                    :color="getLastTx(account.id).type === 'income' ? 'positive' : (getLastTx(account.id).type === 'expense' ? 'negative' : 'blue')"
+                    size="12px" />
+                  <span
+                    :class="getLastTx(account.id).type === 'income' ? 'text-positive' : (getLastTx(account.id).type === 'expense' ? 'text-negative' : 'text-blue')">
+                    {{ settings.currency }}{{ formatNumber(getLastTx(account.id).amount) }}
+                  </span>
+                  <span class="text-grey-6 text-caption">- {{ getLastTx(account.id).date }}</span>
+                </div>
+                <div v-else class="text-grey-6 text-caption q-mt-xs" style="font-size: 0.7rem">{{
+                  $t('accounts.noTransactions') }}
+                </div>
+              </q-item-section>
+              <q-item-section side top>
+                <q-item-label class="text-subtitle1 text-weight-bold q-mt-sm">{{ settings.currency }}{{
+                  formatNumber(account.balance) }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-card>
+        </q-slide-item>
+      </div>
+
+      <!-- Swipe Hint -->
+      <div v-if="accountStore.accounts.length" class="text-center q-pa-md text-grey-6 q-mt-sm" style="font-size: 12px;">
+        <q-icon name="swipe" size="16px" class="q-mr-xs" />
+        {{ $t('categories.swipeHint') }}
       </div>
 
       <!-- Empty State -->
@@ -90,15 +103,15 @@
             <q-input v-model="form.name" :label="$t('accounts.accountName')" outlined dense autofocus color="dark"
               :rules="[(val) => (val && val.length > 0) || $t('common.nameRequired')]" style="margin-bottom: 10px;" />
 
-            <q-select v-model="form.type" :options="accountTypeOptions" :label="$t('accounts.accountType')" outlined dense emit-value map-options color="dark"
-              style="margin-bottom: 10px;" />
+            <q-select v-model="form.type" :options="accountTypeOptions" :label="$t('accounts.accountType')" outlined
+              dense emit-value map-options color="dark" style="margin-bottom: 10px;" />
 
-            <q-input v-model.number="form.balance" :label="$t('common.balance')" type="number" outlined dense color="dark"
-              :prefix="settings.currency" style="margin-bottom: 10px;" />
+            <q-input v-model.number="form.balance" :label="$t('common.balance')" type="number" outlined dense
+              color="dark" :prefix="settings.currency" style="margin-bottom: 10px;" />
 
             <!-- Icon Dropdown with visual previews -->
-            <q-select v-model="form.icon" :options="iconOptions" :label="$t('common.icon')" outlined dense emit-value map-options
-              color="dark" style="margin-bottom: 10px;">
+            <q-select v-model="form.icon" :options="iconOptions" :label="$t('common.icon')" outlined dense emit-value
+              map-options color="dark" style="margin-bottom: 10px;">
               <template v-slot:option="scope">
                 <q-item v-bind="scope.itemProps">
                   <q-item-section avatar>
@@ -265,6 +278,19 @@ function confirmDelete(account) {
     await accountStore.deleteAccount(account.id)
     $q.notify({ type: 'positive', message: t('accounts.accountDeleted'), position: 'top' })
   })
+}
+
+function onSwipe({ reset }, action, account) {
+  setTimeout(() => {
+    if (action === 'edit') {
+      openEditDialog(account)
+    } else if (action === 'delete') {
+      confirmDelete(account)
+    }
+  }, 300)
+  setTimeout(() => {
+    reset()
+  }, 100)
 }
 
 onMounted(() => {
