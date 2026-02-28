@@ -15,7 +15,7 @@
                     <div class="text-right">
                         <div class="text-caption text-grey">{{ $t('common.balance') }}</div>
                         <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{
-                            formatNumber(account.balance) }}</div>
+                            settings.formatNumber(account.balance) }}</div>
                     </div>
                 </q-card-section>
             </q-card>
@@ -53,17 +53,15 @@
         </q-dialog>
 
         <!-- Type Filter -->
-        <div class="row q-gutter-sm q-mb-md">
-            <q-chip v-for="f in typeFilters" :key="f.value" :selected="selectedType === f.value"
-                :color="selectedType === f.value ? 'dark' : 'grey-3'"
-                :text-color="selectedType === f.value ? 'white' : 'dark'" clickable @click="selectedType = f.value"
-                dense>
-                {{ f.label }}
-            </q-chip>
-        </div>
+        <q-card class="finance-card q-mb-md">
+            <q-tabs v-model="selectedType" dense class="text-grey-6" active-color="dark" indicator-color="dark"
+                align="justify">
+                <q-tab v-for="f in typeFilters" :key="f.value" :name="f.value" :label="f.label" />
+            </q-tabs>
+        </q-card>
 
         <!-- Summary -->
-        <div class="row q-gutter-sm q-mb-md" v-if="filteredTransactions.length">
+        <div class="row justify-center q-gutter-sm q-mb-md" v-if="filteredTransactions.length">
             <q-chip color="green-1" text-color="green-9" icon="trending_up" dense>
                 {{ $t('common.income') }}: {{ settings.currency }}{{ settings.formatNumber(filteredSummary.income) }}
             </q-chip>
@@ -73,7 +71,7 @@
         </div>
 
         <!-- Transaction List -->
-        <q-card class="finance-card" v-if="filteredTransactions.length">
+        <q-card class="finance-card" v-if="filteredTransactions.length" style="border-radius: 16px; overflow: hidden;">
             <q-list separator>
                 <q-slide-item v-for="tx in filteredTransactions" :key="tx.id" @left="({ reset }) => onEditTx(tx, reset)"
                     @right="({ reset }) => onDeleteTx(tx.id, reset)">
@@ -97,9 +95,9 @@
                         </q-item-section>
                         <q-item-section>
                             <q-item-label class="text-weight-medium">{{ tx.category || $t('common.transfer')
-                            }}</q-item-label>
+                                }}</q-item-label>
                             <q-item-label caption>{{ tx.notes }} &middot; {{ settings.formatDate(tx.date)
-                            }}</q-item-label>
+                                }}</q-item-label>
                         </q-item-section>
                         <q-item-section side>
                             <q-item-label
