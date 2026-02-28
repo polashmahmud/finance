@@ -88,8 +88,8 @@
                   <q-item-section>
                     <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
                     <q-item-label caption v-if="getLastTransaction(cat.name)">
-                      {{ getLastTransaction(cat.name).date }} &middot; {{ settings.currency }}{{
-                        formatAmount(getLastTransaction(cat.name).amount) }}
+                      {{ settings.formatDate(getLastTransaction(cat.name).date) }} &middot; {{ settings.currency }}{{
+                        settings.formatNumber(getLastTransaction(cat.name).amount) }}
                     </q-item-label>
                     <q-item-label caption v-else>
                       {{ $t('dashboard.noTransactionsYet') }}
@@ -312,10 +312,6 @@ function getLastTransaction(categoryName) {
     const timeB = b.createdAt || 0
     return timeB - timeA
   })[0]
-}
-
-function formatAmount(amount) {
-  return Number(amount || 0).toLocaleString()
 }
 
 function onSwipe({ reset }, action, cat) {

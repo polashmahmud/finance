@@ -14,9 +14,9 @@
           <div class="col-6">
             <div class="q-mb-sm">
               <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance')
-              }}</div>
+                }}</div>
               <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
-                formatNumber(accounts.totalBalance) }}</div>
+                settings.formatNumber(accounts.totalBalance) }}</div>
             </div>
             <div class="row q-gutter-md q-mt-xs">
               <div class="row items-center q-gutter-xs">
@@ -24,7 +24,7 @@
                 <div>
                   <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">{{ $t('common.income') }}</div>
                   <div class="text-white text-weight-bold" style="font-size: 0.85rem">{{ settings.currency }}{{
-                    formatShort(transactions.totalIncome) }}</div>
+                    settings.formatNumber(transactions.totalIncome) }}</div>
                 </div>
               </div>
               <div class="row items-center q-gutter-xs">
@@ -32,7 +32,7 @@
                 <div>
                   <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">{{ $t('common.expense') }}</div>
                   <div class="text-white text-weight-bold" style="font-size: 0.85rem">{{ settings.currency }}{{
-                    formatShort(transactions.totalExpense) }}</div>
+                    settings.formatNumber(transactions.totalExpense) }}</div>
                 </div>
               </div>
             </div>
@@ -62,7 +62,8 @@
               : $t('dashboard.mobile') }}</span>
           </div>
           <div class="text-body2 text-weight-medium">{{ account.name }}</div>
-          <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{ formatNumber(account.balance) }}</div>
+          <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{ settings.formatNumber(account.balance)
+            }}</div>
         </q-card-section>
       </q-card>
     </div>
@@ -80,8 +81,8 @@
             {{ cat.name }}
           </div>
           <div v-if="getCurrentMonthBudget(cat)" class="text-caption q-mt-xs" style="font-size: 10px;">
-            {{ settings.currency }}{{ formatNumber(getCategorySpent(cat.name)) }} / {{ settings.currency }}{{
-              formatNumber(getCurrentMonthBudget(cat)) }}
+            {{ settings.currency }}{{ settings.formatNumber(getCategorySpent(cat.name)) }} / {{ settings.currency }}{{
+              settings.formatNumber(getCurrentMonthBudget(cat)) }}
           </div>
           <div v-if="getCurrentMonthBudget(cat)" class="q-mt-xs" style="width: 100%;">
             <q-linear-progress :value="Math.min(getCategorySpent(cat.name) / getCurrentMonthBudget(cat), 1)"
@@ -172,7 +173,7 @@
             <q-item-section side>
               <q-item-label :class="tx.type === 'income' ? 'amount-income' : 'amount-expense'"
                 class="transaction-amount">
-                {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ formatNumber(tx.amount) }}
+                {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ settings.formatNumber(tx.amount) }}
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -377,10 +378,6 @@ const greeting = computed(() => {
   return t('greetings.night')
 })
 
-function formatNumber(n) {
-  return Number(n || 0).toLocaleString()
-}
-
 function getCategorySpent(categoryName) {
   return transactions.transactions
     .filter((t) => t.type === 'expense' && t.category === categoryName)
@@ -395,11 +392,6 @@ function getCategoryColor(categoryName) {
 function getCategoryIcon(categoryName) {
   const all = [...categories.incomeCategories, ...categories.expenseCategories]
   return all.find((c) => c.name === categoryName)?.icon || 'receipt'
-}
-
-function formatShort(n) {
-  if (n >= 1000) return (n / 1000).toFixed(1) + 'k'
-  return n.toLocaleString()
 }
 
 const balanceEmoji = computed(() => {

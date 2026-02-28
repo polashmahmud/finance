@@ -14,7 +14,8 @@
       <q-card-section class="bg-primary-gradient" style="border-radius: 16px">
         <div class="text-center">
           <div class="text-body2" style="opacity: 0.9">{{ $t('accounts.totalAssets') }}</div>
-          <div class="stat-value text-white">{{ settings.currency }}{{ formatNumber(accountStore.totalBalance) }}</div>
+          <div class="stat-value text-white">{{ settings.currency }}{{ settings.formatNumber(accountStore.totalBalance)
+            }}</div>
         </div>
       </q-card-section>
     </q-card>
@@ -57,7 +58,7 @@
                     size="12px" />
                   <span
                     :class="getLastTx(account.id).type === 'income' ? 'text-positive' : (getLastTx(account.id).type === 'expense' ? 'text-negative' : 'text-blue')">
-                    {{ settings.currency }}{{ formatNumber(getLastTx(account.id).amount) }}
+                    {{ settings.currency }}{{ settings.formatNumber(getLastTx(account.id).amount) }}
                   </span>
                   <span class="text-grey-6 text-caption">- {{ settings.formatDate(getLastTx(account.id).date) }}</span>
                 </div>
@@ -67,7 +68,7 @@
               </q-item-section>
               <q-item-section side top>
                 <q-item-label class="text-subtitle1 text-weight-bold q-mt-sm">{{ settings.currency }}{{
-                  formatNumber(account.balance) }}</q-item-label>
+                  settings.formatNumber(account.balance) }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-card>
@@ -213,10 +214,6 @@ const typeLabels = computed(() => ({
 
 function getTypeLabel(type) {
   return typeLabels.value[type] || type
-}
-
-function formatNumber(n) {
-  return Number(n || 0).toLocaleString()
 }
 
 function getLastTx(accountId) {

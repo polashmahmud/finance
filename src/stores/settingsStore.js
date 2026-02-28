@@ -14,6 +14,25 @@ export const useSettingsStore = defineStore('settings', () => {
   const pin = ref('')
   const isAuthenticated = ref(false)
 
+  // Map English to Bengali numerals
+  const engToBnNumerals = {
+    0: '০',
+    1: '১',
+    2: '২',
+    3: '৩',
+    4: '৪',
+    5: '৫',
+    6: '৬',
+    7: '৭',
+    8: '৮',
+    9: '৯',
+  }
+
+  function toBengaliNumerals(str) {
+    if (!str) return str
+    return str.toString().replace(/\d/g, (match) => engToBnNumerals[match] || match)
+  }
+
   // Load all settings from localStorage on init
   function loadSettings() {
     const saved = localStorage.getItem('finance_settings')
@@ -92,11 +111,69 @@ export const useSettingsStore = defineStore('settings', () => {
     saveSettings()
   }
 
-  function formatDate(dateString) {
+  function formatNumber(value) {
+    if (value === null || value === undefined) return ''
+    const num = Number(value)
+    if (isNaN(num)) return value
+
+    // Enforce locale formatting with appropriate thousands separator
+    const localeStr = num.toLocaleString('en-US')
+
+    // Automatically convert to Bengali numerals if language is Bengali
+    if (language.value === 'bn') {
+      return toBengaliNumerals(localeStr)
+    }
+    return localeStr
+  }
+
+  function formatDate(dateString, overrideFormat = null) {
     if (!dateString) return ''
     const dateObj = new Date(dateString)
     if (isNaN(dateObj)) return dateString
-    return date.formatDate(dateObj, dateFormat.value)
+
+    // Bengali Date Names
+    const bnOptions = {
+      days: ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'],
+      daysShort: ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি'],
+      months: [
+        'জানুয়ারি',
+        'ফেব্রুয়ারি',
+        'মার্চ',
+        'এপ্রিল',
+        'মে',
+        'জুন',
+        'জুলাই',
+        'আগস্ট',
+        'সেপ্টেম্বর',
+        'অক্টোবর',
+        'নভেম্বর',
+        'ডিসেম্বর',
+      ],
+      monthsShort: [
+        'জানু',
+        'ফেব',
+        'মার্চ',
+        'এপ্রিল',
+        'মে',
+        'জুন',
+        'জুল',
+        'আগ',
+        'সেপ্ট',
+        'অক্টো',
+        'নভে',
+        'ডিসে',
+      ],
+    }
+
+    let formatted = ''
+
+    if (language.value === 'bn') {
+      formatted = date.formatDate(dateObj, overrideFormat || dateFormat.value, bnOptions)
+      return toBengaliNumerals(formatted)
+    }
+
+    formatted = date.formatDate(dateObj, overrideFormat || dateFormat.value)
+    return formatted
   }
 
   function setPin(newPin) {
@@ -141,6 +218,8 @@ export const useSettingsStore = defineStore('settings', () => {
     setFont,
     setDateFormat,
     formatDate,
+    formatNumber,
+    toBengaliNumerals,
     setPin,
     removePin,
     verifyPin,

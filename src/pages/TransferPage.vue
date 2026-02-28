@@ -6,8 +6,9 @@
 
     <q-form @submit.prevent="onSubmit" class="q-gutter-md">
       <!-- From Account -->
-      <q-select v-model="form.fromAccount" :options="accountOptions" :label="$t('transferPage.fromAccount')" outlined
-        dense emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
+      <q-select v-model="form.fromAccount" :options="accounts.accounts" option-value="id"
+        :option-label="(opt) => opt.name + ' (' + settings.currency + settings.formatNumber(opt.balance) + ')'" dense
+        emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
 
       <!-- To Account -->
       <q-select v-model="form.toAccount" :options="accountOptions" :label="$t('transferPage.toAccount')" outlined dense
@@ -29,8 +30,8 @@
       <q-input v-model="form.note" :label="$t('common.noteOptional')" outlined dense autogrow />
 
       <!-- Submit -->
-      <q-btn type="submit" :label="$t('transferPage.transferBtn')" color="dark" class="full-width" unelevated
-        rounded no-caps :loading="loading" />
+      <q-btn type="submit" :label="$t('transferPage.transferBtn')" color="dark" class="full-width" unelevated rounded
+        no-caps :loading="loading" />
     </q-form>
   </q-page>
 </template>
@@ -63,7 +64,7 @@ const form = ref({
 const accountOptions = computed(() =>
   accounts.accounts.map((a) => ({
     label: a.name,
-    value: a.name,
+    value: a.id, // Changed from a.name to a.id to match option-value="id"
   })),
 )
 

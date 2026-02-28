@@ -29,17 +29,17 @@
       <div class="row q-col-gutter-sm q-mb-md">
         <div class="col-auto">
           <q-chip color="dark" text-color="white" icon="trending_up" class="q-ma-none shadow-1">
-            {{ $t('common.income') }} {{ settings.currency }}{{ formatShort(totalIncome) }}
+            {{ $t('common.income') }} {{ settings.currency }}{{ settings.formatNumber(totalIncome) }}
           </q-chip>
         </div>
         <div class="col-auto">
           <q-chip color="dark" text-color="white" icon="trending_down" class="q-ma-none shadow-1">
-            {{ $t('common.expense') }} {{ settings.currency }}{{ formatShort(totalExpense) }}
+            {{ $t('common.expense') }} {{ settings.currency }}{{ settings.formatNumber(totalExpense) }}
           </q-chip>
         </div>
         <div class="col-auto">
           <q-chip color="dark" text-color="white" icon="savings" class="q-ma-none shadow-1">
-            {{ $t('reports.savings') }} {{ settings.currency }}{{ formatShort(netSavings) }}
+            {{ $t('reports.savings') }} {{ settings.currency }}{{ settings.formatNumber(netSavings) }}
           </q-chip>
         </div>
       </div>
@@ -81,7 +81,7 @@
                     </q-circular-progress>
                     <div class="text-caption q-mt-sm">{{ $t('common.expense') }}</div>
                     <div class="text-weight-bold text-negative">{{ settings.currency }}{{
-                      formatNumber(totalExpense) }}</div>
+                      settings.formatNumber(totalExpense) }}</div>
                   </div>
                 </div>
               </div>
@@ -89,7 +89,7 @@
               <div class="row justify-between">
                 <span class="text-weight-medium">{{ $t('reports.netSavings') }}</span>
                 <span :class="netSavings >= 0 ? 'text-positive' : 'text-negative'" class="text-weight-bold">
-                  {{ settings.currency }}{{ formatNumber(netSavings) }}
+                  {{ settings.currency }}{{ settings.formatNumber(netSavings) }}
                 </span>
               </div>
             </q-card-section>
@@ -114,7 +114,7 @@
                     <span class="text-body2 text-weight-medium">{{ cat.name }}</span>
                   </div>
                   <div class="text-right">
-                    <span class="text-weight-bold">{{ settings.currency }}{{ formatNumber(cat.spent) }}</span>
+                    <span class="text-weight-bold">{{ settings.currency }}{{ settings.formatNumber(cat.spent) }}</span>
                     <q-badge color="dark" class="q-ml-sm">{{ cat.percent }}%</q-badge>
                   </div>
                 </div>
@@ -137,15 +137,17 @@
                 <div class="row justify-between items-center q-mb-xs">
                   <span class="text-body2 text-weight-medium">{{ cat.name }}</span>
                   <span class="text-caption" :class="cat.over ? 'text-negative' : 'text-grey'">
-                    {{ settings.currency }}{{ formatNumber(cat.spent) }} / {{ settings.currency }}{{
-                      formatNumber(cat.budget) }}
+                    {{ settings.currency }}{{ settings.formatNumber(cat.spent) }} / {{ settings.currency }}{{
+                      settings.formatNumber(cat.budget) }}
                   </span>
                 </div>
                 <q-linear-progress :value="Math.min(cat.usage, 1)"
                   :color="cat.over ? 'negative' : cat.usage > 0.8 ? 'warning' : 'dark'" rounded size="10px"
                   track-color="grey-3" />
                 <div v-if="cat.over" class="text-caption text-negative q-mt-xs">
-                  {{ $t('reports.overBudget', { amount: settings.currency + formatNumber(cat.spent - cat.budget) }) }}
+                  {{ $t('reports.overBudget', {
+                    amount: settings.currency + settings.formatNumber(cat.spent -
+                  cat.budget) }) }}
                 </div>
               </div>
             </q-card-section>
@@ -209,11 +211,6 @@ const total = computed(() => totalIncome.value + totalExpense.value || 1)
 const incomePercent = computed(() => Math.round((totalIncome.value / total.value) * 100))
 const expensePercent = computed(() => Math.round((totalExpense.value / total.value) * 100))
 const netSavings = computed(() => totalIncome.value - totalExpense.value)
-
-function formatShort(n) {
-  if (n >= 1000) return (n / 1000).toFixed(1) + 'k'
-  return n.toString()
-}
 
 // Category breakdown
 const categoryBreakdown = computed(() => {

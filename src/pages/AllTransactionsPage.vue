@@ -41,11 +41,11 @@
 
         <!-- Summary -->
         <div class="row q-gutter-sm q-mb-md justify-center" v-if="filteredTransactions.length">
-            <q-chip color="green-1" text-color="green-9" icon="trending_up" dense>
-                {{ $t('common.income') }}: {{ settings.currency }}{{ formatNumber(filteredIncome) }}
+            <q-chip color="positive" text-color="white" icon="trending_up" class="q-ma-none shadow-1">
+                {{ $t('common.income') }}: {{ settings.currency }}{{ settings.formatNumber(filteredSummary.income) }}
             </q-chip>
-            <q-chip color="red-1" text-color="red-9" icon="trending_down" dense>
-                {{ $t('common.expense') }}: {{ settings.currency }}{{ formatNumber(filteredExpense) }}
+            <q-chip color="negative" text-color="white" icon="trending_down" class="q-ma-none shadow-1">
+                {{ $t('common.expense') }}: {{ settings.currency }}{{ settings.formatNumber(filteredSummary.expense) }}
             </q-chip>
         </div>
 
@@ -82,9 +82,8 @@
                             <q-item-label
                                 :class="tx.type === 'income' ? 'amount-income' : tx.type === 'expense' ? 'amount-expense' : 'text-blue'"
                                 class="transaction-amount">
-                                {{ tx.type === 'income' ? '+' : tx.type === 'expense' ? '-' : '' }}{{ settings.currency
-                                }}{{
-                                    formatNumber(tx.amount) }}
+                                {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{
+                                    settings.formatNumber(tx.amount) }}
                             </q-item-label>
                         </q-item-section>
                     </q-item>
@@ -319,17 +318,18 @@ const filteredTransactions = computed(() => {
     return list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
 })
 
-const filteredIncome = computed(() =>
-    filteredTransactions.value
-        .filter((t) => t.type === 'income')
-        .reduce((sum, t) => sum + (t.amount || 0), 0),
-)
-
-const filteredExpense = computed(() =>
-    filteredTransactions.value
-        .filter((t) => t.type === 'expense')
-        .reduce((sum, t) => sum + (t.amount || 0), 0),
-)
+const filteredSummary = computed(() => {
+    let income = 0
+    let expense = 0
+    filteredTransactions.value.forEach(tx => {
+        if (tx.type === 'income') {
+            income += tx.amount || 0
+        } else if (tx.type === 'expense') {
+            expense += tx.amount || 0
+        }
+    })
+    return { income, expense }
+})
 
 const incomeCategoryOptions = computed(() =>
     categories.incomeCategories.map((c) => ({
@@ -351,7 +351,7 @@ const expenseCategoryOptions = computed(() =>
 
 const accountOptions = computed(() =>
     accounts.accounts.map((a) => ({
-        label: `${a.name} (${settings.currency}${Number(a.balance || 0).toLocaleString()})`,
+        label: `${a.name} (${settings.currency}${settings.formatNumber(a.balance || 0)})`,
         value: a.id,
     })),
 )
@@ -364,10 +364,6 @@ function getCategoryColor(categoryName) {
 function getCategoryIcon(categoryName) {
     const all = [...categories.incomeCategories, ...categories.expenseCategories]
     return all.find((c) => c.name === categoryName)?.icon || 'receipt'
-}
-
-function formatNumber(n) {
-    return Number(n || 0).toLocaleString()
 }
 
 function onEditTx(tx, reset) {

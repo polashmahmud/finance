@@ -53,7 +53,7 @@
                 <q-item-section side>
                   <div class="row items-center q-gutter-xs">
                     <span class="text-weight-medium">
-                      {{ settings.currency }}{{ (item.price || 0).toLocaleString() }}
+                      {{ settings.currency }}{{ settings.formatNumber(item.price * item.quantity) }}
                     </span>
                     <q-btn flat round dense icon="close" size="xs" color="grey"
                       @click="marketLists.removeItem(list.id, item.id)" />
@@ -73,7 +73,7 @@
             <div class="row justify-between items-center">
               <span class="text-weight-bold text-grey">{{ $t('marketLists.estimatedTotal') }}</span>
               <span class="text-weight-bold" style="color: #111;">
-                {{ settings.currency }}{{ marketLists.getListTotal(list.id).toLocaleString() }}
+                {{ settings.currency }}{{ settings.formatNumber(marketLists.getListTotal(list.id)) }}
               </span>
             </div>
 
@@ -224,7 +224,7 @@ function convertToExpense(list) {
 
   $q.dialog({
     title: t('marketLists.convertToExpenseTitle'),
-    message: t('marketLists.convertToExpenseConfirm', { amount: settings.currency + total.toLocaleString() }),
+    message: t('marketLists.convertToExpenseConfirm', { amount: settings.currency + settings.formatNumber(total) }),
     ok: { label: t('common.save'), color: 'negative', flat: true },
     cancel: { label: t('common.cancel'), flat: true },
   }).onOk(() => {

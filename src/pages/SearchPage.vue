@@ -43,7 +43,7 @@
           <q-item-section side>
             <span :class="tx.type === 'income' ? 'text-positive' : tx.type === 'expense' ? 'text-negative' : ''"
               class="text-weight-bold">
-              {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ Number(tx.amount || 0).toLocaleString() }}
+              {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ settings.formatNumber(tx.amount) }}
             </span>
           </q-item-section>
         </q-item>

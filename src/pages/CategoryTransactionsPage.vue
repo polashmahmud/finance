@@ -19,17 +19,17 @@
             <div class="row justify-between items-center q-mb-xs">
               <span class="text-caption text-grey">{{ $t('categoryTransactions.budgetUsed') }}</span>
               <span class="text-caption" :class="isOverBudget ? 'text-negative' : 'text-positive'">
-                {{ settings.currency }}{{ formatNumber(totalSpent) }} / {{ settings.currency }}{{
+                {{ $t('common.expense') }}: {{ settings.currency }}{{ settings.formatNumber(totalSpent) }} / {{
+                  settings.currency }}{{
                   formatNumber(monthlyBudget) }}
               </span>
             </div>
             <q-linear-progress :value="Math.min(totalSpent / monthlyBudget, 1)"
               :color="isOverBudget ? 'negative' : 'positive'" rounded size="10px" track-color="grey-3" />
             <div v-if="isOverBudget" class="text-caption text-negative q-mt-xs">
-              {{ $t('categoryTransactions.overBudgetBy', {
-                amount: settings.currency +
-                  formatNumber(totalSpent - monthlyBudget)
-              }) }}
+              {{ $t('categories.overBudget', {
+                amount: settings.currency + settings.formatNumber(totalSpent -
+              monthlyBudget) }) }} }) }}
             </div>
             <div v-else class="text-caption text-positive q-mt-xs">
               {{ $t('categoryTransactions.remaining', {
@@ -117,7 +117,7 @@
             <q-item-section side>
               <q-item-label :class="tx.type === 'income' ? 'amount-income' : 'amount-expense'"
                 class="transaction-amount">
-                {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ formatNumber(tx.amount)
+                {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ settings.formatNumber(tx.amount) }}
                 }}
               </q-item-label>
             </q-item-section>
@@ -338,7 +338,7 @@ const filteredTotal = computed(() =>
 
 const accountOptions = computed(() =>
   accounts.accounts.map((a) => ({
-    label: `${a.name} (${settings.currency}${Number(a.balance || 0).toLocaleString()})`,
+    label: `${a.name} (${settings.currency}${settings.formatNumber(a.balance || 0)})`,
     value: a.id,
   })),
 )
