@@ -61,6 +61,7 @@ export default {
     bank: 'Bank',
     mobile: 'Mobile',
     budgetStatus: 'Budget Status',
+    quickEntry: 'Quick Entry',
     recentTransactions: 'Recent Transactions',
     noTransactionsYet: 'No transactions yet',
     budgetAmount: 'Budget Amount',

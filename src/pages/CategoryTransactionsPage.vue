@@ -204,10 +204,10 @@ const categories = useCategoryStore()
 const accounts = useAccountStore()
 const settings = useSettingsStore()
 
-const categoryName = computed(() => decodeURIComponent(route.params.name || ''))
+const categoryId = computed(() => route.params.id || '')
 const category = computed(() => {
   const all = [...categories.incomeCategories, ...categories.expenseCategories]
-  return all.find((c) => c.name === categoryName.value)
+  return all.find((c) => c.id === categoryId.value)
 })
 
 const selectedMonth = ref(new Date().toISOString().slice(0, 7))
@@ -230,9 +230,9 @@ const editForm = reactive({
   originalAccountId: null,
 })
 
-// All transactions for this category
+// All transactions for this category (transactions store category by name)
 const categoryTransactions = computed(() =>
-  transactions.transactions.filter((tx) => tx.category === categoryName.value),
+  transactions.transactions.filter((tx) => tx.category === category.value?.name),
 )
 
 const displayMonth = computed(() => selectedMonth.value === 'all' ? new Date().toISOString().slice(0, 7) : selectedMonth.value)

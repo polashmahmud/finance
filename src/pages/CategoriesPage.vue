@@ -301,7 +301,7 @@ function confirmDelete(cat) {
 }
 
 function goToCategory(cat) {
-  $router.push(`/category/${cat.name}/transactions`)
+  $router.push(`/category/${cat.id}/transactions`)
 }
 
 function getLastTransaction(categoryName) {

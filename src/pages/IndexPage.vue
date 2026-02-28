@@ -69,11 +69,17 @@
     </div>
 
     <!-- Budget Status -->
-    <div class="section-title">{{ $t('dashboard.budgetStatus') }}</div>
+    <div class="row items-center justify-between q-mb-sm">
+      <div class="section-title q-mb-none">{{ $t('dashboard.budgetStatus') }}</div>
+      <div class="row items-center q-gutter-xs">
+        <span class="text-caption text-grey">{{ $t('dashboard.quickEntry') }}</span>
+        <q-toggle v-model="quickEntry" color="dark" dense @update:model-value="onQuickEntryChange" />
+      </div>
+    </div>
     <div class="row q-col-gutter-sm q-mb-md">
       <div v-for="cat in categories.expenseCategories" :key="cat.id" class="col-3">
         <q-card class="finance-card cursor-pointer column items-center q-pa-sm" style="min-height: 110px;"
-          @click="openBudgetModal(cat)">
+          @click="onBudgetCardClick(cat)">
           <q-avatar :style="{ background: cat.color + '18' }" size="36px" class="q-mb-xs">
             <q-icon :name="cat.icon" :style="{ color: cat.color }" size="18px" />
           </q-avatar>
@@ -132,6 +138,56 @@
                 @click="goToCategoryDetails" :loading="saving" />
               <q-btn type="submit" :label="$t('common.save')" class="col bg-primary-gradient text-white" unelevated
                 size="md" :loading="saving" />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- Quick Entry Modal -->
+    <q-dialog v-model="quickEntryModalOpen" position="bottom" transition-show="slide-up" transition-hide="slide-down">
+      <q-card
+        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
+        <q-card-section class="row items-center justify-between no-wrap q-pb-none">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
+            {{ quickEntryCategory?.name }}
+          </div>
+          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+        </q-card-section>
+
+        <q-card-section class="q-px-lg">
+          <q-form @submit.prevent="saveQuickEntry" class="q-gutter-md">
+            <!-- Amount & Account (side by side) -->
+            <div class="row q-col-gutter-md q-mb-sm">
+              <div class="col-6">
+                <q-input v-model.number="quickEntryForm.amount" :label="$t('common.amount')" type="number" outlined
+                  color="dark" :prefix="settings.currency"
+                  :rules="[val => val > 0 || $t('common.validAmount')]" autofocus input-class="text-h6 text-weight-bold" />
+              </div>
+              <div class="col-6">
+                <q-select v-model="quickEntryForm.accountId" :options="accountOptions" :label="$t('common.account')"
+                  outlined color="dark" emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
+              </div>
+            </div>
+
+            <!-- Note -->
+            <div class="row q-col-gutter-md q-mb-sm">
+              <div class="col-12">
+                <q-input v-model="quickEntryForm.notes" :label="$t('common.noteOptional')" outlined color="dark"
+                  type="textarea" rows="2" />
+              </div>
+            </div>
+
+            <!-- Buttons (aligned with amount & account columns) -->
+            <div class="row q-col-gutter-md">
+              <div class="col-6">
+                <q-btn type="button" :label="$t('dashboard.details')" class="full-width bg-grey-2 text-dark"
+                  unelevated size="md" @click="goToQuickEntryDetails" />
+              </div>
+              <div class="col-6">
+                <q-btn type="submit" :label="$t('common.save')" class="full-width bg-primary-gradient text-white"
+                  unelevated size="md" :loading="saving" />
+              </div>
             </div>
           </q-form>
         </q-card-section>
@@ -284,12 +340,29 @@ const settings = useSettingsStore()
 const editDialogOpen = ref(false)
 const saving = ref(false)
 
+// Quick Entry
+const QUICK_ENTRY_KEY = 'dashboard_quick_entry'
+const quickEntry = ref(localStorage.getItem(QUICK_ENTRY_KEY) === 'true')
+function onQuickEntryChange(val) {
+  localStorage.setItem(QUICK_ENTRY_KEY, val ? 'true' : 'false')
+}
+
 // Budget Modal
 const budgetModalOpen = ref(false)
 const budgetModalCategory = ref(null)
 const budgetForm = reactive({
   month: '',
   amount: null,
+})
+
+// Quick Entry Modal (expense from category card)
+const quickEntryModalOpen = ref(false)
+const quickEntryCategory = ref(null)
+const quickEntryForm = reactive({
+  amount: null,
+  category: '',
+  accountId: null,
+  notes: '',
 })
 
 // Get current month in YYYY-MM format
@@ -319,6 +392,19 @@ function getCurrentMonthBudget(cat) {
   return getMonthBudget(cat, currentMonth.value)
 }
 
+function onBudgetCardClick(cat) {
+  if (quickEntry.value) {
+    quickEntryCategory.value = cat
+    quickEntryForm.amount = null
+    quickEntryForm.category = cat.name
+    quickEntryForm.accountId = accounts.accounts[0]?.id || null
+    quickEntryForm.notes = ''
+    quickEntryModalOpen.value = true
+  } else {
+    openBudgetModal(cat)
+  }
+}
+
 function openBudgetModal(cat) {
   budgetModalCategory.value = cat
   budgetForm.month = currentMonth.value
@@ -342,7 +428,37 @@ async function saveBudget() {
 
 function goToCategoryDetails() {
   if (budgetModalCategory.value) {
-    $router.push(`/category/${encodeURIComponent(budgetModalCategory.value.name)}/transactions`)
+    $router.push(`/category/${budgetModalCategory.value.id}/transactions`)
+  }
+}
+
+async function saveQuickEntry() {
+  if (!quickEntryForm.amount || quickEntryForm.amount <= 0 || !quickEntryForm.accountId) return
+  saving.value = true
+  try {
+    const now = new Date()
+    await transactions.addTransaction({
+      type: 'expense',
+      amount: quickEntryForm.amount,
+      category: quickEntryForm.category,
+      accountId: quickEntryForm.accountId,
+      date: now.toISOString().slice(0, 10),
+      time: now.toTimeString().slice(0, 5),
+      notes: quickEntryForm.notes || '',
+    })
+    await accounts.updateBalance(quickEntryForm.accountId, -quickEntryForm.amount)
+    $q.notify({ type: 'positive', message: t('addExpense.expenseAdded'), position: 'top' })
+    quickEntryModalOpen.value = false
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  saving.value = false
+}
+
+function goToQuickEntryDetails() {
+  if (quickEntryCategory.value) {
+    quickEntryModalOpen.value = false
+    $router.push(`/category/${quickEntryCategory.value.id}/transactions`)
   }
 }
 const editForm = reactive({

@@ -61,6 +61,7 @@ export default {
     bank: 'ব্যাংক',
     mobile: 'মোবাইল',
     budgetStatus: 'বাজেট স্ট্যাটাস',
+    quickEntry: 'কুইক এন্ট্রি',
     recentTransactions: 'সাম্প্রতিক লেনদেন',
     noTransactionsYet: 'এখনো কোনো লেনদেন হয়নি',
     budgetAmount: 'বাজেট পরিমাণ',

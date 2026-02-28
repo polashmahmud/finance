@@ -39,7 +39,7 @@ const routes = [
         component: () => import('pages/AccountTransactionsPage.vue'),
       },
       {
-        path: 'category/:name/transactions',
+        path: 'category/:id/transactions',
         component: () => import('pages/CategoryTransactionsPage.vue'),
       },
     ],
