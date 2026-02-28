@@ -31,7 +31,7 @@
               </div>
               <div class="row q-gutter-xs">
                 <q-btn flat round dense icon="add" color="dark" @click="openAddItem(list.id)" />
-                <q-btn flat round dense icon="content_copy" color="primary" @click="duplicateList(list)" />
+                <q-btn flat round dense icon="content_copy" color="primary" @click="openCopyDialog(list)" />
                 <q-btn flat round dense icon="share" color="info" @click="shareList(list)" />
                 <q-btn flat round dense icon="delete_outline" color="negative" @click="confirmDeleteList(list)" />
               </div>
@@ -113,6 +113,26 @@
       </q-card>
     </q-dialog>
 
+    <!-- Copy List Dialog -->
+    <q-dialog v-model="showCopyList" position="bottom" transition-show="slide-up" transition-hide="slide-down">
+      <q-card
+        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
+        <q-card-section class="row items-center justify-between no-wrap q-pb-none">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.copyMarketListTitle') }}
+          </div>
+          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+        </q-card-section>
+        <q-card-section>
+          <q-form @submit.prevent="submitCopyList">
+            <q-input v-model="copyListName" :label="$t('marketLists.listName')" outlined dense autofocus color="dark"
+              :rules="[(val) => (val && val.length > 0) || $t('common.nameRequired')]" style="margin-bottom: 10px;" />
+            <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
+              :label="$t('marketLists.copyMarketListBtn')" :loading="saving" />
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
     <!-- Add Item Dialog -->
     <q-dialog v-model="showAddItem" position="bottom" transition-show="slide-up" transition-hide="slide-down">
       <q-card
@@ -161,8 +181,11 @@ const accounts = useAccountStore()
 const settings = useSettingsStore()
 
 const showNewList = ref(false)
+const showCopyList = ref(false)
 const showAddItem = ref(false)
 const newListName = ref('')
+const copyListName = ref('')
+const listToCopy = ref(null)
 const activeListId = ref(null)
 const saving = ref(false)
 const newItem = reactive({ name: '', quantity: 1, price: 0 })
@@ -244,20 +267,24 @@ function convertToExpense(list) {
   })
 }
 
-async function duplicateList(list) {
+function openCopyDialog(list) {
+  listToCopy.value = list
+  const prefix = t('marketLists.defaultCopyPrefix')
+  copyListName.value = prefix + settings.formatDate(new Date().toISOString().slice(0, 10))
+  showCopyList.value = true
+}
+
+async function submitCopyList() {
+  if (!copyListName.value || !listToCopy.value) return
   saving.value = true
+  const list = listToCopy.value
   try {
-    const copyNameSuffix = settings.language === 'bn' ? ' (কপি)' : ' (Copy)'
-    const newListRef = await marketLists.addList({ name: list.name + copyNameSuffix })
+    const newListRef = await marketLists.addList({ name: copyListName.value })
 
     // addList returns the document reference in marketListStore.js, but the store implementation
     // might not return the ID directly depending on how it's written. We will fetch the lists again
     // and find the newest one with this name if we didn't get an ID, but assuming addList adds
     // it locally or we can just iterate.
-    // To be safe and simple, we can add items if we have the new list's ID.
-    // However, looking at marketListStore.js, addList likely pushes to Firebase.
-    // Let's implement a clean duplicate by first getting the ID.
-    // If addList returns the new ID, we can use it:
     const newListId = newListRef?.id || newListRef
 
     if (newListId && list.items && list.items.length > 0) {
@@ -271,6 +298,9 @@ async function duplicateList(list) {
       }
     }
 
+    showCopyList.value = false
+    listToCopy.value = null
+    copyListName.value = ''
     $q.notify({ type: 'positive', message: t('marketLists.copySuccess'), position: 'top' })
   } catch (err) {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
