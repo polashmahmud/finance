@@ -14,7 +14,7 @@
           <div class="col-6">
             <div class="q-mb-sm">
               <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance')
-                }}</div>
+              }}</div>
               <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
                 settings.formatNumber(accounts.totalBalance) }}</div>
             </div>
@@ -63,7 +63,7 @@
           </div>
           <div class="text-body2 text-weight-medium">{{ account.name }}</div>
           <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{ settings.formatNumber(account.balance)
-            }}</div>
+          }}</div>
         </q-card-section>
       </q-card>
     </div>
@@ -466,7 +466,7 @@ const expenseCategoryOptions = computed(() =>
 
 const accountOptions = computed(() =>
   accounts.accounts.map((a) => ({
-    label: `${a.name} (${settings.currency}${Number(a.balance || 0).toLocaleString()})`,
+    label: `${a.name} (${settings.currency}${settings.formatNumber(a.balance || 0)})`,
     value: a.id,
   })),
 )

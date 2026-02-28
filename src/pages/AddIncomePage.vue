@@ -16,8 +16,8 @@
           <!-- Category & Account -->
           <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
             <div class="col-6">
-              <q-select v-model="form.category" :options="incomeCategoryOptions" :label="$t('common.category')" outlined color="dark"
-                emit-value map-options :rules="[val => !!val || $t('common.categoryRequired')]">
+              <q-select v-model="form.category" :options="incomeCategoryOptions" :label="$t('common.category')" outlined
+                color="dark" emit-value map-options :rules="[val => !!val || $t('common.categoryRequired')]">
                 <template v-slot:option="scope">
                   <q-item v-bind="scope.itemProps">
                     <q-item-section avatar>
@@ -33,8 +33,8 @@
               </q-select>
             </div>
             <div class="col-6">
-              <q-select v-model="form.accountId" :options="accountOptions" :label="$t('common.account')" outlined color="dark"
-                emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
+              <q-select v-model="form.accountId" :options="accountOptions" :label="$t('common.account')" outlined
+                color="dark" emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
             </div>
           </div>
 
@@ -67,8 +67,8 @@
           </div>
 
           <!-- Notes -->
-          <q-input v-model="form.notes" :label="$t('common.noteOptional')" outlined color="dark" type="textarea" rows="2"
-            style="margin-bottom: 10px;" />
+          <q-input v-model="form.notes" :label="$t('common.noteOptional')" outlined color="dark" type="textarea"
+            rows="2" style="margin-bottom: 10px;" />
 
           <!-- Submit -->
           <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated size="lg"
@@ -119,7 +119,7 @@ const incomeCategoryOptions = computed(() =>
 
 const accountOptions = computed(() =>
   accounts.accounts.map((a) => ({
-    label: `${a.name} (${settings.currency}${Number(a.balance || 0).toLocaleString()})`,
+    label: `${a.name} (${settings.currency}${settings.formatNumber(a.balance || 0)})`,
     value: a.id
   })),
 )

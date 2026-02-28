@@ -70,7 +70,7 @@
                     </q-circular-progress>
                     <div class="text-caption q-mt-sm">{{ $t('common.income') }}</div>
                     <div class="text-weight-bold text-positive">{{ settings.currency }}{{
-                      formatNumber(totalIncome) }}</div>
+                      settings.formatNumber(totalIncome) }}</div>
                   </div>
                 </div>
                 <div class="col">
@@ -147,7 +147,8 @@
                 <div v-if="cat.over" class="text-caption text-negative q-mt-xs">
                   {{ $t('reports.overBudget', {
                     amount: settings.currency + settings.formatNumber(cat.spent -
-                  cat.budget) }) }}
+                      cat.budget)
+                  }) }}
                 </div>
               </div>
             </q-card-section>
@@ -321,7 +322,7 @@ const chartOptions = computed(() => ({
   },
   yaxis: {
     labels: {
-      formatter: (value) => settings.currency + value.toLocaleString()
+      formatter: (value) => settings.currency + settings.formatNumber(value)
     }
   },
   legend: { position: 'top', horizontalAlign: 'left' },
@@ -336,9 +337,6 @@ const chartOptions = computed(() => ({
   }
 }))
 
-function formatNumber(n) {
-  return Number(n || 0).toLocaleString()
-}
 
 onMounted(() => {
   transactions.listenTransactions()

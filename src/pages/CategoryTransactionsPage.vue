@@ -29,7 +29,8 @@
             <div v-if="isOverBudget" class="text-caption text-negative q-mt-xs">
               {{ $t('categories.overBudget', {
                 amount: settings.currency + settings.formatNumber(totalSpent -
-              monthlyBudget) }) }} }) }}
+                  monthlyBudget)
+              }) }} }) }}
             </div>
             <div v-else class="text-caption text-positive q-mt-xs">
               {{ $t('categoryTransactions.remaining', {
@@ -76,11 +77,11 @@
     </q-dialog>
 
     <!-- Summary -->
-    <div class="row q-gutter-sm q-mb-md" v-if="filteredTransactions.length">
+    <div class="row justify-center q-gutter-sm q-mb-md" v-if="filteredTransactions.length">
       <q-chip :color="category?.type === 'income' ? 'green-1' : 'red-1'"
         :text-color="category?.type === 'income' ? 'green-9' : 'red-9'"
         :icon="category?.type === 'income' ? 'trending_up' : 'trending_down'" dense>
-        {{ $t('categoryTransactions.totalAmount') }}: {{ settings.currency }}{{ formatNumber(filteredTotal) }}
+        {{ $t('categoryTransactions.totalAmount') }}: {{ settings.currency }}{{ settings.formatNumber(filteredTotal) }}
       </q-chip>
       <q-chip color="blue-1" text-color="blue-9" icon="receipt" dense>
         {{ filteredTransactions.length }} {{ $t('categoryTransactions.transactions') }}
@@ -88,7 +89,7 @@
     </div>
 
     <!-- Transaction List -->
-    <q-card class="finance-card" v-if="filteredTransactions.length">
+    <q-card class="finance-card" v-if="filteredTransactions.length" style="border-radius: 16px; overflow: hidden;">
       <q-list separator>
         <q-slide-item v-for="tx in filteredTransactions" :key="tx.id" @left="({ reset }) => onEditTx(tx, reset)"
           @right="({ reset }) => onDeleteTx(tx.id, reset)">
@@ -118,7 +119,6 @@
               <q-item-label :class="tx.type === 'income' ? 'amount-income' : 'amount-expense'"
                 class="transaction-amount">
                 {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ settings.formatNumber(tx.amount) }}
-                }}
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -346,10 +346,6 @@ const accountOptions = computed(() =>
 function getAccountName(accountId) {
   const acc = accounts.accounts.find((a) => a.id === accountId)
   return acc ? acc.name : ''
-}
-
-function formatNumber(n) {
-  return Number(n || 0).toLocaleString()
 }
 
 function onEditTx(tx, reset) {

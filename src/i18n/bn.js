@@ -210,6 +210,7 @@ export default {
     deleteConfirm: 'তালিকাটি মুছে ফেলতে চান?',
     listDeleted: 'তালিকা মুছে ফেলা হয়েছে',
     marketListNotePrefix: 'বাজার তালিকা: ',
+    swipeHint: 'এডিট বা ডিলিট করতে ডানে বা বামে সোয়াইপ করুন',
   },
 
   // ========== Notes ==========

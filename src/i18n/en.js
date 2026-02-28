@@ -206,6 +206,7 @@ export default {
     deleteConfirm: 'Are you sure you want to delete this list?',
     listDeleted: 'List deleted',
     marketListNotePrefix: 'Market List: ',
+    swipeHint: 'Swipe left or right to edit or delete',
   },
 
   // ========== Notes ==========

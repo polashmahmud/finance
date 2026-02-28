@@ -44,6 +44,11 @@
             <q-linear-progress :value="list.items.length ? getCompletedCount(list) / list.items.length : 0" color="dark"
               rounded size="6px" track-color="grey-3" class="q-mb-md" />
 
+            <div v-if="list.items.length" class="text-center text-caption text-grey q-mb-sm">
+              <q-icon name="swipe" size="16px" class="q-mr-xs" />
+              {{ $t('marketLists.swipeHint') }}
+            </div>
+
             <!-- Items -->
             <q-list dense separator>
               <q-slide-item v-for="item in list.items" :key="item.id" @left="onLeftSwipe(list, item, $event)"
