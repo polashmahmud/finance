@@ -23,7 +23,10 @@
               <div>
                 <div class="row items-center q-gutter-sm">
                   <q-icon name="shopping_cart" color="dark" size="20px" />
-                  <div class="text-subtitle1 text-weight-bold">{{ list.name }}</div>
+                  <div class="text-subtitle1 text-weight-bold cursor-pointer" @click="openRenameDialog(list)">
+                    {{ list.name }}
+                    <q-icon name="edit" size="xs" color="grey" class="q-ml-xs" />
+                  </div>
                 </div>
                 <div class="text-caption text-grey q-ml-lg">{{ getCompletedCount(list) }}/{{ list.items.length }} {{
                   $t('marketLists.items') }}
@@ -133,6 +136,26 @@
       </q-card>
     </q-dialog>
 
+    <!-- Rename List Dialog -->
+    <q-dialog v-model="showRenameList" position="bottom" transition-show="slide-up" transition-hide="slide-down">
+      <q-card
+        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
+        <q-card-section class="row items-center justify-between no-wrap q-pb-none">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.renameListTitle') }}
+          </div>
+          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+        </q-card-section>
+        <q-card-section>
+          <q-form @submit.prevent="submitRenameList">
+            <q-input v-model="renameListName" :label="$t('marketLists.listName')" outlined dense autofocus color="dark"
+              :rules="[(val) => (val && val.length > 0) || $t('common.nameRequired')]" style="margin-bottom: 10px;" />
+            <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
+              :label="$t('marketLists.rename')" :loading="saving" />
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
     <!-- Add Item Dialog -->
     <q-dialog v-model="showAddItem" position="bottom" transition-show="slide-up" transition-hide="slide-down">
       <q-card
@@ -182,10 +205,13 @@ const settings = useSettingsStore()
 
 const showNewList = ref(false)
 const showCopyList = ref(false)
+const showRenameList = ref(false)
 const showAddItem = ref(false)
 const newListName = ref('')
 const copyListName = ref('')
+const renameListName = ref('')
 const listToCopy = ref(null)
+const listToRename = ref(null)
 const activeListId = ref(null)
 const saving = ref(false)
 const newItem = reactive({ name: '', quantity: 1, price: 0 })
@@ -308,6 +334,27 @@ async function submitCopyList() {
     listToCopy.value = null
     copyListName.value = ''
     $q.notify({ type: 'positive', message: t('marketLists.copySuccess'), position: 'top' })
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  saving.value = false
+}
+
+function openRenameDialog(list) {
+  listToRename.value = list
+  renameListName.value = list.name
+  showRenameList.value = true
+}
+
+async function submitRenameList() {
+  if (!renameListName.value || !listToRename.value) return
+  saving.value = true
+  try {
+    await marketLists.updateList(listToRename.value.id, { name: renameListName.value })
+    showRenameList.value = false
+    listToRename.value = null
+    renameListName.value = ''
+    $q.notify({ type: 'positive', message: t('marketLists.renameListSuccess'), position: 'top' })
   } catch (err) {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
   }
