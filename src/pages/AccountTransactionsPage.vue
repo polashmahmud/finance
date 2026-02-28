@@ -97,8 +97,9 @@
                         </q-item-section>
                         <q-item-section>
                             <q-item-label class="text-weight-medium">{{ tx.category || $t('common.transfer')
-                            }}</q-item-label>
-                            <q-item-label caption>{{ tx.notes }} &middot; {{ tx.date }}</q-item-label>
+                                }}</q-item-label>
+                            <q-item-label caption>{{ tx.notes }} &middot; {{ settings.formatDate(tx.date)
+                                }}</q-item-label>
                         </q-item-section>
                         <q-item-section side>
                             <q-item-label

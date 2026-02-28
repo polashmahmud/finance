@@ -12,8 +12,8 @@
     <div class="row q-gutter-sm q-mb-md">
       <q-chip v-for="filter in filterOptions" :key="filter.value" :outline="activeFilter !== filter.value"
         :color="activeFilter === filter.value ? 'dark' : 'grey-4'"
-        :text-color="activeFilter === filter.value ? 'white' : 'dark'" clickable
-        @click="activeFilter = filter.value" size="sm">
+        :text-color="activeFilter === filter.value ? 'white' : 'dark'" clickable @click="activeFilter = filter.value"
+        size="sm">
         {{ filter.label }}
       </q-chip>
     </div>
@@ -37,7 +37,7 @@
           </q-item-section>
           <q-item-section>
             <q-item-label class="text-weight-medium">{{ tx.category || tx.note || tx.type }}</q-item-label>
-            <q-item-label caption>{{ tx.account }} · {{ tx.date }}</q-item-label>
+            <q-item-label caption>{{ tx.account }} · {{ settings.formatDate(tx.date) }}</q-item-label>
             <q-item-label v-if="tx.note" caption class="text-grey-6">{{ tx.note }}</q-item-label>
           </q-item-section>
           <q-item-section side>

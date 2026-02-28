@@ -8,6 +8,7 @@ export const useSettingsStore = defineStore('settings', () => {
   const currencyCode = ref('BDT')
   const language = ref('bn')
   const fontFamily = ref('Tiro Bangla')
+  const dateFormat = ref('DD MMM, YYYY')
   const darkMode = ref(false)
   const appLock = ref(false)
   const pin = ref('')
@@ -23,6 +24,7 @@ export const useSettingsStore = defineStore('settings', () => {
         if (s.currencyCode) currencyCode.value = s.currencyCode
         if (s.language) language.value = s.language
         if (s.fontFamily) fontFamily.value = s.fontFamily
+        if (s.dateFormat) dateFormat.value = s.dateFormat
         if (s.darkMode !== undefined) {
           darkMode.value = s.darkMode
           Dark.set(s.darkMode)
@@ -48,6 +50,7 @@ export const useSettingsStore = defineStore('settings', () => {
         currencyCode: currencyCode.value,
         language: language.value,
         fontFamily: fontFamily.value,
+        dateFormat: dateFormat.value,
         darkMode: darkMode.value,
       }),
     )
@@ -84,6 +87,19 @@ export const useSettingsStore = defineStore('settings', () => {
     saveSettings()
   }
 
+  function setDateFormat(format) {
+    dateFormat.value = format
+    saveSettings()
+  }
+
+  function formatDate(dateString) {
+    if (!dateString) return ''
+    const dateObj = new Date(dateString)
+    if (isNaN(dateObj)) return dateString
+    const { date } = require('quasar')
+    return date.formatDate(dateObj, dateFormat.value)
+  }
+
   function setPin(newPin) {
     pin.value = newPin
     appLock.value = true
@@ -114,6 +130,7 @@ export const useSettingsStore = defineStore('settings', () => {
     currencyCode,
     language,
     fontFamily,
+    dateFormat,
     darkMode,
     appLock,
     pin,
@@ -123,6 +140,8 @@ export const useSettingsStore = defineStore('settings', () => {
     setCurrency,
     setLanguage,
     setFont,
+    setDateFormat,
+    formatDate,
     setPin,
     removePin,
     verifyPin,

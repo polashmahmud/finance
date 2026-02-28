@@ -290,6 +290,7 @@ export default {
     preferences: 'Preferences',
     currency: 'Currency',
     language: 'Language',
+    dateFormat: 'Date Format',
     security: 'Security',
     appLockPin: 'App Lock (PIN)',
     active: 'Active',

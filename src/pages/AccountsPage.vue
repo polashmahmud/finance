@@ -59,7 +59,7 @@
                     :class="getLastTx(account.id).type === 'income' ? 'text-positive' : (getLastTx(account.id).type === 'expense' ? 'text-negative' : 'text-blue')">
                     {{ settings.currency }}{{ formatNumber(getLastTx(account.id).amount) }}
                   </span>
-                  <span class="text-grey-6 text-caption">- {{ getLastTx(account.id).date }}</span>
+                  <span class="text-grey-6 text-caption">- {{ settings.formatDate(getLastTx(account.id).date) }}</span>
                 </div>
                 <div v-else class="text-grey-6 text-caption q-mt-xs" style="font-size: 0.7rem">{{
                   $t('accounts.noTransactions') }}

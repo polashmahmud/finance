@@ -14,7 +14,7 @@
           <div class="col-6">
             <div class="q-mb-sm">
               <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance')
-                }}</div>
+              }}</div>
               <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
                 formatNumber(accounts.totalBalance) }}</div>
             </div>
@@ -167,7 +167,7 @@
             </q-item-section>
             <q-item-section>
               <q-item-label class="text-weight-medium">{{ tx.category }}</q-item-label>
-              <q-item-label caption>{{ tx.notes }} &middot; {{ tx.date }}</q-item-label>
+              <q-item-label caption>{{ tx.notes }} &middot; {{ settings.formatDate(tx.date) }}</q-item-label>
             </q-item-section>
             <q-item-section side>
               <q-item-label :class="tx.type === 'income' ? 'amount-income' : 'amount-expense'"

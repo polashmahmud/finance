@@ -93,11 +93,26 @@
                 <q-item v-bind="scope.itemProps">
                   <q-item-section>
                     <q-item-label :style="{ fontFamily: scope.opt.value + ', sans-serif' }">{{ scope.opt.label
-                      }}</q-item-label>
+                    }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </template>
             </q-select>
+          </q-item-section>
+        </q-item>
+
+        <!-- Date Format -->
+        <q-item class="touch-target">
+          <q-item-section avatar>
+            <q-icon name="calendar_today" color="dark" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('settings.dateFormat') }}</q-item-label>
+            <q-item-label caption>{{ settings.dateFormat }}</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-select v-model="selectedDateFormat" :options="dateFormatOptions" dense borderless emit-value map-options
+              @update:model-value="onDateFormatChange" style="min-width: 130px" />
           </q-item-section>
         </q-item>
       </q-list>
@@ -115,7 +130,7 @@
           <q-item-section>
             <q-item-label>{{ $t('settings.appLockPin') }}</q-item-label>
             <q-item-label caption>{{ settings.appLock ? $t('settings.active') : $t('settings.inactive')
-              }}</q-item-label>
+            }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-toggle :model-value="settings.appLock" color="dark" @update:model-value="onToggleAppLock" />
@@ -393,10 +408,18 @@ const newPassword = ref('')
 const confirmNewPassword = ref('')
 const changingPassword = ref(false)
 
-// Select refs
 const selectedCurrency = ref(settings.currencyCode)
 const selectedLang = ref(settings.language)
 const selectedFont = ref(settings.fontFamily)
+const selectedDateFormat = ref(settings.dateFormat)
+
+const dateFormatOptions = [
+  { label: 'DD MMM, YYYY', value: 'DD MMM, YYYY' },
+  { label: 'DD/MM/YYYY', value: 'DD/MM/YYYY' },
+  { label: 'MM/DD/YYYY', value: 'MM/DD/YYYY' },
+  { label: 'YYYY-MM-DD', value: 'YYYY-MM-DD' },
+  { label: 'DD MMMM YYYY', value: 'DD MMMM YYYY' }
+]
 
 const currencyOptions = [
   { label: 'BDT (৳)', value: 'BDT' },
@@ -447,6 +470,10 @@ function onLanguageChange(lang) {
 
 function onFontChange(font) {
   settings.setFont(font)
+}
+
+function onDateFormatChange(format) {
+  settings.setDateFormat(format)
 }
 
 // --- User Profile Modal Functions ---
