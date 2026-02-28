@@ -6,7 +6,7 @@
         <div class="text-h5 text-weight-bold">{{ $t('marketLists.title') }}</div>
         <div class="text-caption text-grey">{{ marketLists.lists.length }}{{ $t('marketLists.countSuffix') }}</div>
       </div>
-      <q-btn round flat icon="add_circle" color="dark" size="lg" @click="showNewList = true" />
+      <q-btn round flat icon="add_circle" color="dark" size="lg" @click="openNewListDialog" />
     </div>
 
     <!-- Loading -->
@@ -192,6 +192,12 @@ const newItem = reactive({ name: '', quantity: 1, price: 0 })
 
 function getCompletedCount(list) {
   return list.items.filter((i) => i.bought).length
+}
+
+function openNewListDialog() {
+  const prefix = t('marketLists.defaultCopyPrefix')
+  newListName.value = prefix + settings.formatDate(new Date().toISOString().slice(0, 10))
+  showNewList.value = true
 }
 
 async function createList() {
