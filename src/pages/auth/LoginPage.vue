@@ -26,7 +26,7 @@
 
       <div class="text-center text-caption q-mt-sm">
         {{ $t('auth.noAccount') }}
-        <router-link to="/auth/register" class="text-dark text-weight-bold" style="text-decoration: none">
+        <router-link to="/register" class="text-dark text-weight-bold" style="text-decoration: none">
           {{ $t('auth.createNewAccount') }}
         </router-link>
       </div>

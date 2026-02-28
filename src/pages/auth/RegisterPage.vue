@@ -31,7 +31,7 @@
 
       <div class="text-center text-caption q-mt-sm">
         {{ $t('auth.alreadyHaveAccount') }}
-        <router-link to="/auth/login" class="text-dark text-weight-bold" style="text-decoration: none">
+        <router-link to="/login" class="text-dark text-weight-bold" style="text-decoration: none">
           {{ $t('auth.loginLink') }}
         </router-link>
       </div>
