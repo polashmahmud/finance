@@ -203,6 +203,7 @@ const sections = computed(() => [
       { label: t('help.sections.marketList.s2'), detail: t('help.sections.marketList.s2d') },
       { label: t('help.sections.marketList.s3'), detail: t('help.sections.marketList.s3d') },
       { label: t('help.sections.marketList.s4'), detail: t('help.sections.marketList.s4d') },
+      { label: t('help.sections.marketList.s5'), detail: t('help.sections.marketList.s5d') },
     ],
   },
   {
