@@ -1,4 +1,6 @@
 {
+  "name": "My Finance",
+  "short_name": "My Finance",
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#027be3",
