@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md q-pb-xl">
+  <q-page class="q-pa-md">
     <!-- Header -->
     <div class="q-mb-lg">
       <div class="text-h5 text-weight-bold">{{ $t('help.title') }}</div>

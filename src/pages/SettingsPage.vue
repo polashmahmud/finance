@@ -4,6 +4,11 @@
       <div class="text-h5 text-weight-bold">{{ $t('settings.title') }}</div>
     </div>
 
+    <!-- Responsive 2-column layout on desktop -->
+    <div class="row q-col-gutter-lg">
+      <!-- LEFT column: Profile + Preferences -->
+      <div class="col-12 col-md-6">
+
     <!-- Profile Section -->
     <q-card class="finance-card q-mb-md">
       <q-list>
@@ -117,6 +122,10 @@
         </q-item>
       </q-list>
     </q-card>
+
+      </div>
+      <!-- RIGHT column: Security + Dashboard Settings + Data + About -->
+      <div class="col-12 col-md-6">
 
     <!-- Security Section -->
     <div class="section-title">{{ $t('settings.security') }}</div>
@@ -238,6 +247,8 @@
       </q-list>
     </q-card>
 
+      </div>
+    </div>
 
     <!-- User Profile Modal -->
     <q-dialog v-model="showUserProfileModal" persistent>

@@ -50,6 +50,8 @@ export default {
     quickAdd: 'Quick Add',
     marketList: 'Market List',
     note: 'Note',
+    allTransactions: 'Transactions',
+    search: 'Search',
   },
 
   // ========== Index / Dashboard ==========

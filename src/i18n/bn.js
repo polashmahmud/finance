@@ -50,6 +50,8 @@ export default {
     quickAdd: 'দ্রুত যোগ করুন',
     marketList: 'বাজার তালিকা',
     note: 'নোট',
+    allTransactions: 'লেনদেন',
+    search: 'অনুসন্ধান',
   },
 
   // ========== Index / Dashboard ==========

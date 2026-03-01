@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md q-pb-xl">
+  <q-page class="q-pa-md">
     <!-- Account Header -->
     <div class="q-mb-md" v-if="account">
       <q-card class="finance-card">

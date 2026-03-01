@@ -18,8 +18,9 @@
       <!-- Pinned Notes -->
       <div v-if="pinnedNotes.length" class="q-mb-md">
         <div class="section-title">{{ $t('notes.pinned') }}</div>
-        <div class="q-gutter-sm">
-          <q-card v-for="note in pinnedNotes" :key="note.id" class="finance-card" style="border-left: 4px solid #111;">
+        <div class="row q-col-gutter-sm">
+          <div v-for="note in pinnedNotes" :key="note.id" class="col-12 col-md-6">
+          <q-card class="finance-card full-height" style="border-left: 4px solid #111;">
             <q-card-section>
               <div class="row items-start justify-between">
                 <div class="col" @click="openEditDialog(note)" style="cursor: pointer;">
@@ -38,14 +39,16 @@
               </div>
             </q-card-section>
           </q-card>
+          </div>
         </div>
       </div>
 
       <!-- Other Notes -->
       <div v-if="unpinnedNotes.length">
         <div class="section-title">{{ $t('notes.allNotes') }}</div>
-        <div class="q-gutter-sm">
-          <q-card v-for="note in unpinnedNotes" :key="note.id" class="finance-card">
+        <div class="row q-col-gutter-sm">
+          <div v-for="note in unpinnedNotes" :key="note.id" class="col-12 col-md-6">
+          <q-card class="finance-card full-height">
             <q-card-section>
               <div class="row items-start justify-between">
                 <div class="col" @click="openEditDialog(note)" style="cursor: pointer;">
@@ -62,6 +65,7 @@
               </div>
             </q-card-section>
           </q-card>
+          </div>
         </div>
       </div>
 

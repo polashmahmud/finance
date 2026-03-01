@@ -1,5 +1,5 @@
 <template>
-    <q-page class="q-pa-md q-pb-xl">
+    <q-page class="q-pa-md">
         <!-- Month Filter -->
         <div class="row items-center justify-center q-mb-md">
             <q-btn flat round dense icon="chevron_left" color="dark" @click="goToPrevMonth" :disable="!canGoPrev" />

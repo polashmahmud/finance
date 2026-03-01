@@ -1,105 +1,241 @@
 <template>
   <q-page class="q-pa-md">
-    <!-- Greeting -->
-    <div class="q-mb-md">
-      <div class="text-caption text-grey">{{ greeting }} 👋</div>
-      <div class="text-h5 text-weight-bold">{{ $t('dashboard.myFinance') }}</div>
-    </div>
+    <!-- Responsive two-column layout: single col on mobile/tablet, two cols on desktop -->
+    <div class="row q-col-gutter-lg">
 
-    <!-- Total Balance Card -->
-    <q-card class="finance-card q-mb-md cursor-pointer" @click="$router.push('/accounts')">
-      <q-card-section class="bg-primary-gradient" style="border-radius: 16px; overflow: hidden; position: relative;">
-        <div class="row items-center no-wrap">
-          <!-- Left Content -->
-          <div class="col-6">
-            <div class="q-mb-sm">
-              <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{ $t('dashboard.totalBalance')
-                }}</div>
-              <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency }}{{
-                settings.formatNumber(accounts.totalBalance) }}</div>
-            </div>
-            <div class="row q-gutter-md q-mt-xs">
-              <div class="row items-center q-gutter-xs">
-                <q-icon name="trending_up" size="18px" style="color: #4ade80" />
-                <div>
-                  <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">{{ $t('common.income') }}</div>
-                  <div class="text-white text-weight-bold" style="font-size: 0.85rem">{{ settings.currency }}{{
-                    settings.formatNumber(transactions.totalIncome) }}</div>
+      <!-- LEFT COLUMN: Greeting + Balance Card + Recent Transactions (desktop: beside right col) -->
+      <div class="col-12 col-md-7">
+
+        <!-- Greeting -->
+        <div class="q-mb-md">
+          <div class="text-caption text-grey">{{ greeting }} 👋</div>
+          <div class="text-h5 text-weight-bold">{{ $t('dashboard.myFinance') }}</div>
+        </div>
+
+        <!-- Total Balance Card -->
+        <q-card class="finance-card q-mb-md cursor-pointer" @click="$router.push('/accounts')">
+          <q-card-section class="bg-primary-gradient"
+            style="border-radius: 16px; overflow: hidden; position: relative;">
+            <div class="row items-center no-wrap">
+              <!-- Left Content -->
+              <div class="col-6">
+                <div class="q-mb-sm">
+                  <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{
+                    $t('dashboard.totalBalance') }}</div>
+                  <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency
+                    }}{{ settings.formatNumber(accounts.totalBalance) }}</div>
+                </div>
+                <div class="row q-gutter-md q-mt-xs">
+                  <div class="row items-center q-gutter-xs">
+                    <q-icon name="trending_up" size="18px" style="color: #4ade80" />
+                    <div>
+                      <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">{{ $t('common.income') }}</div>
+                      <div class="text-white text-weight-bold" style="font-size: 0.85rem">{{ settings.currency }}{{
+                        settings.formatNumber(transactions.totalIncome) }}</div>
+                    </div>
+                  </div>
+                  <div class="row items-center q-gutter-xs">
+                    <q-icon name="trending_down" size="18px" style="color: #f87171" />
+                    <div>
+                      <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">{{ $t('common.expense') }}</div>
+                      <div class="text-white text-weight-bold" style="font-size: 0.85rem">{{ settings.currency }}{{
+                        settings.formatNumber(transactions.totalExpense) }}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="row items-center q-gutter-xs">
-                <q-icon name="trending_down" size="18px" style="color: #f87171" />
-                <div>
-                  <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">{{ $t('common.expense') }}</div>
-                  <div class="text-white text-weight-bold" style="font-size: 0.85rem">{{ settings.currency }}{{
-                    settings.formatNumber(transactions.totalExpense) }}</div>
+              <!-- Right Emoji -->
+              <div class="col-6 flex justify-end items-center" style="height: 90px; overflow: visible;">
+                <div style="font-size: 4rem; user-select: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
+                  {{ balanceEmoji }}
                 </div>
               </div>
             </div>
+          </q-card-section>
+        </q-card>
+
+        <!-- Recent Transactions (desktop: in left col) -->
+        <template v-if="$q.screen.gt.sm">
+          <div class="row items-center justify-between q-mb-sm">
+            <div class="section-title q-mb-none">{{ $t('dashboard.recentTransactions') }}</div>
+            <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right"
+              @click="$router.push('/all-transactions')" size="sm" />
           </div>
+          <q-card class="finance-card" style="border-radius: 16px; overflow: hidden;">
+            <q-list separator>
+              <q-slide-item v-for="tx in transactions.recentTransactions" :key="tx.id"
+                @left="({ reset }) => onEditTx(tx, reset)" @right="({ reset }) => onDeleteTx(tx.id, reset)">
+                <template v-slot:left>
+                  <div class="row items-center"><q-icon name="edit" color="info" /></div>
+                </template>
+                <template v-slot:right>
+                  <div class="row items-center"><q-icon name="delete" color="negative" /></div>
+                </template>
+                <q-item class="touch-target">
+                  <q-item-section avatar>
+                    <q-avatar :style="{ background: getCategoryColor(tx.category) + '20' }" size="40px">
+                      <q-icon :name="getCategoryIcon(tx.category)" :style="{ color: getCategoryColor(tx.category) }"
+                        size="20px" />
+                    </q-avatar>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label class="text-weight-medium">{{ tx.category }}</q-item-label>
+                    <q-item-label caption>{{ tx.notes }} &middot; {{ settings.formatDate(tx.date) }}</q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-item-label :class="tx.type === 'income' ? 'amount-income' : 'amount-expense'"
+                      class="transaction-amount">
+                      {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ settings.formatNumber(tx.amount)
+                      }}
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-slide-item>
+            </q-list>
+            <q-card-section v-if="!transactions.recentTransactions.length" class="text-center text-grey q-pa-lg">
+              <q-icon name="receipt_long" size="40px" class="q-mb-sm" />
+              <div>{{ $t('dashboard.noTransactionsYet') }}</div>
+            </q-card-section>
+          </q-card>
+          <div class="text-center q-pa-md text-grey-6" style="font-size: 12px;"
+            v-if="transactions.recentTransactions.length">
+            <q-icon name="swipe" size="16px" class="q-mr-xs" />
+            {{ $t('categories.swipeHint') }}
+          </div>
+        </template>
 
-          <!-- Right Chart / Emoji -->
-          <div class="col-6 flex justify-end items-center" style="height: 90px; overflow: visible;">
-            <div style="font-size: 4rem; user-select: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
-              {{ balanceEmoji }}
-            </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Accounts + Budget Status + Recent Transactions (mobile: at bottom) -->
+      <div class="col-12 col-md-5">
+
+        <!-- Accounts -->
+        <div class="section-title">{{ $t('dashboard.accounts') }}</div>
+        <!-- Desktop: wrap grid, Mobile: horizontal scroll -->
+        <div v-if="$q.screen.gt.sm" class="row q-col-gutter-sm q-mb-md">
+          <div v-for="account in accounts.accounts" :key="account.id" class="col-6">
+            <q-card class="finance-card cursor-pointer full-height"
+              @click="$router.push('/account/' + account.id + '/transactions')" v-ripple>
+              <q-card-section class="q-pa-md">
+                <div class="row items-center q-gutter-sm q-mb-sm">
+                  <q-icon :name="account.icon" :style="{ color: account.color }" size="20px" />
+                  <span class="text-caption text-grey">{{ account.type === 'Cash' ? $t('dashboard.cash') : account.type
+                    ===
+                    'Bank' ? $t('dashboard.bank') : $t('dashboard.mobile') }}</span>
+                </div>
+                <div class="text-body2 text-weight-medium">{{ account.name }}</div>
+                <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{
+                  settings.formatNumber(account.balance)
+                  }}</div>
+              </q-card-section>
+            </q-card>
           </div>
         </div>
-      </q-card-section>
-    </q-card>
+        <div v-else class="row q-gutter-md q-mb-md" style="overflow-x: auto; flex-wrap: nowrap; padding-bottom: 8px">
+          <q-card v-for="account in accounts.accounts" :key="account.id" class="finance-card cursor-pointer"
+            style="min-width: 160px; flex-shrink: 0" @click="$router.push('/account/' + account.id + '/transactions')"
+            v-ripple>
+            <q-card-section class="q-pa-md">
+              <div class="row items-center q-gutter-sm q-mb-sm">
+                <q-icon :name="account.icon" :style="{ color: account.color }" size="20px" />
+                <span class="text-caption text-grey">{{ account.type === 'Cash' ? $t('dashboard.cash') : account.type
+                  ===
+                  'Bank' ? $t('dashboard.bank') : $t('dashboard.mobile') }}</span>
+              </div>
+              <div class="text-body2 text-weight-medium">{{ account.name }}</div>
+              <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{
+                settings.formatNumber(account.balance) }}
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
 
-    <!-- Accounts Horizontal Scroll -->
-    <div class="section-title">{{ $t('dashboard.accounts') }}</div>
-    <div class="row q-gutter-md q-mb-md" style="overflow-x: auto; flex-wrap: nowrap; padding-bottom: 8px">
-      <q-card v-for="account in accounts.accounts" :key="account.id" class="finance-card cursor-pointer"
-        style="min-width: 160px; flex-shrink: 0" @click="$router.push('/account/' + account.id + '/transactions')"
-        v-ripple>
-        <q-card-section class="q-pa-md">
-          <div class="row items-center q-gutter-sm q-mb-sm">
-            <q-icon :name="account.icon" :style="{ color: account.color }" size="20px" />
-            <span class="text-caption text-grey">{{ account.type === 'Cash' ? $t('dashboard.cash') : account.type ===
-              'Bank' ? $t('dashboard.bank')
-              : $t('dashboard.mobile') }}</span>
+        <!-- Budget Status -->
+        <div class="row items-center justify-between q-mb-sm">
+          <div class="section-title q-mb-none">{{ $t('dashboard.budgetStatus') }}</div>
+          <div class="row items-center q-gutter-xs">
+            <span class="text-caption text-grey">{{ $t('dashboard.quickEntry') }}</span>
+            <q-toggle v-model="quickEntry" color="dark" dense @update:model-value="onQuickEntryChange" />
           </div>
-          <div class="text-body2 text-weight-medium">{{ account.name }}</div>
-          <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{ settings.formatNumber(account.balance)
-            }}</div>
-        </q-card-section>
-      </q-card>
-    </div>
+        </div>
+        <div class="row q-col-gutter-sm q-mb-md">
+          <div v-for="cat in categories.expenseCategories" :key="cat.id" class="col-3 col-sm-2 col-md-3">
+            <q-card class="finance-card cursor-pointer column items-center q-pa-sm" style="min-height: 110px;"
+              @click="onBudgetCardClick(cat)">
+              <q-avatar :style="{ background: cat.color + '18' }" size="36px" class="q-mb-xs">
+                <q-icon :name="cat.icon" :style="{ color: cat.color }" size="18px" />
+              </q-avatar>
+              <div class="text-body2 text-weight-medium text-center ellipsis" style="font-size: 11px; width: 100%;">
+                {{ cat.name }}
+              </div>
+              <div v-if="getCurrentMonthBudget(cat)" class="text-caption q-mt-xs" style="font-size: 10px;">
+                {{ settings.currency }}{{ settings.formatNumber(getCategorySpent(cat.name)) }} / {{ settings.currency
+                }}{{
+                  settings.formatNumber(getCurrentMonthBudget(cat)) }}
+              </div>
+              <div v-if="getCurrentMonthBudget(cat)" class="q-mt-xs" style="width: 100%;">
+                <q-linear-progress :value="Math.min(getCategorySpent(cat.name) / getCurrentMonthBudget(cat), 1)"
+                  :color="getCategorySpent(cat.name) > getCurrentMonthBudget(cat) ? 'negative' : 'positive'" rounded
+                  size="6px" track-color="grey-3" />
+              </div>
+              <div v-else class="text-caption text-grey-5 q-mt-xs text-center leading-tight"
+                style="font-size: 10px; line-height: 1.1;">
+                {{ $t('dashboard.tapToSetBudget') }}
+              </div>
+            </q-card>
+          </div>
+        </div>
 
-    <!-- Budget Status -->
-    <div class="row items-center justify-between q-mb-sm">
-      <div class="section-title q-mb-none">{{ $t('dashboard.budgetStatus') }}</div>
-      <div class="row items-center q-gutter-xs">
-        <span class="text-caption text-grey">{{ $t('dashboard.quickEntry') }}</span>
-        <q-toggle v-model="quickEntry" color="dark" dense @update:model-value="onQuickEntryChange" />
-      </div>
-    </div>
-    <div class="row q-col-gutter-sm q-mb-md">
-      <div v-for="cat in categories.expenseCategories" :key="cat.id" class="col-3">
-        <q-card class="finance-card cursor-pointer column items-center q-pa-sm" style="min-height: 110px;"
-          @click="onBudgetCardClick(cat)">
-          <q-avatar :style="{ background: cat.color + '18' }" size="36px" class="q-mb-xs">
-            <q-icon :name="cat.icon" :style="{ color: cat.color }" size="18px" />
-          </q-avatar>
-          <div class="text-body2 text-weight-medium text-center ellipsis" style="font-size: 11px; width: 100%;">
-            {{ cat.name }}
+        <!-- Recent Transactions (mobile/tablet: at bottom of page) -->
+        <template v-if="!$q.screen.gt.sm">
+          <div class="row items-center justify-between q-mb-sm">
+            <div class="section-title q-mb-none">{{ $t('dashboard.recentTransactions') }}</div>
+            <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right"
+              @click="$router.push('/all-transactions')" size="sm" />
           </div>
-          <div v-if="getCurrentMonthBudget(cat)" class="text-caption q-mt-xs" style="font-size: 10px;">
-            {{ settings.currency }}{{ settings.formatNumber(getCategorySpent(cat.name)) }} / {{ settings.currency }}{{
-              settings.formatNumber(getCurrentMonthBudget(cat)) }}
+          <q-card class="finance-card" style="border-radius: 16px; overflow: hidden;">
+            <q-list separator>
+              <q-slide-item v-for="tx in transactions.recentTransactions" :key="tx.id"
+                @left="({ reset }) => onEditTx(tx, reset)" @right="({ reset }) => onDeleteTx(tx.id, reset)">
+                <template v-slot:left>
+                  <div class="row items-center"><q-icon name="edit" color="info" /></div>
+                </template>
+                <template v-slot:right>
+                  <div class="row items-center"><q-icon name="delete" color="negative" /></div>
+                </template>
+                <q-item class="touch-target">
+                  <q-item-section avatar>
+                    <q-avatar :style="{ background: getCategoryColor(tx.category) + '20' }" size="40px">
+                      <q-icon :name="getCategoryIcon(tx.category)" :style="{ color: getCategoryColor(tx.category) }"
+                        size="20px" />
+                    </q-avatar>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label class="text-weight-medium">{{ tx.category }}</q-item-label>
+                    <q-item-label caption>{{ tx.notes }} &middot; {{ settings.formatDate(tx.date) }}</q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-item-label :class="tx.type === 'income' ? 'amount-income' : 'amount-expense'"
+                      class="transaction-amount">
+                      {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ settings.formatNumber(tx.amount)
+                      }}
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-slide-item>
+            </q-list>
+            <q-card-section v-if="!transactions.recentTransactions.length" class="text-center text-grey q-pa-lg">
+              <q-icon name="receipt_long" size="40px" class="q-mb-sm" />
+              <div>{{ $t('dashboard.noTransactionsYet') }}</div>
+            </q-card-section>
+          </q-card>
+          <div class="text-center q-pa-md text-grey-6" style="font-size: 12px;"
+            v-if="transactions.recentTransactions.length">
+            <q-icon name="swipe" size="16px" class="q-mr-xs" />
+            {{ $t('categories.swipeHint') }}
           </div>
-          <div v-if="getCurrentMonthBudget(cat)" class="q-mt-xs" style="width: 100%;">
-            <q-linear-progress :value="Math.min(getCategorySpent(cat.name) / getCurrentMonthBudget(cat), 1)"
-              :color="getCategorySpent(cat.name) > getCurrentMonthBudget(cat) ? 'negative' : 'positive'" rounded
-              size="6px" track-color="grey-3" />
-          </div>
-          <div v-else class="text-caption text-grey-5 q-mt-xs text-center leading-tight"
-            style="font-size: 10px; line-height: 1.1;">
-            {{ $t('dashboard.tapToSetBudget') }}
-          </div>
-        </q-card>
+        </template>
+
       </div>
     </div>
 
@@ -177,7 +313,7 @@
               </div>
             </div>
 
-            <!-- Buttons (aligned with amount & account columns) -->
+            <!-- Buttons -->
             <div class="row q-col-gutter-md">
               <div class="col-6">
                 <q-btn type="button" :label="$t('dashboard.details')" class="full-width bg-grey-2 text-dark" unelevated
@@ -192,60 +328,6 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-
-    <!-- Recent Transactions -->
-    <div class="row items-center justify-between q-mb-sm">
-      <div class="section-title q-mb-none">{{ $t('dashboard.recentTransactions') }}</div>
-      <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right"
-        @click="$router.push('/all-transactions')" size="sm" />
-    </div>
-    <q-card class="finance-card" style="border-radius: 16px; overflow: hidden;">
-      <q-list separator>
-        <q-slide-item v-for="tx in transactions.recentTransactions" :key="tx.id"
-          @left="({ reset }) => onEditTx(tx, reset)" @right="({ reset }) => onDeleteTx(tx.id, reset)">
-          <template v-slot:left>
-            <div class="row items-center">
-              <q-icon name="edit" color="info" />
-            </div>
-          </template>
-          <template v-slot:right>
-            <div class="row items-center">
-              <q-icon name="delete" color="negative" />
-            </div>
-          </template>
-
-          <q-item class="touch-target">
-            <q-item-section avatar>
-              <q-avatar :style="{ background: getCategoryColor(tx.category) + '20' }" size="40px">
-                <q-icon :name="getCategoryIcon(tx.category)" :style="{ color: getCategoryColor(tx.category) }"
-                  size="20px" />
-              </q-avatar>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="text-weight-medium">{{ tx.category }}</q-item-label>
-              <q-item-label caption>{{ tx.notes }} &middot; {{ settings.formatDate(tx.date) }}</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-item-label :class="tx.type === 'income' ? 'amount-income' : 'amount-expense'"
-                class="transaction-amount">
-                {{ tx.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ settings.formatNumber(tx.amount) }}
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-slide-item>
-      </q-list>
-
-      <q-card-section v-if="!transactions.recentTransactions.length" class="text-center text-grey q-pa-lg">
-        <q-icon name="receipt_long" size="40px" class="q-mb-sm" />
-        <div>{{ $t('dashboard.noTransactionsYet') }}</div>
-      </q-card-section>
-    </q-card>
-
-    <!-- Swipe Hint -->
-    <div class="text-center q-pa-md text-grey-6" style="font-size: 12px;" v-if="transactions.recentTransactions.length">
-      <q-icon name="swipe" size="16px" class="q-mr-xs" />
-      {{ $t('categories.swipeHint') }}
-    </div>
 
     <!-- Edit Transaction Dialog -->
     <q-dialog v-model="editDialogOpen">
@@ -317,6 +399,7 @@
     </q-dialog>
   </q-page>
 </template>
+
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'

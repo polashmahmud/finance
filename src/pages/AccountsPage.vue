@@ -27,9 +27,10 @@
 
     <template v-else>
       <!-- Account Cards -->
-      <div class="q-gutter-sm">
+      <div class="row q-col-gutter-sm">
+        <div v-for="account in accountStore.accounts" :key="account.id" class="col-12 col-md-6">
         <q-slide-item @left="(obj) => onSwipe(obj, 'edit', account)" @right="(obj) => onSwipe(obj, 'delete', account)"
-          v-for="account in accountStore.accounts" :key="account.id" class="finance-card">
+          class="finance-card">
           <template v-slot:left>
             <q-icon name="edit" color="dark" />
           </template>
@@ -69,10 +70,16 @@
               <q-item-section side top>
                 <q-item-label class="text-subtitle1 text-weight-bold q-mt-sm">{{ settings.currency }}{{
                   settings.formatNumber(account.balance) }}</q-item-label>
+                <!-- Desktop action buttons -->
+                <div class="row q-gutter-xs q-mt-xs gt-sm">
+                  <q-btn flat round dense icon="edit" size="sm" color="dark" @click.stop="openEditDialog(account)" />
+                  <q-btn flat round dense icon="delete_outline" size="sm" color="negative" @click.stop="confirmDelete(account)" />
+                </div>
               </q-item-section>
             </q-item>
           </q-card>
         </q-slide-item>
+        </div>
       </div>
 
       <!-- Swipe Hint -->

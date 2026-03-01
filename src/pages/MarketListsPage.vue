@@ -16,8 +16,9 @@
 
     <!-- Lists -->
     <template v-else>
-      <div class="q-gutter-md">
-        <q-card v-for="list in marketLists.lists" :key="list.id" class="finance-card">
+      <div class="row q-col-gutter-md">
+        <div v-for="list in marketLists.lists" :key="list.id" class="col-12 col-md-6">
+        <q-card class="finance-card full-height">
           <q-card-section>
             <div class="row items-center justify-between q-mb-sm">
               <div>
@@ -101,6 +102,7 @@
               class="q-mt-sm full-width" @click="convertToExpense(list)" :disable="!list.items.length" />
           </q-card-section>
         </q-card>
+        </div>
       </div>
 
       <!-- Empty state -->

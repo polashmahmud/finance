@@ -128,6 +128,64 @@ body {
   border-left: 4px solid #111111 !important;
 }
 
+// ---------- Sidebar styles ----------
+.sidebar-drawer {
+  border-right: 1px solid #d4d4d4 !important;
+
+  .q-item {
+    border-radius: 10px;
+    margin: 2px 8px;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #f1f5f9;
+    }
+
+    &__section--avatar {
+      min-width: 38px;
+    }
+  }
+}
+
+.sidebar-item-active {
+  background: #f1f5f9 !important;
+  color: #111 !important;
+  font-weight: 700;
+
+  .q-icon {
+    color: #111 !important;
+  }
+}
+
+// ---------- Responsive layouts ----------
+
+// Tablet (600px – 1023px): Sidebar visible, no bottom nav
+@media (min-width: 600px) {
+  .q-page {
+    padding-bottom: 24px; // no bottom nav on tablet/desktop
+    max-width: 860px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .finance-fab {
+    display: none !important;
+  }
+
+  .section-title {
+    padding: 12px 0 4px;
+  }
+}
+
+// Desktop (≥ 1024px): Wider content
+@media (min-width: 1024px) {
+  .q-page {
+    max-width: 1100px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
 // ---------- Dark mode overrides ----------
 .body--dark {
   .finance-card {
@@ -140,5 +198,19 @@ body {
     background: #1e1e1e !important;
     border-color: #333333 !important;
     border-left-color: #757575 !important;
+  }
+
+  .sidebar-drawer {
+    background: #1e1e1e !important;
+    border-right-color: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .sidebar-item-active {
+    background: #2e2e2e !important;
+    color: #fff !important;
+
+    .q-icon {
+      color: #fff !important;
+    }
   }
 }

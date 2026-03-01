@@ -31,9 +31,10 @@
             <q-icon name="category" size="48px" class="q-mb-sm" />
             <div>{{ $t('categories.noExpenseCategories') }}</div>
           </div>
-          <div class="q-gutter-sm">
+          <div class="row q-col-gutter-sm">
+            <div v-for="cat in categoryStore.expenseCategories" :key="cat.id" class="col-12 col-md-6">
             <q-slide-item @left="(obj) => onSwipe(obj, 'edit', cat)" @right="(obj) => onSwipe(obj, 'delete', cat)"
-              v-for="cat in categoryStore.expenseCategories" :key="cat.id" class="finance-card">
+              class="finance-card">
               <template v-slot:left>
                 <q-icon name="edit" color="dark" />
               </template>
@@ -60,6 +61,7 @@
                 </q-item>
               </q-card>
             </q-slide-item>
+            </div>
           </div>
         </q-tab-panel>
 
@@ -69,9 +71,10 @@
             <q-icon name="category" size="48px" class="q-mb-sm" />
             <div>{{ $t('categories.noIncomeCategories') }}</div>
           </div>
-          <div class="q-gutter-sm">
+          <div class="row q-col-gutter-sm">
+            <div v-for="cat in categoryStore.incomeCategories" :key="cat.id" class="col-12 col-md-6">
             <q-slide-item @left="(obj) => onSwipe(obj, 'edit', cat)" @right="(obj) => onSwipe(obj, 'delete', cat)"
-              v-for="cat in categoryStore.incomeCategories" :key="cat.id" class="finance-card">
+              class="finance-card">
               <template v-slot:left>
                 <q-icon name="edit" color="dark" />
               </template>
@@ -98,6 +101,7 @@
                 </q-item>
               </q-card>
             </q-slide-item>
+            </div>
           </div>
         </q-tab-panel>
       </q-tab-panels>

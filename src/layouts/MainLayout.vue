@@ -3,6 +3,10 @@
     <!-- Global Header -->
     <q-header class="bg-white text-dark" bordered style="border-bottom: 1px solid #d4d4d4;">
       <q-toolbar style="min-height: 56px;">
+        <!-- Hamburger toggle (tablet/desktop only when drawer hidden) -->
+        <q-btn v-if="$q.screen.gt.xs" flat round dense icon="menu" color="dark" class="q-mr-sm"
+          @click="drawerOpen = !drawerOpen" />
+
         <!-- Left: Logo + Name -->
         <div class="row items-center q-gutter-sm cursor-pointer" @click="$router.push('/')">
           <q-icon name="account_balance_wallet" size="28px" color="dark" />
@@ -11,6 +15,10 @@
         </div>
 
         <q-space />
+
+        <!-- Quick Add Button (desktop/tablet header) -->
+        <q-btn v-if="$q.screen.gt.xs && showFab" unelevated icon="add" :label="$t('nav.quickAdd')" color="dark"
+          text-color="white" rounded size="sm" class="q-mr-sm" @click="quickAddOpen = true" />
 
         <!-- Right: User Avatar -->
         <q-avatar color="dark" text-color="white" size="36px" class="cursor-pointer">
@@ -55,15 +63,107 @@
       </q-toolbar>
     </q-header>
 
+    <!-- Left Sidebar Drawer (tablet & desktop) -->
+    <q-drawer v-model="drawerOpen" show-if-above :width="220" :breakpoint="600" bordered
+      class="bg-white sidebar-drawer">
+      <q-scroll-area class="fit">
+        <q-list padding>
+          <!-- Main nav -->
+          <q-item clickable v-ripple to="/" exact active-class="sidebar-item-active">
+            <q-item-section avatar>
+              <q-icon name="home" />
+            </q-item-section>
+            <q-item-section>{{ $t('nav.home') }}</q-item-section>
+          </q-item>
+
+          <q-item clickable v-ripple to="/accounts" active-class="sidebar-item-active">
+            <q-item-section avatar>
+              <q-icon name="account_balance_wallet" />
+            </q-item-section>
+            <q-item-section>{{ $t('nav.accounts') }}</q-item-section>
+          </q-item>
+
+          <q-item clickable v-ripple to="/reports" active-class="sidebar-item-active">
+            <q-item-section avatar>
+              <q-icon name="bar_chart" />
+            </q-item-section>
+            <q-item-section>{{ $t('nav.reports') }}</q-item-section>
+          </q-item>
+
+          <q-item clickable v-ripple to="/market-lists" active-class="sidebar-item-active">
+            <q-item-section avatar>
+              <q-icon name="shopping_cart" />
+            </q-item-section>
+            <q-item-section>{{ $t('nav.lists') }}</q-item-section>
+          </q-item>
+
+          <q-separator class="q-my-sm" />
+
+          <q-item clickable v-ripple to="/all-transactions" active-class="sidebar-item-active">
+            <q-item-section avatar>
+              <q-icon name="receipt_long" />
+            </q-item-section>
+            <q-item-section>{{ $t('nav.allTransactions') }}</q-item-section>
+          </q-item>
+
+          <q-item clickable v-ripple to="/search" active-class="sidebar-item-active">
+            <q-item-section avatar>
+              <q-icon name="search" />
+            </q-item-section>
+            <q-item-section>{{ $t('nav.search') }}</q-item-section>
+          </q-item>
+
+          <q-item clickable v-ripple to="/notes" active-class="sidebar-item-active">
+            <q-item-section avatar>
+              <q-icon name="description" />
+            </q-item-section>
+            <q-item-section>{{ $t('nav.note') }}</q-item-section>
+          </q-item>
+
+          <q-separator class="q-my-sm" />
+
+          <q-item clickable v-ripple to="/categories" active-class="sidebar-item-active">
+            <q-item-section avatar>
+              <q-icon name="category" />
+            </q-item-section>
+            <q-item-section>{{ $t('nav.categories') }}</q-item-section>
+          </q-item>
+
+          <q-item clickable v-ripple to="/settings" active-class="sidebar-item-active">
+            <q-item-section avatar>
+              <q-icon name="settings" />
+            </q-item-section>
+            <q-item-section>{{ $t('nav.settings') }}</q-item-section>
+          </q-item>
+
+          <q-item clickable v-ripple to="/help" active-class="sidebar-item-active">
+            <q-item-section avatar>
+              <q-icon name="help_outline" />
+            </q-item-section>
+            <q-item-section>{{ $t('help.title') }}</q-item-section>
+          </q-item>
+
+          <q-separator class="q-my-sm" />
+
+          <q-item clickable v-ripple @click="onLogout">
+            <q-item-section avatar>
+              <q-icon name="logout" color="negative" />
+            </q-item-section>
+            <q-item-section class="text-negative">{{ $t('common.logout') }}</q-item-section>
+          </q-item>
+        </q-list>
+      </q-scroll-area>
+    </q-drawer>
+
     <q-page-container>
       <router-view />
     </q-page-container>
 
-    <!-- Floating Action Button -->
-    <q-btn v-if="showFab" class="finance-fab shadow-4" icon="add" color="dark" text-color="white" round size="lg"
-      style="position: fixed; right: 16px; z-index: 100" @click="quickAddOpen = true" />
+    <!-- Floating Action Button (mobile only) -->
+    <q-btn v-if="showFab && $q.screen.lt.md" class="finance-fab shadow-4" icon="add" color="dark" text-color="white"
+      round size="lg" style="position: fixed; right: 16px; z-index: 100" @click="quickAddOpen = true" />
 
-    <!-- Quick Add Dialog / Bottom Sheet -->
+    <!-- Quick Add Dialog -->
     <q-dialog v-model="quickAddOpen">
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; padding: 12px 16px 32px; background: white;">
         <!-- Header -->
@@ -90,8 +190,8 @@
       </q-card>
     </q-dialog>
 
-    <!-- Bottom Navigation -->
-    <q-footer v-if="showBottomNav" class="bg-white text-grey-8 finance-bottom-nav" bordered>
+    <!-- Bottom Navigation (mobile only) -->
+    <q-footer v-if="showBottomNav && $q.screen.lt.sm" class="bg-white text-grey-8 finance-bottom-nav" bordered>
       <q-tabs v-model="currentTab" dense active-color="dark" indicator-color="dark" class="text-grey-6"
         narrow-indicator>
         <q-route-tab name="home" icon="home" :label="$t('nav.home')" to="/" exact />
@@ -120,6 +220,7 @@ const settings = useSettingsStore()
 
 const currentTab = ref('home')
 const quickAddOpen = ref(false)
+const drawerOpen = ref(false)
 
 const noFabPages = ['/splash', '/add-income', '/add-expense', '/transfer', '/search', '/categories', '/all-transactions']
 const noBottomNavPages = ['/splash']
