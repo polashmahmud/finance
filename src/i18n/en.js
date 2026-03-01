@@ -177,6 +177,7 @@ export default {
     noItems: 'No items',
     estimatedTotal: 'Estimated Total',
     emptyStateMessage: 'No items in this list yet',
+    convertToExpense: 'Convert to Expense',
     convertToExpenseTitle: 'Convert to Expense',
     convertToExpenseConfirm:
       'Are you sure you want to create an expense transaction for {amount}? This will be added to your default account.',
