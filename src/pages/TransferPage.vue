@@ -1,53 +1,54 @@
 <template>
   <q-page class="q-pa-md">
     <div class="row justify-center">
-    <div class="col-12 col-sm-10 col-md-8 col-lg-7">
-    <div class="row items-center q-mb-md">
-      <q-btn flat round icon="arrow_back" @click="$router.back()" />
-      <div class="text-h6 text-weight-bold q-ml-sm">{{ $t('transferPage.title') }}</div>
-    </div>
+      <div class="col-12 col-sm-10 col-md-8 col-lg-7">
+        <div class="row items-center q-mb-md">
+          <q-btn flat round icon="arrow_back" @click="$router.back()" />
+          <div class="text-h6 text-weight-bold q-ml-sm">{{ $t('transferPage.title') }}</div>
+        </div>
 
-    <q-card class="finance-card">
-      <q-card-section>
-        <q-form @submit.prevent="onSubmit">
-          <!-- Amount -->
-          <q-input v-model.number="form.amount" :label="$t('transferPage.transferAmount')" type="number" outlined
-            color="dark" :prefix="settings.currency" :rules="[val => val > 0 || $t('common.validAmount')]" autofocus
-            input-class="text-h5 text-weight-bold" style="margin-bottom: 10px;" />
+        <q-card class="finance-card">
+          <q-card-section>
+            <q-form @submit.prevent="onSubmit">
+              <!-- Amount -->
+              <q-input v-model.number="form.amount" :label="$t('transferPage.transferAmount')" type="number" outlined
+                color="dark" :prefix="settings.currency" :rules="[val => val > 0 || $t('common.validAmount')]" autofocus
+                input-class="text-h5 text-weight-bold" style="margin-bottom: 10px;" />
 
-          <!-- From & To Accounts -->
-          <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
-            <div class="col-6">
-              <q-select v-model="form.fromAccount" :options="accounts.accounts" option-value="id"
-                :option-label="(opt) => opt.name + ' (' + settings.currency + settings.formatNumber(opt.balance || 0) + ')'"
-                :label="$t('common.account')" outlined color="dark" emit-value map-options
-                :rules="[val => !!val || $t('common.accountRequired')]" />
-            </div>
-            <div class="col-6">
-              <q-select v-model="form.toAccount" :options="accountOptions" :label="$t('transferPage.toAccount')" outlined
-                color="dark" emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
-            </div>
-          </div>
+              <!-- From & To Accounts -->
+              <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
+                <div class="col-6">
+                  <q-select v-model="form.fromAccount" :options="accounts.accounts" option-value="id"
+                    :option-label="(opt) => opt.name + ' (' + settings.currency + settings.formatNumber(opt.balance || 0) + ')'"
+                    :label="$t('common.account')" outlined color="dark" emit-value map-options
+                    :rules="[val => !!val || $t('common.accountRequired')]" />
+                </div>
+                <div class="col-6">
+                  <q-select v-model="form.toAccount" :options="accountOptions" :label="$t('transferPage.toAccount')"
+                    outlined color="dark" emit-value map-options
+                    :rules="[val => !!val || $t('common.accountRequired')]" />
+                </div>
+              </div>
 
-          <!-- Transfer Fee -->
-          <q-input v-model.number="form.fee" type="number" :label="$t('transferPage.transferFee')" outlined color="dark"
-            :prefix="settings.currency" style="margin-bottom: 10px;" />
+              <!-- Transfer Fee -->
+              <q-input v-model.number="form.fee" type="number" :label="$t('transferPage.transferFee')" outlined
+                color="dark" :prefix="settings.currency" style="margin-bottom: 10px;" />
 
-          <!-- Date -->
-          <q-input v-model="form.date" :label="$t('common.date')" outlined color="dark" type="date"
-            :rules="[val => !!val || $t('common.dateRequired')]" style="margin-bottom: 10px;" />
+              <!-- Date -->
+              <q-input v-model="form.date" :label="$t('common.date')" outlined color="dark" type="date"
+                :rules="[val => !!val || $t('common.dateRequired')]" style="margin-bottom: 10px;" />
 
-          <!-- Note -->
-          <q-input v-model="form.note" :label="$t('common.noteOptional')" outlined color="dark" type="textarea" rows="2"
-            style="margin-bottom: 10px;" />
+              <!-- Note -->
+              <q-input v-model="form.note" :label="$t('common.noteOptional')" outlined color="dark" type="textarea"
+                rows="2" style="margin-bottom: 10px;" />
 
-          <!-- Submit -->
-          <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated size="lg"
-            icon="sync_alt" :label="$t('transferPage.transferBtn')" :loading="loading" />
-        </q-form>
-      </q-card-section>
-    </q-card>
-    </div>
+              <!-- Submit -->
+              <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
+                size="lg" icon="sync_alt" :label="$t('transferPage.transferBtn')" :loading="loading" />
+            </q-form>
+          </q-card-section>
+        </q-card>
+      </div>
     </div>
   </q-page>
 </template>
@@ -112,7 +113,7 @@ async function onSubmit() {
     await accounts.updateBalance(form.value.fromAccount, -(form.value.amount + fee))
     await accounts.updateBalance(form.value.toAccount, form.value.amount)
     Notify.create({ message: t('transferPage.transferSuccess'), color: 'positive' })
-    router.push('/')
+    router.push('/dashboard')
   } catch (e) {
     Notify.create({ message: t('common.error') + e.message, color: 'negative' })
   } finally {

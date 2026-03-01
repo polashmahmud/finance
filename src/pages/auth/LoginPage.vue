@@ -61,7 +61,7 @@ async function onLogin() {
       if (settings.appLock) {
         router.push('/splash')
       } else {
-        router.push('/')
+        router.push('/dashboard')
       }
     } else {
       Notify.create({ message: t('auth.loginFailed') + result.error, color: 'negative' })

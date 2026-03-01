@@ -40,8 +40,8 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     // Wait for Firebase auth to be ready before making any decisions
     await authStore.waitForAuth()
 
-    const publicPages = ['/login', '/register', '/splash']
-    const authRequired = !publicPages.includes(to.path)
+    // Landing page and auth pages are public; everything under /dashboard requires auth
+    const authRequired = to.path.startsWith('/dashboard')
 
     if (authRequired && !authStore.isAuthenticated) {
       return '/login'
@@ -56,13 +56,14 @@ export default defineRouter(function (/* { store, ssrContext } */) {
       }
     }
 
-    // Authenticated user visiting public pages (except splash) → go home
-    if (!authRequired && authStore.isAuthenticated && to.path !== '/splash') {
+    // Authenticated user visiting login/register → go to dashboard
+    const loginPages = ['/login', '/register']
+    if (loginPages.includes(to.path) && authStore.isAuthenticated) {
       const settingsStoreModule = await import('src/stores/settingsStore')
       const settingsStore = settingsStoreModule.useSettingsStore()
-      // Only redirect to home if no PIN lock, or PIN already entered
+      // Only redirect if no PIN lock, or PIN already entered
       if (!settingsStore.appLock || settingsStore.isAuthenticated) {
-        return '/'
+        return '/dashboard'
       }
     }
 

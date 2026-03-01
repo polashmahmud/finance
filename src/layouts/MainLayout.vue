@@ -8,7 +8,7 @@
           @click="drawerOpen = !drawerOpen" />
 
         <!-- Left: Logo + Name -->
-        <div class="row items-center q-gutter-sm cursor-pointer" @click="$router.push('/')">
+        <div class="row items-center q-gutter-sm cursor-pointer" @click="$router.push('/dashboard')">
           <q-icon name="account_balance_wallet" size="28px" color="dark" />
           <span class="text-weight-bold" style="font-size: 1.1rem; letter-spacing: -0.02em;">{{
             $t('layout.financeManager') }}</span>
@@ -32,19 +32,19 @@
                 </q-item-section>
               </q-item>
               <q-separator />
-              <q-item clickable v-close-popup @click="$router.push('/settings')">
+              <q-item clickable v-close-popup @click="$router.push('/dashboard/settings')">
                 <q-item-section avatar>
                   <q-icon name="settings" color="dark" />
                 </q-item-section>
                 <q-item-section>{{ $t('nav.settings') }}</q-item-section>
               </q-item>
-              <q-item clickable v-close-popup @click="$router.push('/categories')">
+              <q-item clickable v-close-popup @click="$router.push('/dashboard/categories')">
                 <q-item-section avatar>
                   <q-icon name="category" color="dark" />
                 </q-item-section>
                 <q-item-section>{{ $t('nav.categories') }}</q-item-section>
               </q-item>
-              <q-item clickable v-close-popup @click="$router.push('/help')">
+              <q-item clickable v-close-popup @click="$router.push('/dashboard/help')">
                 <q-item-section avatar>
                   <q-icon name="help_outline" color="dark" />
                 </q-item-section>
@@ -69,28 +69,28 @@
       <q-scroll-area class="fit">
         <q-list padding>
           <!-- Main nav -->
-          <q-item clickable v-ripple to="/" exact active-class="sidebar-item-active">
+          <q-item clickable v-ripple to="/dashboard" exact active-class="sidebar-item-active">
             <q-item-section avatar>
               <q-icon name="home" />
             </q-item-section>
             <q-item-section>{{ $t('nav.home') }}</q-item-section>
           </q-item>
 
-          <q-item clickable v-ripple to="/accounts" active-class="sidebar-item-active">
+          <q-item clickable v-ripple to="/dashboard/accounts" active-class="sidebar-item-active">
             <q-item-section avatar>
               <q-icon name="account_balance_wallet" />
             </q-item-section>
             <q-item-section>{{ $t('nav.accounts') }}</q-item-section>
           </q-item>
 
-          <q-item clickable v-ripple to="/reports" active-class="sidebar-item-active">
+          <q-item clickable v-ripple to="/dashboard/reports" active-class="sidebar-item-active">
             <q-item-section avatar>
               <q-icon name="bar_chart" />
             </q-item-section>
             <q-item-section>{{ $t('nav.reports') }}</q-item-section>
           </q-item>
 
-          <q-item clickable v-ripple to="/market-lists" active-class="sidebar-item-active">
+          <q-item clickable v-ripple to="/dashboard/market-lists" active-class="sidebar-item-active">
             <q-item-section avatar>
               <q-icon name="shopping_cart" />
             </q-item-section>
@@ -99,21 +99,21 @@
 
           <q-separator class="q-my-sm" />
 
-          <q-item clickable v-ripple to="/all-transactions" active-class="sidebar-item-active">
+          <q-item clickable v-ripple to="/dashboard/all-transactions" active-class="sidebar-item-active">
             <q-item-section avatar>
               <q-icon name="receipt_long" />
             </q-item-section>
             <q-item-section>{{ $t('nav.allTransactions') }}</q-item-section>
           </q-item>
 
-          <q-item clickable v-ripple to="/search" active-class="sidebar-item-active">
+          <q-item clickable v-ripple to="/dashboard/search" active-class="sidebar-item-active">
             <q-item-section avatar>
               <q-icon name="search" />
             </q-item-section>
             <q-item-section>{{ $t('nav.search') }}</q-item-section>
           </q-item>
 
-          <q-item clickable v-ripple to="/notes" active-class="sidebar-item-active">
+          <q-item clickable v-ripple to="/dashboard/notes" active-class="sidebar-item-active">
             <q-item-section avatar>
               <q-icon name="description" />
             </q-item-section>
@@ -122,21 +122,21 @@
 
           <q-separator class="q-my-sm" />
 
-          <q-item clickable v-ripple to="/categories" active-class="sidebar-item-active">
+          <q-item clickable v-ripple to="/dashboard/categories" active-class="sidebar-item-active">
             <q-item-section avatar>
               <q-icon name="category" />
             </q-item-section>
             <q-item-section>{{ $t('nav.categories') }}</q-item-section>
           </q-item>
 
-          <q-item clickable v-ripple to="/settings" active-class="sidebar-item-active">
+          <q-item clickable v-ripple to="/dashboard/settings" active-class="sidebar-item-active">
             <q-item-section avatar>
               <q-icon name="settings" />
             </q-item-section>
             <q-item-section>{{ $t('nav.settings') }}</q-item-section>
           </q-item>
 
-          <q-item clickable v-ripple to="/help" active-class="sidebar-item-active">
+          <q-item clickable v-ripple to="/dashboard/help" active-class="sidebar-item-active">
             <q-item-section avatar>
               <q-icon name="help_outline" />
             </q-item-section>
@@ -194,10 +194,11 @@
     <q-footer v-if="showBottomNav && $q.screen.lt.sm" class="bg-white text-grey-8 finance-bottom-nav" bordered>
       <q-tabs v-model="currentTab" dense active-color="dark" indicator-color="dark" class="text-grey-6"
         narrow-indicator>
-        <q-route-tab name="home" icon="home" :label="$t('nav.home')" to="/" exact />
-        <q-route-tab name="accounts" icon="account_balance_wallet" :label="$t('nav.accounts')" to="/accounts" />
-        <q-route-tab name="reports" icon="bar_chart" :label="$t('nav.reports')" to="/reports" />
-        <q-route-tab name="lists" icon="shopping_cart" :label="$t('nav.lists')" to="/market-lists" />
+        <q-route-tab name="home" icon="home" :label="$t('nav.home')" to="/dashboard" exact />
+        <q-route-tab name="accounts" icon="account_balance_wallet" :label="$t('nav.accounts')"
+          to="/dashboard/accounts" />
+        <q-route-tab name="reports" icon="bar_chart" :label="$t('nav.reports')" to="/dashboard/reports" />
+        <q-route-tab name="lists" icon="shopping_cart" :label="$t('nav.lists')" to="/dashboard/market-lists" />
       </q-tabs>
     </q-footer>
   </q-layout>
@@ -222,18 +223,18 @@ const currentTab = ref('home')
 const quickAddOpen = ref(false)
 const drawerOpen = ref(false)
 
-const noFabPages = ['/splash', '/add-income', '/add-expense', '/transfer', '/search', '/categories', '/all-transactions']
+const noFabPages = ['/splash', '/dashboard/add-income', '/dashboard/add-expense', '/dashboard/transfer', '/dashboard/search', '/dashboard/categories', '/dashboard/all-transactions']
 const noBottomNavPages = ['/splash']
 
-const showFab = computed(() => !noFabPages.includes(route.path) && !route.path.startsWith('/account/') && !route.path.startsWith('/category/'))
+const showFab = computed(() => !noFabPages.includes(route.path) && !route.path.startsWith('/dashboard/account/') && !route.path.startsWith('/dashboard/category/'))
 const showBottomNav = computed(() => !noBottomNavPages.includes(route.path))
 
 const quickAddActions = computed(() => [
-  { label: t('common.income'), icon: 'trending_up', color: '#22c55e', bgColor: '#f0fdf4', route: '/add-income' },
-  { label: t('common.expense'), icon: 'trending_down', color: '#ef4444', bgColor: '#fef2f2', route: '/add-expense' },
-  { label: t('common.transfer'), icon: 'sync_alt', color: '#3b82f6', bgColor: '#eff6ff', route: '/transfer' },
-  { label: t('nav.marketList'), icon: 'shopping_cart', color: '#22c55e', bgColor: '#f0fdf4', route: '/market-lists' },
-  { label: t('nav.note'), icon: 'description', color: '#0f172a', bgColor: '#fffbeb', route: '/notes' }
+  { label: t('common.income'), icon: 'trending_up', color: '#22c55e', bgColor: '#f0fdf4', route: '/dashboard/add-income' },
+  { label: t('common.expense'), icon: 'trending_down', color: '#ef4444', bgColor: '#fef2f2', route: '/dashboard/add-expense' },
+  { label: t('common.transfer'), icon: 'sync_alt', color: '#3b82f6', bgColor: '#eff6ff', route: '/dashboard/transfer' },
+  { label: t('nav.marketList'), icon: 'shopping_cart', color: '#22c55e', bgColor: '#f0fdf4', route: '/dashboard/market-lists' },
+  { label: t('nav.note'), icon: 'description', color: '#0f172a', bgColor: '#fffbeb', route: '/dashboard/notes' }
 ])
 
 function navigateTo(path) {

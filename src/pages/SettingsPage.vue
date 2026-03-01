@@ -9,243 +9,245 @@
       <!-- LEFT column: Profile + Preferences -->
       <div class="col-12 col-md-6">
 
-    <!-- Profile Section -->
-    <q-card class="finance-card q-mb-md">
-      <q-list>
-        <q-item class="touch-target" clickable @click="openUserProfileModal">
-          <q-item-section avatar>
-            <q-avatar color="dark" text-color="white" size="48px">
-              <img v-if="authStore.userProfile?.avatar" :src="authStore.userProfile.avatar" />
-              <q-icon v-else name="person" />
-            </q-avatar>
-          </q-item-section>
-          <q-item-section>
-            <q-item-label class="text-weight-medium">
-              {{ authStore.userProfile?.name || $t('settings.user') }}
-            </q-item-label>
-            <q-item-label caption>{{ $t('settings.manageProfile') }}</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-icon name="chevron_right" />
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-card>
+        <!-- Profile Section -->
+        <q-card class="finance-card q-mb-md">
+          <q-list>
+            <q-item class="touch-target" clickable @click="openUserProfileModal">
+              <q-item-section avatar>
+                <q-avatar color="dark" text-color="white" size="48px">
+                  <img v-if="authStore.userProfile?.avatar" :src="authStore.userProfile.avatar" />
+                  <q-icon v-else name="person" />
+                </q-avatar>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-weight-medium">
+                  {{ authStore.userProfile?.name || $t('settings.user') }}
+                </q-item-label>
+                <q-item-label caption>{{ $t('settings.manageProfile') }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" />
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card>
 
-    <!-- Preferences Section -->
-    <div class="section-title">{{ $t('settings.preferences') }}</div>
-    <q-card class="finance-card q-mb-md">
-      <q-list separator>
-        <!-- Currency -->
-        <q-item class="touch-target">
-          <q-item-section avatar>
-            <q-icon name="payments" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('settings.currency') }}</q-item-label>
-            <q-item-label caption>{{ settings.currencyCode }} ({{ settings.currency }})</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-select v-model="selectedCurrency" :options="currencyOptions" dense borderless emit-value map-options
-              @update:model-value="onCurrencyChange" style="min-width: 100px" />
-          </q-item-section>
-        </q-item>
+        <!-- Preferences Section -->
+        <div class="section-title">{{ $t('settings.preferences') }}</div>
+        <q-card class="finance-card q-mb-md">
+          <q-list separator>
+            <!-- Currency -->
+            <q-item class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="payments" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.currency') }}</q-item-label>
+                <q-item-label caption>{{ settings.currencyCode }} ({{ settings.currency }})</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-select v-model="selectedCurrency" :options="currencyOptions" dense borderless emit-value map-options
+                  @update:model-value="onCurrencyChange" style="min-width: 100px" />
+              </q-item-section>
+            </q-item>
 
-        <!-- Language -->
-        <q-item class="touch-target">
-          <q-item-section avatar>
-            <q-icon name="language" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('settings.language') }}</q-item-label>
-            <q-item-label caption>{{ settings.language === 'en' ? 'English' : 'বাংলা' }}</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-select v-model="selectedLang" :options="[
-              { label: 'English', value: 'en' },
-              { label: 'বাংলা', value: 'bn' },
-            ]" dense borderless emit-value map-options @update:model-value="onLanguageChange"
-              style="min-width: 100px" />
-          </q-item-section>
-        </q-item>
+            <!-- Language -->
+            <q-item class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="language" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.language') }}</q-item-label>
+                <q-item-label caption>{{ settings.language === 'en' ? 'English' : 'বাংলা' }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-select v-model="selectedLang" :options="[
+                  { label: 'English', value: 'en' },
+                  { label: 'বাংলা', value: 'bn' },
+                ]" dense borderless emit-value map-options @update:model-value="onLanguageChange"
+                  style="min-width: 100px" />
+              </q-item-section>
+            </q-item>
 
-        <!-- Dark Mode -->
-        <q-item class="touch-target">
-          <q-item-section avatar>
-            <q-icon name="dark_mode" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('common.darkMode') }}</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-toggle :model-value="settings.darkMode" color="dark" @update:model-value="settings.toggleDarkMode()" />
-          </q-item-section>
-        </q-item>
+            <!-- Dark Mode -->
+            <q-item class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="dark_mode" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('common.darkMode') }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-toggle :model-value="settings.darkMode" color="dark"
+                  @update:model-value="settings.toggleDarkMode()" />
+              </q-item-section>
+            </q-item>
 
-        <!-- Font -->
-        <q-item class="touch-target">
-          <q-item-section avatar>
-            <q-icon name="text_fields" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('settings.font') }}</q-item-label>
-            <q-item-label caption :style="{ fontFamily: settings.fontFamily }">{{ settings.fontFamily }}</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-select v-model="selectedFont" :options="fontOptions" dense borderless emit-value map-options
-              @update:model-value="onFontChange" style="min-width: 140px">
-              <template v-slot:option="scope">
-                <q-item v-bind="scope.itemProps">
-                  <q-item-section>
-                    <q-item-label :style="{ fontFamily: scope.opt.value + ', sans-serif' }">{{ scope.opt.label
-                    }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
-          </q-item-section>
-        </q-item>
+            <!-- Font -->
+            <q-item class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="text_fields" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.font') }}</q-item-label>
+                <q-item-label caption :style="{ fontFamily: settings.fontFamily }">{{ settings.fontFamily
+                  }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-select v-model="selectedFont" :options="fontOptions" dense borderless emit-value map-options
+                  @update:model-value="onFontChange" style="min-width: 140px">
+                  <template v-slot:option="scope">
+                    <q-item v-bind="scope.itemProps">
+                      <q-item-section>
+                        <q-item-label :style="{ fontFamily: scope.opt.value + ', sans-serif' }">{{ scope.opt.label
+                          }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </q-item-section>
+            </q-item>
 
-        <!-- Date Format -->
-        <q-item class="touch-target">
-          <q-item-section avatar>
-            <q-icon name="calendar_today" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('settings.dateFormat') }}</q-item-label>
-            <q-item-label caption>{{ settings.dateFormat }}</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-select v-model="selectedDateFormat" :options="dateFormatOptions" dense borderless emit-value map-options
-              @update:model-value="onDateFormatChange" style="min-width: 130px" />
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-card>
+            <!-- Date Format -->
+            <q-item class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="calendar_today" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.dateFormat') }}</q-item-label>
+                <q-item-label caption>{{ settings.dateFormat }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-select v-model="selectedDateFormat" :options="dateFormatOptions" dense borderless emit-value
+                  map-options @update:model-value="onDateFormatChange" style="min-width: 130px" />
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card>
 
       </div>
       <!-- RIGHT column: Security + Dashboard Settings + Data + About -->
       <div class="col-12 col-md-6">
 
-    <!-- Security Section -->
-    <div class="section-title">{{ $t('settings.security') }}</div>
-    <q-card class="finance-card q-mb-md">
-      <q-list separator>
-        <!-- App Lock Toggle -->
-        <q-item class="touch-target">
-          <q-item-section avatar>
-            <q-icon name="lock" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('settings.appLockPin') }}</q-item-label>
-            <q-item-label caption>{{ settings.appLock ? $t('settings.active') : $t('settings.inactive')
-            }}</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-toggle :model-value="settings.appLock" color="dark" @update:model-value="onToggleAppLock" />
-          </q-item-section>
-        </q-item>
+        <!-- Security Section -->
+        <div class="section-title">{{ $t('settings.security') }}</div>
+        <q-card class="finance-card q-mb-md">
+          <q-list separator>
+            <!-- App Lock Toggle -->
+            <q-item class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="lock" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.appLockPin') }}</q-item-label>
+                <q-item-label caption>{{ settings.appLock ? $t('settings.active') : $t('settings.inactive')
+                  }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-toggle :model-value="settings.appLock" color="dark" @update:model-value="onToggleAppLock" />
+              </q-item-section>
+            </q-item>
 
-        <!-- Change PIN (only when active) -->
-        <q-item v-if="settings.appLock" clickable class="touch-target" @click="showChangePinDialog = true">
-          <q-item-section avatar>
-            <q-icon name="pin" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('settings.change') }} PIN</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-icon name="chevron_right" />
-          </q-item-section>
-        </q-item>
+            <!-- Change PIN (only when active) -->
+            <q-item v-if="settings.appLock" clickable class="touch-target" @click="showChangePinDialog = true">
+              <q-item-section avatar>
+                <q-icon name="pin" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.change') }} PIN</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" />
+              </q-item-section>
+            </q-item>
 
-        <!-- Change Password -->
-        <q-item clickable class="touch-target" @click="showChangePasswordDialog = true">
-          <q-item-section avatar>
-            <q-icon name="key" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('settings.changePassword') }}</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-icon name="chevron_right" />
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-card>
+            <!-- Change Password -->
+            <q-item clickable class="touch-target" @click="showChangePasswordDialog = true">
+              <q-item-section avatar>
+                <q-icon name="key" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.changePassword') }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" />
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card>
 
-    <!-- Dashboard Settings Section -->
-    <div class="section-title">{{ $t('dashboard.myFinance') }}</div>
-    <q-card class="finance-card q-mb-md">
-      <q-list separator>
-        <!-- Dashboard Emojis -->
-        <q-item clickable class="touch-target" @click="openEmojisModal">
-          <q-item-section avatar>
-            <q-icon name="sentiment_satisfied_alt" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('settings.dashboardEmojis') }}</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-icon name="chevron_right" />
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-card>
+        <!-- Dashboard Settings Section -->
+        <div class="section-title">{{ $t('dashboard.myFinance') }}</div>
+        <q-card class="finance-card q-mb-md">
+          <q-list separator>
+            <!-- Dashboard Emojis -->
+            <q-item clickable class="touch-target" @click="openEmojisModal">
+              <q-item-section avatar>
+                <q-icon name="sentiment_satisfied_alt" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.dashboardEmojis') }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" />
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card>
 
-    <!-- Data Section -->
-    <div class="section-title">{{ $t('settings.data') }}</div>
-    <q-card class="finance-card q-mb-md">
-      <q-list separator>
-        <q-item clickable class="touch-target">
-          <q-item-section avatar>
-            <q-icon name="backup" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('settings.backup') }}</q-item-label>
-            <q-item-label caption>{{ $t('settings.localBackup') }}</q-item-label>
-          </q-item-section>
-        </q-item>
+        <!-- Data Section -->
+        <div class="section-title">{{ $t('settings.data') }}</div>
+        <q-card class="finance-card q-mb-md">
+          <q-list separator>
+            <q-item clickable class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="backup" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.backup') }}</q-item-label>
+                <q-item-label caption>{{ $t('settings.localBackup') }}</q-item-label>
+              </q-item-section>
+            </q-item>
 
-        <q-item clickable class="touch-target">
-          <q-item-section avatar>
-            <q-icon name="file_download" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('settings.dataExport') }}</q-item-label>
-            <q-item-label caption>CSV / PDF</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-card>
+            <q-item clickable class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="file_download" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.dataExport') }}</q-item-label>
+                <q-item-label caption>CSV / PDF</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card>
 
-    <!-- About Section -->
-    <q-card class="finance-card q-mb-md">
-      <q-list separator>
-        <q-item clickable class="touch-target" @click="$router.push('/help')">
-          <q-item-section avatar>
-            <q-icon name="help_outline" color="dark" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('help.title') }}</q-item-label>
-            <q-item-label caption>{{ $t('help.subtitle') }}</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-icon name="chevron_right" />
-          </q-item-section>
-        </q-item>
+        <!-- About Section -->
+        <q-card class="finance-card q-mb-md">
+          <q-list separator>
+            <q-item clickable class="touch-target" @click="$router.push('/dashboard/help')">
+              <q-item-section avatar>
+                <q-icon name="help_outline" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('help.title') }}</q-item-label>
+                <q-item-label caption>{{ $t('help.subtitle') }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" />
+              </q-item-section>
+            </q-item>
 
-        <q-item class="touch-target">
-          <q-item-section avatar>
-            <q-icon name="info" color="grey" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ $t('settings.appName') }}</q-item-label>
-            <q-item-label caption>{{ $t('settings.version') }}</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-card>
+            <q-item class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="info" color="grey" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.appName') }}</q-item-label>
+                <q-item-label caption>{{ $t('settings.version') }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card>
 
       </div>
     </div>
@@ -426,7 +428,8 @@
           <!-- Low Balance -->
           <div class="text-subtitle2 q-mb-sm">{{ $t('settings.level2', {
             min: emojisForm.negative.threshold, max:
-              emojisForm.low.threshold }) }}</div>
+              emojisForm.low.threshold
+          }) }}</div>
           <div class="row q-col-gutter-sm q-mb-md">
             <div class="col-8">
               <q-input v-model.number="emojisForm.low.threshold" :label="$t('settings.thresholdAmount')" type="number"

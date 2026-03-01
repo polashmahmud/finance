@@ -66,7 +66,7 @@ async function onRegister() {
   try {
     await auth.register(email.value, password.value)
     Notify.create({ message: t('auth.registerSuccess'), color: 'positive' })
-    router.push('/')
+    router.push('/dashboard')
   } catch (e) {
     Notify.create({ message: t('auth.registerFailed') + e.message, color: 'negative' })
   } finally {

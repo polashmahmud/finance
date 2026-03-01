@@ -91,7 +91,7 @@ function unlockApp() {
     const enteredPin = pinDigits.value.join('')
     if (settings.verifyPin(enteredPin)) {
         settings.authenticate()
-        router.push('/')
+        router.push('/dashboard')
     } else {
         pinError.value = true
         pinDigits.value = ['', '', '', '']
@@ -103,6 +103,6 @@ function unlockApp() {
 
 function goHome() {
     settings.authenticate()
-    router.push('/')
+    router.push('/dashboard')
 }
 </script>

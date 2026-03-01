@@ -13,7 +13,7 @@
         </div>
 
         <!-- Total Balance Card -->
-        <q-card class="finance-card q-mb-md cursor-pointer" @click="$router.push('/accounts')">
+        <q-card class="finance-card q-mb-md cursor-pointer" @click="$router.push('/dashboard/accounts')">
           <q-card-section class="bg-primary-gradient"
             style="border-radius: 16px; overflow: hidden; position: relative;">
             <div class="row items-center no-wrap">
@@ -23,7 +23,7 @@
                   <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{
                     $t('dashboard.totalBalance') }}</div>
                   <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency
-                    }}{{ settings.formatNumber(accounts.totalBalance) }}</div>
+                  }}{{ settings.formatNumber(accounts.totalBalance) }}</div>
                 </div>
                 <div class="row q-gutter-md q-mt-xs">
                   <div class="row items-center q-gutter-xs">
@@ -59,7 +59,7 @@
           <div class="row items-center justify-between q-mb-sm">
             <div class="section-title q-mb-none">{{ $t('dashboard.recentTransactions') }}</div>
             <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right"
-              @click="$router.push('/all-transactions')" size="sm" />
+              @click="$router.push('/dashboard/all-transactions')" size="sm" />
           </div>
           <q-card class="finance-card" style="border-radius: 16px; overflow: hidden;">
             <q-list separator>
@@ -115,7 +115,7 @@
         <div v-if="$q.screen.gt.sm" class="row q-col-gutter-sm q-mb-md">
           <div v-for="account in accounts.accounts" :key="account.id" class="col-6">
             <q-card class="finance-card cursor-pointer full-height"
-              @click="$router.push('/account/' + account.id + '/transactions')" v-ripple>
+              @click="$router.push('/dashboard/account/' + account.id + '/transactions')" v-ripple>
               <q-card-section class="q-pa-md">
                 <div class="row items-center q-gutter-sm q-mb-sm">
                   <q-icon :name="account.icon" :style="{ color: account.color }" size="20px" />
@@ -126,15 +126,15 @@
                 <div class="text-body2 text-weight-medium">{{ account.name }}</div>
                 <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{
                   settings.formatNumber(account.balance)
-                  }}</div>
+                }}</div>
               </q-card-section>
             </q-card>
           </div>
         </div>
         <div v-else class="row q-gutter-md q-mb-md" style="overflow-x: auto; flex-wrap: nowrap; padding-bottom: 8px">
           <q-card v-for="account in accounts.accounts" :key="account.id" class="finance-card cursor-pointer"
-            style="min-width: 160px; flex-shrink: 0" @click="$router.push('/account/' + account.id + '/transactions')"
-            v-ripple>
+            style="min-width: 160px; flex-shrink: 0"
+            @click="$router.push('/dashboard/account/' + account.id + '/transactions')" v-ripple>
             <q-card-section class="q-pa-md">
               <div class="row items-center q-gutter-sm q-mb-sm">
                 <q-icon :name="account.icon" :style="{ color: account.color }" size="20px" />
@@ -191,7 +191,7 @@
           <div class="row items-center justify-between q-mb-sm">
             <div class="section-title q-mb-none">{{ $t('dashboard.recentTransactions') }}</div>
             <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right"
-              @click="$router.push('/all-transactions')" size="sm" />
+              @click="$router.push('/dashboard/all-transactions')" size="sm" />
           </div>
           <q-card class="finance-card" style="border-radius: 16px; overflow: hidden;">
             <q-list separator>
@@ -510,7 +510,7 @@ async function saveBudget() {
 
 function goToCategoryDetails() {
   if (budgetModalCategory.value) {
-    $router.push(`/category/${budgetModalCategory.value.id}/transactions`)
+    $router.push(`/dashboard/category/${budgetModalCategory.value.id}/transactions`)
   }
 }
 
@@ -540,7 +540,7 @@ async function saveQuickEntry() {
 function goToQuickEntryDetails() {
   if (quickEntryCategory.value) {
     quickEntryModalOpen.value = false
-    $router.push(`/category/${quickEntryCategory.value.id}/transactions`)
+    $router.push(`/dashboard/category/${quickEntryCategory.value.id}/transactions`)
   }
 }
 const editForm = reactive({

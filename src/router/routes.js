@@ -1,4 +1,11 @@
 const routes = [
+  // Landing page (public)
+  {
+    path: '/',
+    component: () => import('layouts/LandingLayout.vue'),
+    children: [{ path: '', component: () => import('pages/LandingPage.vue') }],
+  },
+
   // Auth routes
   {
     path: '/login',
@@ -16,9 +23,9 @@ const routes = [
     children: [{ path: '', component: () => import('pages/SplashPage.vue') }],
   },
 
-  // Main app routes
+  // Main app routes (protected)
   {
-    path: '/',
+    path: '/dashboard',
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },

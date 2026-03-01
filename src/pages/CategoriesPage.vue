@@ -33,34 +33,34 @@
           </div>
           <div class="row q-col-gutter-sm">
             <div v-for="cat in categoryStore.expenseCategories" :key="cat.id" class="col-12 col-md-6">
-            <q-slide-item @left="(obj) => onSwipe(obj, 'edit', cat)" @right="(obj) => onSwipe(obj, 'delete', cat)"
-              class="finance-card">
-              <template v-slot:left>
-                <q-icon name="edit" color="dark" />
-              </template>
-              <template v-slot:right>
-                <q-icon name="delete" color="negative" />
-              </template>
-              <q-card class="finance-card" @click="goToCategory(cat)">
-                <q-item class="touch-target">
-                  <q-item-section avatar>
-                    <q-avatar :style="{ background: cat.color + '18' }" size="44px">
-                      <q-icon :name="cat.icon" :style="{ color: cat.color }" size="22px" />
-                    </q-avatar>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
-                    <q-item-label caption v-if="getLastTransaction(cat.name)">
-                      {{ settings.formatDate(getLastTransaction(cat.name).date) }} &middot; {{ settings.currency }}{{
-                        settings.formatNumber(getLastTransaction(cat.name).amount) }}
-                    </q-item-label>
-                    <q-item-label caption v-else>
-                      {{ $t('dashboard.noTransactionsYet') }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-card>
-            </q-slide-item>
+              <q-slide-item @left="(obj) => onSwipe(obj, 'edit', cat)" @right="(obj) => onSwipe(obj, 'delete', cat)"
+                class="finance-card">
+                <template v-slot:left>
+                  <q-icon name="edit" color="dark" />
+                </template>
+                <template v-slot:right>
+                  <q-icon name="delete" color="negative" />
+                </template>
+                <q-card class="finance-card" @click="goToCategory(cat)">
+                  <q-item class="touch-target">
+                    <q-item-section avatar>
+                      <q-avatar :style="{ background: cat.color + '18' }" size="44px">
+                        <q-icon :name="cat.icon" :style="{ color: cat.color }" size="22px" />
+                      </q-avatar>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
+                      <q-item-label caption v-if="getLastTransaction(cat.name)">
+                        {{ settings.formatDate(getLastTransaction(cat.name).date) }} &middot; {{ settings.currency }}{{
+                          settings.formatNumber(getLastTransaction(cat.name).amount) }}
+                      </q-item-label>
+                      <q-item-label caption v-else>
+                        {{ $t('dashboard.noTransactionsYet') }}
+                      </q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-card>
+              </q-slide-item>
             </div>
           </div>
         </q-tab-panel>
@@ -73,34 +73,34 @@
           </div>
           <div class="row q-col-gutter-sm">
             <div v-for="cat in categoryStore.incomeCategories" :key="cat.id" class="col-12 col-md-6">
-            <q-slide-item @left="(obj) => onSwipe(obj, 'edit', cat)" @right="(obj) => onSwipe(obj, 'delete', cat)"
-              class="finance-card">
-              <template v-slot:left>
-                <q-icon name="edit" color="dark" />
-              </template>
-              <template v-slot:right>
-                <q-icon name="delete" color="negative" />
-              </template>
-              <q-card class="finance-card" @click="goToCategory(cat)">
-                <q-item class="touch-target">
-                  <q-item-section avatar>
-                    <q-avatar :style="{ background: cat.color + '18' }" size="44px">
-                      <q-icon :name="cat.icon" :style="{ color: cat.color }" size="22px" />
-                    </q-avatar>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
-                    <q-item-label caption v-if="getLastTransaction(cat.name)">
-                      {{ settings.formatDate(getLastTransaction(cat.name).date) }} &middot; {{ settings.currency }}{{
-                        settings.formatNumber(getLastTransaction(cat.name).amount) }}
-                    </q-item-label>
-                    <q-item-label caption v-else>
-                      {{ $t('dashboard.noTransactionsYet') }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-card>
-            </q-slide-item>
+              <q-slide-item @left="(obj) => onSwipe(obj, 'edit', cat)" @right="(obj) => onSwipe(obj, 'delete', cat)"
+                class="finance-card">
+                <template v-slot:left>
+                  <q-icon name="edit" color="dark" />
+                </template>
+                <template v-slot:right>
+                  <q-icon name="delete" color="negative" />
+                </template>
+                <q-card class="finance-card" @click="goToCategory(cat)">
+                  <q-item class="touch-target">
+                    <q-item-section avatar>
+                      <q-avatar :style="{ background: cat.color + '18' }" size="44px">
+                        <q-icon :name="cat.icon" :style="{ color: cat.color }" size="22px" />
+                      </q-avatar>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label class="text-weight-medium">{{ cat.name }}</q-item-label>
+                      <q-item-label caption v-if="getLastTransaction(cat.name)">
+                        {{ settings.formatDate(getLastTransaction(cat.name).date) }} &middot; {{ settings.currency }}{{
+                          settings.formatNumber(getLastTransaction(cat.name).amount) }}
+                      </q-item-label>
+                      <q-item-label caption v-else>
+                        {{ $t('dashboard.noTransactionsYet') }}
+                      </q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-card>
+              </q-slide-item>
             </div>
           </div>
         </q-tab-panel>
@@ -304,7 +304,7 @@ function confirmDelete(cat) {
 }
 
 function goToCategory(cat) {
-  $router.push(`/category/${cat.id}/transactions`)
+  $router.push(`/dashboard/category/${cat.id}/transactions`)
 }
 
 function getLastTransaction(categoryName) {

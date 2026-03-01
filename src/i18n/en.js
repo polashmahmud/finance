@@ -579,4 +579,53 @@ export default {
       t7: 'Enabling app lock keeps your financial data secure. Logging out only locks the screen — it does not sign out from your account.',
     },
   },
+
+  // ========== Landing Page ==========
+  landing: {
+    nav: {
+      features: 'Features',
+      login: 'Login',
+      register: 'Register',
+      dashboard: 'Dashboard',
+    },
+    hero: {
+      badge: 'Personal Finance Manager',
+      title: 'Take Control of Your',
+      titleHighlight: 'Finances',
+      subtitle:
+        'Track income, expenses, budgets and accounts — all in one place. Simple, fast and secure.',
+      ctaStart: 'Get Started Free',
+      ctaLogin: 'Sign In',
+    },
+    features: {
+      sectionTitle: 'Everything you need to',
+      sectionTitleHighlight: 'manage money',
+      f1Title: 'Income & Expense Tracking',
+      f1Desc:
+        'Log every transaction instantly. Categorize income and expenses to know exactly where your money goes.',
+      f2Title: 'Budget Management',
+      f2Desc:
+        'Set monthly budgets per category. Get visual alerts when you are approaching your limit.',
+      f3Title: 'Multiple Accounts',
+      f3Desc:
+        'Manage cash, bank and mobile banking accounts in one unified view with real-time balances.',
+      f4Title: 'Market Lists',
+      f4Desc:
+        'Create shopping lists and convert them to expenses instantly. Never lose track of your purchases.',
+      f5Title: 'Reports & Analytics',
+      f5Desc:
+        'Visual charts and trend analysis give you deep insight into your spending patterns over time.',
+      f6Title: 'Secure & Private',
+      f6Desc:
+        'Your data stays yours. PIN lock and Firebase authentication keep your finances protected.',
+    },
+    cta: {
+      title: 'Ready to take control?',
+      subtitle: 'Join thousands of users managing their finances smarter.',
+      button: 'Start for Free',
+    },
+    footer: {
+      rights: 'All rights reserved.',
+    },
+  },
 }
