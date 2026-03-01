@@ -12,6 +12,43 @@ import {
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc } from 'firebase/firestore'
 import { auth, firestore } from 'boot/firebase'
 
+// Map Firebase auth error codes to user-friendly messages, preventing
+// implementation details (e.g. "auth/user-not-found") from reaching the UI.
+function sanitizeAuthError(error) {
+  const code = error?.code || ''
+  const messages = {
+    'auth/invalid-email': 'ইমেইল ঠিকানাটি বৈধ নয়।',
+    'auth/user-disabled': 'এই অ্যাকাউন্টটি নিষ্ক্রিয় করা হয়েছে।',
+    'auth/user-not-found': 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।',
+    'auth/wrong-password': 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।',
+    'auth/invalid-credential': 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।',
+    'auth/too-many-requests': 'অনেকবার ব্যর্থ প্রচেষ্টা। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
+    'auth/email-already-in-use': 'এই ইমেইল দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট আছে।',
+    'auth/weak-password': 'পাসওয়ার্ড যথেষ্ট শক্তিশালী নয়। কমপক্ষে ৬টি অক্ষর ব্যবহার করুন।',
+    'auth/network-request-failed': 'নেটওয়ার্ক সংযোগ ব্যর্থ হয়েছে। আবার চেষ্টা করুন।',
+    'auth/requires-recent-login': 'এই কাজটি করতে আবার লগইন করুন।',
+  }
+  return messages[code] || 'একটি ত্রুটি ঘটেছে। আবার চেষ্টা করুন।'
+}
+
+// Simple in-memory login rate limiter – maximum 5 attempts per 15 minutes.
+const _loginAttempts = { count: 0, windowStart: 0 }
+const LOGIN_MAX_ATTEMPTS = 5
+const LOGIN_WINDOW_MS = 15 * 60 * 1000 // 15 minutes
+
+function checkLoginRateLimit() {
+  const now = Date.now()
+  if (now - _loginAttempts.windowStart > LOGIN_WINDOW_MS) {
+    _loginAttempts.count = 0
+    _loginAttempts.windowStart = now
+  }
+  if (_loginAttempts.count >= LOGIN_MAX_ATTEMPTS) {
+    return false
+  }
+  _loginAttempts.count++
+  return true
+}
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const userProfile = ref(null)
@@ -102,14 +139,22 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function login(email, password) {
+    if (!checkLoginRateLimit()) {
+      return {
+        success: false,
+        error: 'অনেকবার ব্যর্থ প্রচেষ্টা। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
+      }
+    }
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      // Reset rate limit counter on successful login
+      _loginAttempts.count = 0
       user.value = userCredential.user
       isAuthenticated.value = true
       await fetchUserProfile(userCredential.user.uid)
       return { success: true }
     } catch (error) {
-      return { success: false, error: error.message }
+      return { success: false, error: sanitizeAuthError(error) }
     }
   }
 
@@ -178,7 +223,7 @@ export const useAuthStore = defineStore('auth', () => {
       await fetchUserProfile(userCredential.user.uid)
       return { success: true }
     } catch (error) {
-      return { success: false, error: error.message }
+      return { success: false, error: sanitizeAuthError(error) }
     }
   }
 
@@ -210,7 +255,7 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: true }
     } catch (error) {
       console.error('Error changing password:', error)
-      return { success: false, error: error.message }
+      return { success: false, error: sanitizeAuthError(error) }
     }
   }
 

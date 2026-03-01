@@ -31,7 +31,7 @@
                 </div>
 
                 <div v-if="pinError" class="text-negative text-caption q-mt-xs">
-                    {{ $t('settings.wrongPin') }}
+                    {{ pinErrorMsg }}
                 </div>
 
                 <q-btn :label="$t('splash.unlock')" color="dark" unelevated rounded class="full-width q-mt-md" no-caps
@@ -50,17 +50,24 @@ import { ref, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useSettingsStore } from 'stores/settingsStore'
+import { useAuthStore } from 'stores/authStore'
 import { useQuasar } from 'quasar'
 
 useI18n()
 const router = useRouter()
 const settings = useSettingsStore()
+const authStore = useAuthStore()
 const $q = useQuasar()
 
 const isDark = ref($q.dark.isActive)
 const pinDigits = ref(['', '', '', ''])
 const pinRefs = ref([])
 const pinError = ref(false)
+const pinErrorMsg = ref('')
+
+// Brute-force protection: max 5 failed PIN attempts, then force logout.
+const MAX_PIN_ATTEMPTS = 5
+let failedPinAttempts = 0
 
 watch(isDark, (val) => {
     $q.dark.set(val)
@@ -87,17 +94,32 @@ function onBackspace(index) {
     }
 }
 
-function unlockApp() {
+async function unlockApp() {
     const enteredPin = pinDigits.value.join('')
-    if (settings.verifyPin(enteredPin)) {
+    if (await settings.verifyPin(enteredPin)) {
+        failedPinAttempts = 0
         settings.authenticate()
         router.push('/dashboard')
     } else {
-        pinError.value = true
+        failedPinAttempts++
         pinDigits.value = ['', '', '', '']
-        nextTick(() => {
-            pinRefs.value[0]?.focus()
-        })
+
+        if (failedPinAttempts >= MAX_PIN_ATTEMPTS) {
+            // Too many failed attempts → force logout for security
+            pinErrorMsg.value = 'অনেকবার ভুল PIN। নিরাপত্তার জন্য লগআউট করা হচ্ছে...'
+            pinError.value = true
+            setTimeout(async () => {
+                await authStore.logout()
+                router.push('/login')
+            }, 2000)
+        } else {
+            const remaining = MAX_PIN_ATTEMPTS - failedPinAttempts
+            pinErrorMsg.value = `ভুল PIN। আর ${remaining} বার ভুল হলে লগআউট হবে।`
+            pinError.value = true
+            nextTick(() => {
+                pinRefs.value[0]?.focus()
+            })
+        }
     }
 }
 

@@ -3,6 +3,16 @@ import { ref } from 'vue'
 import { Dark, date } from 'quasar'
 import i18n from 'src/i18n'
 
+// Hash a PIN string using SHA-256 via the Web Crypto API.
+// Returns a lowercase hex string (64 chars).
+async function hashPin(rawPin) {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(rawPin)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+}
+
 export const useSettingsStore = defineStore('settings', () => {
   const currency = ref('৳')
   const currencyCode = ref('BDT')
@@ -11,7 +21,8 @@ export const useSettingsStore = defineStore('settings', () => {
   const dateFormat = ref('DD MMM, YYYY')
   const darkMode = ref(false)
   const appLock = ref(false)
-  const pin = ref('')
+  // PIN is stored internally as a SHA-256 hash and never exposed in the return object.
+  const _pinHash = ref('')
   const isAuthenticated = ref(false)
 
   // Balance Emojis Configuration
@@ -63,11 +74,23 @@ export const useSettingsStore = defineStore('settings', () => {
         /* ignore parse errors */
       }
     }
-    // Load PIN separately
+    // Load PIN separately – stored as SHA-256 hash since v2.
+    // If the stored value is not a 64-char hex string it is a legacy plaintext PIN;
+    // migrate it transparently by hashing and re-saving.
     const savedPin = localStorage.getItem('finance_pin')
     if (savedPin) {
-      pin.value = savedPin
-      appLock.value = true
+      const isAlreadyHashed = /^[0-9a-f]{64}$/.test(savedPin)
+      if (isAlreadyHashed) {
+        _pinHash.value = savedPin
+        appLock.value = true
+      } else {
+        // Migrate legacy plaintext PIN → hash
+        hashPin(savedPin).then((hashed) => {
+          _pinHash.value = hashed
+          appLock.value = true
+          localStorage.setItem('finance_pin', hashed)
+        })
+      }
     }
   }
 
@@ -192,21 +215,23 @@ export const useSettingsStore = defineStore('settings', () => {
     return formatted
   }
 
-  function setPin(newPin) {
-    pin.value = newPin
+  async function setPin(newPin) {
+    const hashed = await hashPin(newPin)
+    _pinHash.value = hashed
     appLock.value = true
-    localStorage.setItem('finance_pin', newPin)
+    localStorage.setItem('finance_pin', hashed)
   }
 
   function removePin() {
-    pin.value = ''
+    _pinHash.value = ''
     appLock.value = false
     isAuthenticated.value = false
     localStorage.removeItem('finance_pin')
   }
 
-  function verifyPin(input) {
-    return input === pin.value
+  async function verifyPin(input) {
+    const hashed = await hashPin(input)
+    return hashed === _pinHash.value
   }
 
   function authenticate() {
@@ -225,7 +250,8 @@ export const useSettingsStore = defineStore('settings', () => {
     dateFormat,
     darkMode,
     appLock,
-    pin,
+    // NOTE: raw PIN / hash is intentionally NOT returned here to prevent
+    // accidental exposure via Vue DevTools or component templates.
     isAuthenticated,
     balanceEmojis,
     toggleDarkMode,

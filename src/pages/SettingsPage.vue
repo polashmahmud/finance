@@ -91,7 +91,7 @@
               <q-item-section>
                 <q-item-label>{{ $t('settings.font') }}</q-item-label>
                 <q-item-label caption :style="{ fontFamily: settings.fontFamily }">{{ settings.fontFamily
-                  }}</q-item-label>
+                }}</q-item-label>
               </q-item-section>
               <q-item-section side>
                 <q-select v-model="selectedFont" :options="fontOptions" dense borderless emit-value map-options
@@ -100,7 +100,7 @@
                     <q-item v-bind="scope.itemProps">
                       <q-item-section>
                         <q-item-label :style="{ fontFamily: scope.opt.value + ', sans-serif' }">{{ scope.opt.label
-                          }}</q-item-label>
+                        }}</q-item-label>
                       </q-item-section>
                     </q-item>
                   </template>
@@ -141,7 +141,7 @@
               <q-item-section>
                 <q-item-label>{{ $t('settings.appLockPin') }}</q-item-label>
                 <q-item-label caption>{{ settings.appLock ? $t('settings.active') : $t('settings.inactive')
-                  }}</q-item-label>
+                }}</q-item-label>
               </q-item-section>
               <q-item-section side>
                 <q-toggle :model-value="settings.appLock" color="dark" @update:model-value="onToggleAppLock" />
@@ -770,19 +770,19 @@ function onToggleAppLock(val) {
   }
 }
 
-function savePin() {
+async function savePin() {
   if (newPin.value.length !== 4) {
     Notify.create({ type: 'warning', message: t('settings.pinMustBe4') })
     return
   }
-  settings.setPin(newPin.value)
+  await settings.setPin(newPin.value)
   newPin.value = ''
   showPinDialog.value = false
   Notify.create({ type: 'positive', message: t('settings.pinSetSuccess') })
 }
 
-function changePin() {
-  if (!settings.verifyPin(currentPinInput.value)) {
+async function changePin() {
+  if (!(await settings.verifyPin(currentPinInput.value))) {
     Notify.create({ type: 'negative', message: t('settings.wrongPin') })
     return
   }
@@ -790,15 +790,15 @@ function changePin() {
     Notify.create({ type: 'warning', message: t('settings.pinMustBe4') })
     return
   }
-  settings.setPin(newPin.value)
+  await settings.setPin(newPin.value)
   newPin.value = ''
   currentPinInput.value = ''
   showChangePinDialog.value = false
   Notify.create({ type: 'positive', message: t('settings.pinSetSuccess') })
 }
 
-function removePinConfirm() {
-  if (!settings.verifyPin(currentPinInput.value)) {
+async function removePinConfirm() {
+  if (!(await settings.verifyPin(currentPinInput.value))) {
     Notify.create({ type: 'negative', message: t('settings.wrongPin') })
     return
   }

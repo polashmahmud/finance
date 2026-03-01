@@ -64,10 +64,10 @@ async function onLogin() {
         router.push('/dashboard')
       }
     } else {
-      Notify.create({ message: t('auth.loginFailed') + result.error, color: 'negative' })
+      Notify.create({ message: result.error, color: 'negative' })
     }
-  } catch (e) {
-    Notify.create({ message: t('auth.loginFailed') + e.message, color: 'negative' })
+  } catch {
+    Notify.create({ message: t('auth.loginFailed') + 'একটি ত্রুটি ঘটেছে।', color: 'negative' })
   } finally {
     loading.value = false
   }

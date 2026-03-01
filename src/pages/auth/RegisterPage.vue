@@ -13,8 +13,12 @@
           :rules="[val => !!val || $t('auth.emailRequired')]" />
 
         <q-input v-model="password" :label="$t('auth.password')" outlined dense
-          :type="showPassword ? 'text' : 'password'"
-          :rules="[val => !!val || $t('auth.passwordRequired'), val => val.length >= 6 || $t('auth.passwordMinLength')]">
+          :type="showPassword ? 'text' : 'password'" :rules="[
+            val => !!val || $t('auth.passwordRequired'),
+            val => val.length >= 8 || $t('auth.passwordMinLength'),
+            val => /[0-9]/.test(val) || $t('auth.passwordNeedsNumber'),
+            val => /[A-Z]/.test(val) || $t('auth.passwordNeedsUppercase'),
+          ]">
           <template v-slot:append>
             <q-icon :name="showPassword ? 'visibility_off' : 'visibility'" class="cursor-pointer"
               @click="showPassword = !showPassword" />
@@ -64,11 +68,15 @@ async function onRegister() {
 
   loading.value = true
   try {
-    await auth.register(email.value, password.value)
-    Notify.create({ message: t('auth.registerSuccess'), color: 'positive' })
-    router.push('/dashboard')
-  } catch (e) {
-    Notify.create({ message: t('auth.registerFailed') + e.message, color: 'negative' })
+    const result = await auth.register(email.value, password.value)
+    if (result.success) {
+      Notify.create({ message: t('auth.registerSuccess'), color: 'positive' })
+      router.push('/dashboard')
+    } else {
+      Notify.create({ message: result.error, color: 'negative' })
+    }
+  } catch {
+    Notify.create({ message: 'একটি ত্রুটি ঘটেছে। আবার চেষ্টা করুন।', color: 'negative' })
   } finally {
     loading.value = false
   }
