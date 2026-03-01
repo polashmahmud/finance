@@ -3,6 +3,16 @@ import { ref, computed } from 'vue'
 import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
 
+// When offline, Firestore persistence queues writes but the Promise never resolves
+// until server ack. Use this to fire-and-forget when offline so UI stays responsive.
+function offlineWrite(operation) {
+  if (!navigator.onLine) {
+    operation().catch((err) => console.warn('[Offline] Write queued for sync:', err))
+    return Promise.resolve()
+  }
+  return operation()
+}
+
 export const useTransactionStore = defineStore('transactions', () => {
   const transactions = ref([])
   const loading = ref(false)
@@ -58,7 +68,7 @@ export const useTransactionStore = defineStore('transactions', () => {
   async function addTransaction(tx) {
     const txRef = getUserTransactionsRef()
     if (!txRef) return
-    await addDoc(txRef, {
+    const docData = {
       type: tx.type,
       amount: tx.amount || 0,
       category: tx.category || '',
@@ -70,20 +80,37 @@ export const useTransactionStore = defineStore('transactions', () => {
       time: tx.time || new Date().toTimeString().slice(0, 5),
       notes: tx.notes || '',
       createdAt: Date.now(),
-    })
+    }
+    // When offline: add to local state immediately so UI shows the entry,
+    // then queue the Firestore write (persistentLocalCache syncs when online)
+    if (!navigator.onLine) {
+      const tempId = `offline_${Date.now()}`
+      transactions.value.unshift({ id: tempId, ...docData })
+      addDoc(txRef, docData)
+        .then((ref) => {
+          // Replace temp entry with real Firestore ID once sync completes
+          const idx = transactions.value.findIndex((t) => t.id === tempId)
+          if (idx >= 0) transactions.value[idx].id = ref.id
+        })
+        .catch((err) => console.warn('[Offline] Transaction queued for sync:', err))
+      return
+    }
+    await addDoc(txRef, docData)
   }
 
   async function updateTransaction(id, data) {
     const uid = auth.currentUser?.uid
     if (!uid) return
     const txRef = doc(firestore, `users/${uid}/transactions/${id}`)
-    await updateDoc(txRef, data)
+    await offlineWrite(() => updateDoc(txRef, data))
   }
 
   async function deleteTransaction(id) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await deleteDoc(doc(firestore, `users/${uid}/transactions/${id}`))
+    // Optimistically remove from local state immediately
+    transactions.value = transactions.value.filter((t) => t.id !== id)
+    await offlineWrite(() => deleteDoc(doc(firestore, `users/${uid}/transactions/${id}`)))
   }
 
   function searchTransactions(query) {

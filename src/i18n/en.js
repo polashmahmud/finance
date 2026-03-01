@@ -29,6 +29,9 @@ export default {
     darkMode: 'Dark Mode',
     balance: 'Balance',
     month: 'Month',
+    offline: 'You are offline. Data will sync when connection is restored.',
+    offlineShort: 'Offline',
+    savedOffline: 'Saved offline — will sync automatically.',
   },
 
   // ========== Greetings ==========

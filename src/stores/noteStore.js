@@ -3,6 +3,14 @@ import { ref } from 'vue'
 import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
 
+function offlineWrite(operation) {
+  if (!navigator.onLine) {
+    operation().catch((err) => console.warn('[Offline] Write queued for sync:', err))
+    return Promise.resolve()
+  }
+  return operation()
+}
+
 export const useNoteStore = defineStore('notes', () => {
   const notes = ref([])
   const loading = ref(false)
@@ -39,35 +47,39 @@ export const useNoteStore = defineStore('notes', () => {
   async function addNote(note) {
     const notesRef = getUserNotesRef()
     if (!notesRef) return
-    await addDoc(notesRef, {
-      title: note.title,
-      description: note.description || '',
-      pinned: false,
-      createdAt: Date.now(),
-    })
+    await offlineWrite(() =>
+      addDoc(notesRef, {
+        title: note.title,
+        description: note.description || '',
+        pinned: false,
+        createdAt: Date.now(),
+      }),
+    )
   }
 
   async function updateNote(id, data) {
     const uid = auth.currentUser?.uid
     if (!uid) return
     const noteRef = doc(firestore, `users/${uid}/notes/${id}`)
-    await updateDoc(noteRef, {
-      title: data.title,
-      description: data.description || '',
-    })
+    await offlineWrite(() =>
+      updateDoc(noteRef, {
+        title: data.title,
+        description: data.description || '',
+      }),
+    )
   }
 
   async function deleteNote(id) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await deleteDoc(doc(firestore, `users/${uid}/notes/${id}`))
+    await offlineWrite(() => deleteDoc(doc(firestore, `users/${uid}/notes/${id}`)))
   }
 
   async function togglePin(id, currentValue) {
     const uid = auth.currentUser?.uid
     if (!uid) return
     const noteRef = doc(firestore, `users/${uid}/notes/${id}`)
-    await updateDoc(noteRef, { pinned: !currentValue })
+    await offlineWrite(() => updateDoc(noteRef, { pinned: !currentValue }))
   }
 
   function stopListening() {

@@ -202,10 +202,18 @@
       </q-tabs>
     </q-footer>
   </q-layout>
+
+  <!-- Offline Banner (rendered outside q-layout to overlay properly) -->
+  <transition name="offline-slide">
+    <div v-if="!isOnline" class="offline-banner">
+      <q-icon name="wifi_off" size="16px" class="q-mr-xs" />
+      <span>{{ $t('common.offline') }}</span>
+    </div>
+  </transition>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
@@ -222,6 +230,23 @@ const settings = useSettingsStore()
 const currentTab = ref('home')
 const quickAddOpen = ref(false)
 const drawerOpen = ref(false)
+const isOnline = ref(navigator.onLine)
+
+function handleOnline() {
+  isOnline.value = true
+}
+function handleOffline() {
+  isOnline.value = false
+}
+
+onMounted(() => {
+  window.addEventListener('online', handleOnline)
+  window.addEventListener('offline', handleOffline)
+})
+onUnmounted(() => {
+  window.removeEventListener('online', handleOnline)
+  window.removeEventListener('offline', handleOffline)
+})
 
 const noFabPages = ['/splash', '/dashboard/add-income', '/dashboard/add-expense', '/dashboard/transfer', '/dashboard/search', '/dashboard/categories', '/dashboard/all-transactions']
 const noBottomNavPages = ['/splash']
@@ -258,3 +283,42 @@ async function onLogout() {
   }
 }
 </script>
+<style scoped>
+/* ===== Offline Banner ===== */
+.offline-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f59e0b;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 7px 16px;
+  letter-spacing: 0.01em;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Keep banner above the bottom nav on mobile */
+@media (max-width: 599px) {
+  .offline-banner {
+    bottom: 50px;
+  }
+}
+
+/* Slide transition */
+.offline-slide-enter-active,
+.offline-slide-leave-active {
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.offline-slide-enter-from,
+.offline-slide-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+</style>

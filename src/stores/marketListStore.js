@@ -5,11 +5,20 @@ import {
   doc,
   onSnapshot,
   addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   deleteField,
 } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
+
+function offlineWrite(operation) {
+  if (!navigator.onLine) {
+    operation().catch((err) => console.warn('[Offline] Write queued for sync:', err))
+    return Promise.resolve()
+  }
+  return operation()
+}
 
 export const useMarketListStore = defineStore('marketLists', () => {
   const lists = ref([])
@@ -59,25 +68,30 @@ export const useMarketListStore = defineStore('marketLists', () => {
   async function addList(data) {
     const listsRef = getUserListsRef()
     if (!listsRef) return null
-    const docRef = await addDoc(listsRef, {
+    const uid = auth.currentUser?.uid
+    if (!uid) return null
+    // Pre-generate doc ref so we can return the ID even when offline
+    const newDocRef = doc(listsRef)
+    const docData = {
       name: data.name,
       date: new Date().toISOString().slice(0, 10),
       createdAt: Date.now(),
       items: {},
-    })
-    return docRef.id
+    }
+    await offlineWrite(() => setDoc(newDocRef, docData))
+    return newDocRef.id
   }
 
   async function deleteList(id) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await deleteDoc(doc(firestore, `users/${uid}/marketLists/${id}`))
+    await offlineWrite(() => deleteDoc(doc(firestore, `users/${uid}/marketLists/${id}`)))
   }
 
   async function updateList(id, data) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await updateDoc(doc(firestore, `users/${uid}/marketLists/${id}`), data)
+    await offlineWrite(() => updateDoc(doc(firestore, `users/${uid}/marketLists/${id}`), data))
   }
 
   async function updateItem(listId, itemId, data) {
@@ -89,7 +103,9 @@ export const useMarketListStore = defineStore('marketLists', () => {
       updates[`items.${itemId}.${key}`] = data[key]
     }
 
-    await updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), updates)
+    await offlineWrite(() =>
+      updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), updates),
+    )
   }
 
   async function addItem(listId, item) {
@@ -107,23 +123,29 @@ export const useMarketListStore = defineStore('marketLists', () => {
       },
     }
 
-    await updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), updates)
+    await offlineWrite(() =>
+      updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), updates),
+    )
   }
 
   async function toggleBought(listId, itemId, currentValue) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), {
-      [`items.${itemId}.bought`]: !currentValue,
-    })
+    await offlineWrite(() =>
+      updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), {
+        [`items.${itemId}.bought`]: !currentValue,
+      }),
+    )
   }
 
   async function removeItem(listId, itemId) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), {
-      [`items.${itemId}`]: deleteField(),
-    })
+    await offlineWrite(() =>
+      updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), {
+        [`items.${itemId}`]: deleteField(),
+      }),
+    )
   }
 
   function getListTotal(listId) {

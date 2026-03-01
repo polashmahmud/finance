@@ -3,6 +3,16 @@ import { ref, computed } from 'vue'
 import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
 
+// When offline, Firestore persistence queues the write but the Promise never resolves
+// until the server acks. Use this helper to fire-and-forget when offline.
+function offlineWrite(operation) {
+  if (!navigator.onLine) {
+    operation().catch((err) => console.warn('[Offline] Write queued for sync:', err))
+    return Promise.resolve()
+  }
+  return operation()
+}
+
 export const useAccountStore = defineStore('accounts', () => {
   const accounts = ref([])
   const loading = ref(false)
@@ -39,21 +49,23 @@ export const useAccountStore = defineStore('accounts', () => {
   async function addAccount(account) {
     const accountsRef = getUserAccountsRef()
     if (!accountsRef) return
-    await addDoc(accountsRef, {
-      name: account.name,
-      type: account.type,
-      balance: account.balance || 0,
-      icon: account.icon || 'account_balance_wallet',
-      color: account.color || '#111111',
-      createdAt: Date.now(),
-    })
+    await offlineWrite(() =>
+      addDoc(accountsRef, {
+        name: account.name,
+        type: account.type,
+        balance: account.balance || 0,
+        icon: account.icon || 'account_balance_wallet',
+        color: account.color || '#111111',
+        createdAt: Date.now(),
+      }),
+    )
   }
 
   async function updateAccount(id, data) {
     const uid = auth.currentUser?.uid
     if (!uid) return
     const accRef = doc(firestore, `users/${uid}/accounts/${id}`)
-    await updateDoc(accRef, data)
+    await offlineWrite(() => updateDoc(accRef, data))
   }
 
   async function updateBalance(accountId, amount) {
@@ -63,17 +75,21 @@ export const useAccountStore = defineStore('accounts', () => {
     if (!uid) return
     const accRef = doc(firestore, `users/${uid}/accounts/${accountId}`)
 
-    // Ensure both are treated as numbers to prevent string concatenation
     const currentBalance = Number(acc.balance || 0)
     const amountToUpdate = Number(amount || 0)
+    const newBalance = currentBalance + amountToUpdate
 
-    await updateDoc(accRef, { balance: currentBalance + amountToUpdate })
+    // Optimistically update pinia state immediately so UI reflects the change
+    // whether online or offline. Firestore will sync in background.
+    acc.balance = newBalance
+
+    await offlineWrite(() => updateDoc(accRef, { balance: newBalance }))
   }
 
   async function deleteAccount(id) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await deleteDoc(doc(firestore, `users/${uid}/accounts/${id}`))
+    await offlineWrite(() => deleteDoc(doc(firestore, `users/${uid}/accounts/${id}`)))
   }
 
   function stopListening() {

@@ -3,6 +3,14 @@ import { ref, computed } from 'vue'
 import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
 
+function offlineWrite(operation) {
+  if (!navigator.onLine) {
+    operation().catch((err) => console.warn('[Offline] Write queued for sync:', err))
+    return Promise.resolve()
+  }
+  return operation()
+}
+
 export const useCategoryStore = defineStore('categories', () => {
   const categories = ref([])
   const loading = ref(false)
@@ -42,42 +50,48 @@ export const useCategoryStore = defineStore('categories', () => {
   async function addCategory(cat) {
     const catRef = getUserCategoriesRef()
     if (!catRef) return
-    await addDoc(catRef, {
-      type: cat.type,
-      name: cat.name,
-      icon: cat.icon || 'category',
-      color: cat.color || '#111111',
-      budget: cat.budget || 0,
-    })
+    await offlineWrite(() =>
+      addDoc(catRef, {
+        type: cat.type,
+        name: cat.name,
+        icon: cat.icon || 'category',
+        color: cat.color || '#111111',
+        budget: cat.budget || 0,
+      }),
+    )
   }
 
   async function updateCategory(id, cat) {
     const uid = auth.currentUser?.uid
     if (!uid) return
     const catRef = doc(firestore, `users/${uid}/categories/${id}`)
-    await updateDoc(catRef, {
-      type: cat.type,
-      name: cat.name,
-      icon: cat.icon,
-      color: cat.color,
-      budget: cat.budget || 0,
-    })
+    await offlineWrite(() =>
+      updateDoc(catRef, {
+        type: cat.type,
+        name: cat.name,
+        icon: cat.icon,
+        color: cat.color,
+        budget: cat.budget || 0,
+      }),
+    )
   }
 
   async function deleteCategory(id) {
     const uid = auth.currentUser?.uid
     if (!uid) return
     const catRef = doc(firestore, `users/${uid}/categories/${id}`)
-    await deleteDoc(catRef)
+    await offlineWrite(() => deleteDoc(catRef))
   }
 
   async function setMonthlyBudget(categoryId, yearMonth, amount) {
     const uid = auth.currentUser?.uid
     if (!uid) return
     const catRef = doc(firestore, `users/${uid}/categories/${categoryId}`)
-    await updateDoc(catRef, {
-      [`budgets.${yearMonth}`]: amount,
-    })
+    await offlineWrite(() =>
+      updateDoc(catRef, {
+        [`budgets.${yearMonth}`]: amount,
+      }),
+    )
   }
 
   function getMonthlyBudget(category, yearMonth) {
