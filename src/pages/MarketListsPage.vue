@@ -112,9 +112,8 @@
     </template>
 
     <!-- New List Dialog -->
-    <q-dialog v-model="showNewList" position="bottom" transition-show="slide-up" transition-hide="slide-down">
-      <q-card
-        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
+    <q-dialog v-model="showNewList">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.newMarketList') }}</div>
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
@@ -131,9 +130,8 @@
     </q-dialog>
 
     <!-- Copy List Dialog -->
-    <q-dialog v-model="showCopyList" position="bottom" transition-show="slide-up" transition-hide="slide-down">
-      <q-card
-        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
+    <q-dialog v-model="showCopyList">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.copyMarketListTitle') }}
           </div>
@@ -151,9 +149,8 @@
     </q-dialog>
 
     <!-- Rename List Dialog -->
-    <q-dialog v-model="showRenameList" position="bottom" transition-show="slide-up" transition-hide="slide-down">
-      <q-card
-        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
+    <q-dialog v-model="showRenameList">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.renameListTitle') }}
           </div>
@@ -171,9 +168,8 @@
     </q-dialog>
 
     <!-- Add Item Dialog -->
-    <q-dialog v-model="showAddItem" position="bottom" transition-show="slide-up" transition-hide="slide-down">
-      <q-card
-        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; padding: 0 16px 24px; background: white;">
+    <q-dialog v-model="showAddItem">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px; padding: 0 16px 24px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.addItem') }}</div>
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
@@ -200,9 +196,8 @@
     </q-dialog>
 
     <!-- Edit Item Dialog -->
-    <q-dialog v-model="showEditItem" position="bottom" transition-show="slide-up" transition-hide="slide-down">
-      <q-card
-        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; padding: 0 16px 24px; background: white;">
+    <q-dialog v-model="showEditItem">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px; padding: 0 16px 24px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.editItemTitle') }}
           </div>

@@ -110,9 +110,8 @@
     </template>
 
     <!-- Add/Edit Category Dialog -->
-    <q-dialog v-model="showDialog" position="bottom" transition-show="slide-up" transition-hide="slide-down">
-      <q-card
-        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
+    <q-dialog v-model="showDialog">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <!-- Dialog Header -->
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">

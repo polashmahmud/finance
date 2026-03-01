@@ -74,9 +74,8 @@
     </template>
 
     <!-- Add/Edit Note Dialog -->
-    <q-dialog v-model="showDialog" position="bottom" transition-show="slide-up" transition-hide="slide-down">
-      <q-card
-        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
+    <q-dialog v-model="showDialog">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
             {{ isEditing ? $t('notes.editNote') : $t('notes.newNote') }}
@@ -87,8 +86,8 @@
           <q-form @submit.prevent="saveNote">
             <q-input v-model="form.title" :label="$t('notes.titleLabel')" outlined dense autofocus color="dark"
               :rules="[(val) => (val && val.length > 0) || $t('notes.titleRequired')]" style="margin-bottom: 10px;" />
-            <q-input v-model="form.description" :label="$t('notes.description')" outlined type="textarea" rows="4" color="dark"
-              style="margin-bottom: 10px;" />
+            <q-input v-model="form.description" :label="$t('notes.description')" outlined type="textarea" rows="4"
+              color="dark" style="margin-bottom: 10px;" />
             <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
               :label="isEditing ? $t('common.update') : $t('notes.saveNote')" :loading="saving" />
           </q-form>

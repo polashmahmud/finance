@@ -136,9 +136,8 @@
     </div>
 
     <!-- Budget Modal -->
-    <q-dialog v-model="budgetModalOpen" position="bottom" transition-show="slide-up" transition-hide="slide-down">
-      <q-card
-        style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px; background: white;">
+    <q-dialog v-model="budgetModalOpen">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
             {{ category?.name }}
@@ -173,8 +172,8 @@
     </q-dialog>
 
     <!-- Edit Dialog -->
-    <q-dialog v-model="editDialogOpen" position="bottom" transition-show="slide-up" transition-hide="slide-down">
-      <q-card style="border-top-left-radius: 28px; border-top-right-radius: 28px; width: 100%; max-width: 500px;">
+    <q-dialog v-model="editDialogOpen">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px;">
         <q-card-section class="row items-center justify-between">
           <div class="text-h6 text-weight-bold">{{ $t('allTransactions.editTransaction') }}</div>
           <q-btn icon="close" flat round dense v-close-popup />
