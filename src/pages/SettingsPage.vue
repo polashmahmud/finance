@@ -218,6 +218,19 @@
                 <q-item-label caption>CSV / PDF</q-item-label>
               </q-item-section>
             </q-item>
+
+            <q-item clickable class="touch-target" @click="showResetDbDialog = true">
+              <q-item-section avatar>
+                <q-icon name="restart_alt" color="negative" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-negative">{{ $t('settings.resetDatabase') }}</q-item-label>
+                <q-item-label caption>{{ $t('settings.resetDatabaseDesc') }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" color="negative" />
+              </q-item-section>
+            </q-item>
           </q-list>
         </q-card>
 
@@ -400,6 +413,33 @@
       </q-card>
     </q-dialog>
 
+    <!-- Reset Database Confirmation Dialog -->
+    <q-dialog v-model="showResetDbDialog" persistent>
+      <q-card style="min-width: 320px; max-width: 90vw; border-radius: 16px">
+        <q-card-section class="row items-center q-pb-none">
+          <q-icon name="warning" color="negative" size="28px" class="q-mr-sm" />
+          <div class="text-h6 text-weight-bold">{{ $t('settings.resetDatabaseTitle') }}</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup :disable="resettingDb" />
+        </q-card-section>
+
+        <q-card-section class="q-pt-sm">
+          <p class="text-body2 text-grey-8">{{ $t('settings.resetDatabaseWarning') }}</p>
+        </q-card-section>
+
+        <q-card-actions align="right" class="q-px-md q-pb-md">
+          <q-btn flat :label="$t('common.cancel')" v-close-popup :disable="resettingDb" />
+          <q-btn
+            unelevated
+            color="negative"
+            :label="resettingDb ? $t('settings.resetting') : $t('common.yes')"
+            :loading="resettingDb"
+            @click="onResetDatabase"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
     <!-- Dashboard Emojis Dialog -->
     <q-dialog v-model="showEmojisDialog" persistent>
       <q-card style="min-width: 350px; border-radius: 16px">
@@ -460,6 +500,8 @@ import { useI18n } from 'vue-i18n'
 import { useSettingsStore } from 'stores/settingsStore'
 import { useAuthStore } from 'stores/authStore'
 import { Notify } from 'quasar'
+import { collection, getDocs, deleteDoc, addDoc } from 'firebase/firestore'
+import { firestore, auth } from 'boot/firebase'
 
 const { t } = useI18n()
 const settings = useSettingsStore()
@@ -477,6 +519,10 @@ const saving = ref(false)
 const showCropper = ref(false)
 const selectedFile = ref(null)
 const imageElement = ref(null)
+
+// Reset database
+const showResetDbDialog = ref(false)
+const resettingDb = ref(false)
 
 // Dialog refs
 const showPinDialog = ref(false)
@@ -767,6 +813,78 @@ function onToggleAppLock(val) {
     // Turning OFF → confirm with current PIN
     currentPinInput.value = ''
     showRemovePinDialog.value = true
+  }
+}
+
+async function onResetDatabase() {
+  resettingDb.value = true
+  try {
+    const uid = auth.currentUser?.uid
+    if (!uid) throw new Error('Not authenticated')
+
+    const collections = ['transactions', 'accounts', 'categories', 'notes', 'marketLists']
+
+    // Delete all documents from every subcollection
+    await Promise.all(
+      collections.map(async (col) => {
+        const ref = collection(firestore, `users/${uid}/${col}`)
+        const snap = await getDocs(ref)
+        await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)))
+      })
+    )
+
+    // Recreate default accounts
+    const accountsRef = collection(firestore, `users/${uid}/accounts`)
+    await Promise.all([
+      addDoc(accountsRef, {
+        name: 'Cash',
+        type: 'Cash',
+        balance: 0,
+        icon: 'wallet',
+        color: '#111111',
+        createdAt: Date.now(),
+      }),
+      addDoc(accountsRef, {
+        name: 'Bank',
+        type: 'Bank',
+        balance: 0,
+        icon: 'account_balance',
+        color: '#111111',
+        createdAt: Date.now(),
+      }),
+    ])
+
+    // Recreate default categories
+    const categoriesRef = collection(firestore, `users/${uid}/categories`)
+    const defaultCategories = [
+      { type: 'expense', name: 'Groceries', icon: 'shopping_cart', color: '#f44336' },
+      { type: 'expense', name: 'Restaurant', icon: 'restaurant', color: '#ff9800' },
+      { type: 'expense', name: 'Transport', icon: 'directions_bus', color: '#2196f3' },
+      { type: 'expense', name: 'Health', icon: 'local_hospital', color: '#e91e63' },
+      { type: 'expense', name: 'Gifts', icon: 'card_giftcard', color: '#9c27b0' },
+      { type: 'expense', name: 'Family', icon: 'family_restroom', color: '#4caf50' },
+      { type: 'expense', name: 'Shopping', icon: 'shopping_bag', color: '#3f51b5' },
+      { type: 'income', name: 'Salary', icon: 'attach_money', color: '#4caf50' },
+    ]
+    await Promise.all(
+      defaultCategories.map((cat) =>
+        addDoc(categoriesRef, {
+          type: cat.type,
+          name: cat.name,
+          icon: cat.icon,
+          color: cat.color,
+          budget: 0,
+        })
+      )
+    )
+
+    showResetDbDialog.value = false
+    Notify.create({ type: 'positive', message: t('settings.resetDatabaseSuccess') })
+  } catch (err) {
+    console.error('Reset database error:', err)
+    Notify.create({ type: 'negative', message: t('settings.resetDatabaseError') })
+  } finally {
+    resettingDb.value = false
   }
 }
 

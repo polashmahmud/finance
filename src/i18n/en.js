@@ -32,6 +32,8 @@ export default {
     offline: 'You are offline. Data will sync when connection is restored.',
     offlineShort: 'Offline',
     savedOffline: 'Saved offline — will sync automatically.',
+    yes: 'Yes, Reset',
+    no: 'No',
   },
 
   // ========== Greetings ==========
@@ -321,6 +323,14 @@ export default {
     backup: 'Backup',
     localBackup: 'Local Backup',
     dataExport: 'Data Export',
+    resetDatabase: 'Reset Database',
+    resetDatabaseDesc: 'Delete all data & start fresh',
+    resetDatabaseTitle: 'Reset Database?',
+    resetDatabaseWarning:
+      'This will permanently delete all your transactions, notes, and market lists. Your default accounts and categories will be restored. This action cannot be undone.',
+    resetDatabaseSuccess: 'Database reset successfully',
+    resetDatabaseError: 'Error resetting database. Please try again.',
+    resetting: 'Resetting…',
     categoryAndBudget: 'Categories & Budget',
     categoryAndBudgetManage: 'Manage categories & budget',
     appName: 'Personal Finance Manager',
