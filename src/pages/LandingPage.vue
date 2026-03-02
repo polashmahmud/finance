@@ -15,6 +15,13 @@
         <nav class="landing-nav__links row items-center q-gutter-md gt-xs">
           <a href="#features" class="landing-nav__link">{{ $t('landing.nav.features') }}</a>
 
+          <!-- GitHub link -->
+          <a href="https://github.com/polashmahmud/finance" target="_blank" rel="noopener noreferrer"
+            class="landing-nav__link row items-center q-gutter-xs no-wrap">
+            <q-icon name="mdi-github" size="18px" />
+            <span>GitHub</span>
+          </a>
+
           <!-- Language switcher -->
           <q-btn-toggle v-model="locale" toggle-color="dark" color="white" text-color="dark" unelevated dense rounded
             no-caps :options="langOptions" class="landing-lang-toggle" />
@@ -62,6 +69,11 @@
                 {{ $t('landing.nav.register') }}
               </router-link>
             </template>
+            <a href="https://github.com/polashmahmud/finance" target="_blank" rel="noopener noreferrer"
+              class="landing-mobile-menu__item" @click="mobileMenuOpen = false">
+              <q-icon name="mdi-github" size="18px" class="q-mr-sm" />
+              GitHub
+            </a>
           </div>
         </div>
       </transition>
@@ -155,8 +167,16 @@
             {{ $t('layout.financeManager') }}
           </span>
         </div>
-        <div class="text-grey-6" style="font-size: 0.8rem;">
-          &copy; {{ currentYear }} {{ $t('landing.footer.rights') }}
+        <div class="row items-center q-gutter-md">
+          <a href="https://github.com/polashmahmud/finance" target="_blank" rel="noopener noreferrer"
+            class="row items-center q-gutter-xs text-grey-6 no-decoration"
+            style="font-size: 0.85rem; text-decoration: none;">
+            <q-icon name="mdi-github" size="18px" />
+            <span>GitHub</span>
+          </a>
+          <div class="text-grey-6" style="font-size: 0.8rem;">
+            &copy; {{ currentYear }} {{ $t('landing.footer.rights') }}
+          </div>
         </div>
       </div>
     </footer>
