@@ -74,6 +74,13 @@ export default {
     budgetAmount: 'বাজেট পরিমাণ',
     details: 'বিস্তারিত',
     tapToSetBudget: 'বাজেট সেট করতে ট্যাপ করুন',
+    deleteTransactionTitle: 'লেনদেন মুছুন',
+    deleteExpenseConfirm: '"{account}" অ্যাকাউন্টে {amount} ফেরত যোগ হবে?',
+    deleteIncomeConfirm: '"{account}" অ্যাকাউন্ট থেকে {amount} বাদ যাবে?',
+    deleteWithRefund: 'মুছুন ও ফেরত দিন',
+    deleteWithDeduct: 'মুছুন ও বাদ দিন',
+    deleteOnly: 'শুধু মুছুন',
+    transactionDeleted: 'লেনদেন মুছে ফেলা হয়েছে',
   },
 
   // ========== Accounts ==========

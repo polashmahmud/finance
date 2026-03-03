@@ -75,6 +75,13 @@ export default {
     budgetAmount: 'Budget Amount',
     details: 'Details',
     tapToSetBudget: 'Tap to set budget',
+    deleteTransactionTitle: 'Delete Transaction',
+    deleteExpenseConfirm: 'Add {amount} back to "{account}"?',
+    deleteIncomeConfirm: 'Deduct {amount} from "{account}"?',
+    deleteWithRefund: 'Delete & Refund',
+    deleteWithDeduct: 'Delete & Deduct',
+    deleteOnly: 'Delete Only',
+    transactionDeleted: 'Transaction deleted',
   },
 
   // ========== Accounts ==========
