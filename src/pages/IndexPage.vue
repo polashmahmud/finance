@@ -24,7 +24,12 @@
         <q-card class="balance-overview-card q-mb-lg cursor-pointer" @click="$router.push('/dashboard/accounts')"
           v-ripple>
           <q-card-section class="balance-card-gradient">
-            <div class="row items-center no-wrap">
+            <!-- Animated orbs -->
+            <div class="balance-orb balance-orb-1"></div>
+            <div class="balance-orb balance-orb-2"></div>
+            <div class="balance-orb balance-orb-3"></div>
+            <div class="balance-shimmer"></div>
+            <div class="row items-center no-wrap" style="position: relative; z-index: 1;">
               <div class="col">
                 <div class="balance-label">{{ $t('dashboard.totalBalance') }}</div>
                 <div class="balance-amount">{{ settings.currency }}{{ settings.formatNumber(accounts.totalBalance) }}
@@ -834,6 +839,8 @@ async function confirmDeleteOnly() {
 
 .balance-card-gradient {
   background: linear-gradient(145deg, #2d2d3a 0%, #1a1a2a 50%, #111118 100%) !important;
+  background-size: 200% 200% !important;
+  animation: gradientShift 8s ease infinite;
   padding: 22px 24px !important;
   position: relative;
   overflow: hidden;
@@ -849,6 +856,125 @@ async function confirmDeleteOnly() {
   background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
+}
+
+/* Floating orbs */
+.balance-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(40px);
+  opacity: 0.35;
+}
+
+.balance-orb-1 {
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+  top: -30px;
+  right: -20px;
+  animation: orbFloat1 6s ease-in-out infinite;
+}
+
+.balance-orb-2 {
+  width: 90px;
+  height: 90px;
+  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+  bottom: -20px;
+  left: 20%;
+  animation: orbFloat2 8s ease-in-out infinite;
+}
+
+.balance-orb-3 {
+  width: 70px;
+  height: 70px;
+  background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
+  top: 50%;
+  right: 30%;
+  animation: orbFloat3 7s ease-in-out infinite;
+}
+
+/* Shimmer sweep */
+.balance-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(105deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.03) 40%,
+      rgba(255, 255, 255, 0.07) 50%,
+      rgba(255, 255, 255, 0.03) 60%,
+      transparent 100%);
+  animation: shimmerSweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes gradientShift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes orbFloat1 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(-15px, 10px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(10px, -8px) scale(0.95);
+  }
+}
+
+@keyframes orbFloat2 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  40% {
+    transform: translate(20px, -12px) scale(1.15);
+  }
+
+  70% {
+    transform: translate(-10px, 8px) scale(0.9);
+  }
+}
+
+@keyframes orbFloat3 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(-12px, -15px) scale(1.1);
+  }
+}
+
+@keyframes shimmerSweep {
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 200%;
+  }
 }
 
 .balance-label {
