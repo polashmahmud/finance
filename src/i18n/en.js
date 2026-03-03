@@ -34,6 +34,7 @@ export default {
     savedOffline: 'Saved offline — will sync automatically.',
     yes: 'Yes, Reset',
     no: 'No',
+    areYouSure: 'Are you sure?',
   },
 
   // ========== Greetings ==========

@@ -33,6 +33,7 @@ export default {
     offlineShort: 'অফলাইন',
     savedOffline: 'অফলাইনে সংরক্ষিত — স্বয়ংক্রিয়ভাবে সিঙ্ক হবে।',
     yes: 'হ্যাঁ, রিসেট করুন',
+    areYouSure: 'আপনি কি নিশ্চিত?',
   },
 
   // ========== Greetings ==========
