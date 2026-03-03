@@ -228,6 +228,12 @@ export default {
     listDeleted: 'তালিকা মুছে ফেলা হয়েছে',
     marketListNotePrefix: 'বাজার তালিকা: ',
     swipeHint: 'এডিট বা ডিলিট করতে ডানে বা বামে সোয়াইপ করুন',
+    deleteModalTitle: 'বাজারের তালিকা মুছুন',
+    linkedTransactions: 'সংযুক্ত ব্যয় লেনদেন',
+    noLinkedTransactions: 'কোনো সংযুক্ত লেনদেন পাওয়া যায়নি',
+    deleteListOnly: 'শুধু তালিকা মুছুন',
+    deleteListWithTx: 'তালিকা ও লেনদেন মুছুন',
+    deleteListWithTxRefund: 'মুছুন ও একাউন্টে ফেরত দিন',
   },
 
   // ========== Notes ==========

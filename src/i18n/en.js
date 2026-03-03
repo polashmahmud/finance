@@ -226,6 +226,12 @@ export default {
     listDeleted: 'List deleted',
     marketListNotePrefix: 'Market List: ',
     swipeHint: 'Swipe left or right to edit or delete',
+    deleteModalTitle: 'Delete Market List',
+    linkedTransactions: 'Linked Expense Transactions',
+    noLinkedTransactions: 'No linked transactions found',
+    deleteListOnly: 'Delete List Only',
+    deleteListWithTx: 'Delete List & Transactions',
+    deleteListWithTxRefund: 'Delete & Refund to Accounts',
   },
 
   // ========== Notes ==========

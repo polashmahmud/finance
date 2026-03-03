@@ -289,6 +289,94 @@
       </q-card>
     </q-dialog>
 
+    <!-- Delete List Confirmation Dialog -->
+    <q-dialog v-model="deleteListModalOpen" persistent>
+      <q-card style="border-radius: 28px; width: 100%; max-width: 480px; background: white;">
+        <q-card-section class="row items-center justify-between no-wrap q-pb-none">
+          <div class="row items-center q-gutter-sm">
+            <q-avatar color="negative" text-color="white" icon="delete_outline" size="36px" />
+            <div class="text-h6 text-weight-bold" style="color: #222;">{{ $t('marketLists.deleteModalTitle') }}</div>
+          </div>
+          <q-btn icon="close" flat round dense @click="deleteListModalOpen = false" style="background: #f1f5f9; color: #64748b;" />
+        </q-card-section>
+
+        <q-card-section class="q-pt-sm">
+          <!-- List name summary -->
+          <div class="q-pa-sm q-mb-md row items-center q-gutter-sm" style="background: #f8fafc; border-radius: 12px;">
+            <q-icon name="shopping_cart" color="dark" size="22px" />
+            <div class="text-weight-bold">{{ deleteListTarget?.name }}</div>
+            <q-space />
+            <div class="text-caption text-grey">{{ deleteListTarget?.items?.length || 0 }} {{ $t('marketLists.items') }}</div>
+          </div>
+
+          <!-- Linked transactions section -->
+          <div class="text-caption text-weight-bold text-grey-7 q-mb-xs q-mt-sm">
+            {{ $t('marketLists.linkedTransactions') }}
+          </div>
+          <div v-if="deleteLinkedTransactions.length" class="q-mb-md" style="max-height: 220px; overflow-y: auto;">
+            <div v-for="tx in deleteLinkedTransactions" :key="tx.id"
+              class="row items-center q-pa-sm q-mb-xs" style="background: #fff5f5; border-radius: 10px; border: 1px solid #fecaca;">
+              <q-avatar :style="{ background: getCategoryColor(tx.category) + '20' }" size="32px" class="q-mr-sm">
+                <q-icon :name="getCategoryIcon(tx.category)" :style="{ color: getCategoryColor(tx.category) }" size="16px" />
+              </q-avatar>
+              <div class="col">
+                <div class="text-weight-medium" style="font-size: 13px;">{{ tx.category }}</div>
+                <div class="text-caption text-grey">{{ settings.formatDate(tx.date) }} &middot; {{ getAccountName(tx.accountId) }}</div>
+              </div>
+              <div class="amount-expense text-weight-bold" style="font-size: 13px;">
+                -{{ settings.currency }}{{ settings.formatNumber(tx.amount) }}
+              </div>
+            </div>
+          </div>
+          <div v-else class="text-caption text-grey q-mb-md row items-center q-gutter-xs">
+            <q-icon name="info_outline" size="14px" />
+            <span>{{ $t('marketLists.noLinkedTransactions') }}</span>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="column q-gutter-sm">
+            <q-btn
+              v-if="deleteLinkedTransactions.length"
+              :label="$t('marketLists.deleteListWithTxRefund')"
+              icon="savings"
+              color="negative"
+              unelevated
+              class="full-width"
+              :loading="saving"
+              @click="doDeleteWithTransactions(true)"
+            />
+            <q-btn
+              v-if="deleteLinkedTransactions.length"
+              :label="$t('marketLists.deleteListWithTx')"
+              icon="delete_forever"
+              outline
+              color="negative"
+              class="full-width"
+              :loading="saving"
+              @click="doDeleteWithTransactions(false)"
+            />
+            <q-btn
+              :label="$t('marketLists.deleteListOnly')"
+              :icon="deleteLinkedTransactions.length ? 'playlist_remove' : 'delete_forever'"
+              :outline="!!deleteLinkedTransactions.length"
+              :unelevated="!deleteLinkedTransactions.length"
+              :color="deleteLinkedTransactions.length ? 'grey-7' : 'negative'"
+              class="full-width"
+              :loading="saving"
+              @click="doDeleteListOnly"
+            />
+            <q-btn
+              :label="$t('common.cancel')"
+              flat
+              color="grey-7"
+              class="full-width"
+              @click="deleteListModalOpen = false"
+            />
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
     <!-- Edit Item Dialog -->
     <q-dialog v-model="showEditItem">
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; padding: 0 16px 24px; background: white;">
@@ -358,6 +446,18 @@ const newItem = reactive({ name: '', quantity: 1, price: 0 })
 const editItemData = reactive({ name: '', quantity: 1, price: 0 })
 const convertForm = reactive({ amount: 0, category: '', accountId: null, date: '', time: '', notes: '' })
 
+// Delete list modal
+const deleteListModalOpen = ref(false)
+const deleteListTarget = ref(null)
+
+const deleteLinkedTransactions = computed(() => {
+  if (!deleteListTarget.value) return []
+  const prefix = t('marketLists.marketListNotePrefix')
+  return transactions.transactions.filter(
+    (tx) => tx.type === 'expense' && tx.notes === `${prefix}${deleteListTarget.value.name}`
+  )
+})
+
 const expenseCategoryOptions = computed(() =>
   categories.expenseCategories.map((c) => ({ label: c.name, value: c.name, icon: c.icon, color: c.color }))
 )
@@ -368,14 +468,28 @@ const accountOptions = computed(() =>
   }))
 )
 
-function getCompletedCount(list) {
-  return list.items.filter((i) => i.bought).length
+function getCategoryColor(categoryName) {
+  const all = [...categories.incomeCategories, ...categories.expenseCategories]
+  return all.find((c) => c.name === categoryName)?.color || '#757575'
+}
+
+function getCategoryIcon(categoryName) {
+  const all = [...categories.incomeCategories, ...categories.expenseCategories]
+  return all.find((c) => c.name === categoryName)?.icon || 'receipt'
+}
+
+function getAccountName(accountId) {
+  return accounts.accounts.find((a) => a.id === accountId)?.name || ''
 }
 
 function openNewListDialog() {
   const prefix = t('marketLists.defaultCopyPrefix')
   newListName.value = prefix + settings.formatDate(new Date().toISOString().slice(0, 10))
   showNewList.value = true
+}
+
+function getCompletedCount(list) {
+  return list.items.filter((i) => i.bought).length
 }
 
 async function createList() {
@@ -393,15 +507,43 @@ async function createList() {
 }
 
 function confirmDeleteList(list) {
-  $q.dialog({
-    title: t('marketLists.deleteList'),
-    message: `"${list.name}" ${t('marketLists.deleteConfirm')}`,
-    ok: { label: t('common.delete'), color: 'negative', flat: true },
-    cancel: { label: t('common.cancel'), flat: true },
-  }).onOk(async () => {
-    await marketLists.deleteList(list.id)
+  deleteListTarget.value = list
+  deleteListModalOpen.value = true
+}
+
+async function doDeleteListOnly() {
+  if (!deleteListTarget.value) return
+  saving.value = true
+  try {
+    await marketLists.deleteList(deleteListTarget.value.id)
     $q.notify({ type: 'positive', message: t('marketLists.listDeleted'), position: 'top' })
-  })
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  deleteListModalOpen.value = false
+  deleteListTarget.value = null
+  saving.value = false
+}
+
+async function doDeleteWithTransactions(refund = false) {
+  if (!deleteListTarget.value) return
+  saving.value = true
+  try {
+    const txList = deleteLinkedTransactions.value.slice()
+    for (const tx of txList) {
+      await transactions.deleteTransaction(tx.id)
+      if (refund && tx.accountId) {
+        await accounts.updateBalance(tx.accountId, tx.amount)
+      }
+    }
+    await marketLists.deleteList(deleteListTarget.value.id)
+    $q.notify({ type: 'positive', message: t('marketLists.listDeleted'), position: 'top' })
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  deleteListModalOpen.value = false
+  deleteListTarget.value = null
+  saving.value = false
 }
 
 function openAddItem(listId) {
@@ -561,12 +703,14 @@ onMounted(() => {
   marketLists.listenLists()
   categories.listenCategories()
   accounts.listenAccounts()
+  transactions.listenTransactions()
 })
 
 onUnmounted(() => {
   marketLists.stopListening()
   categories.stopListening()
   accounts.stopListening()
+  transactions.stopListening()
 })
 
 function onLeftSwipe(list, item, { reset }) {
