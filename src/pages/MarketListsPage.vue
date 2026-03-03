@@ -18,114 +18,128 @@
     <template v-else>
       <div class="row q-col-gutter-md">
         <div v-for="list in marketLists.lists" :key="list.id" class="col-12 col-md-6">
-        <q-card class="finance-card full-height">
-          <q-card-section>
-            <div class="column q-mb-sm">
-              <!-- Title row -->
-              <div class="row items-center no-wrap cursor-pointer q-mb-xs" @click="toggleExpanded(list.id)">
-                <q-icon name="shopping_cart" color="dark" size="20px" class="q-mr-sm flex-shrink-0" />
-                <div class="col" style="min-width:0">
-                  <div class="text-subtitle1 text-weight-bold" style="white-space:normal; word-break:break-word;">{{ list.name }}</div>
-                  <div class="text-caption text-grey">{{ getCompletedCount(list) }}/{{ list.items.length }} {{ $t('marketLists.items') }}</div>
+        <q-card class="finance-card full-height" style="border-radius: 16px; overflow: hidden;">
+
+          <!-- Card Header -->
+          <div class="row items-center no-wrap q-px-md q-pt-md q-pb-sm cursor-pointer" @click="toggleExpanded(list.id)">
+            <q-avatar size="36px" style="background: #f1f5f9; flex-shrink: 0;">
+              <q-icon name="shopping_cart" color="dark" size="18px" />
+            </q-avatar>
+            <div class="col q-mx-sm" style="min-width: 0;">
+              <div class="text-weight-bold" style="font-size: 15px; color: #111; word-break: break-word; line-height: 1.3;">{{ list.name }}</div>
+              <div class="row items-center q-gutter-xs q-mt-xs">
+                <div style="font-size: 11px; color: #94a3b8;">{{ getCompletedCount(list) }}/{{ list.items.length }} {{ $t('marketLists.items') }}</div>
+                <div v-if="list.convertedAt" class="row items-center q-gutter-xs" style="font-size: 11px; color: #22c55e;">
+                  <q-icon name="check_circle" size="11px" />
+                  <span>{{ $t('marketLists.expenseConverted') }}</span>
                 </div>
-                <q-btn flat round dense :icon="isExpanded(list.id) ? 'expand_less' : 'expand_more'" color="grey-6" class="q-ml-xs flex-shrink-0" @click.stop="toggleExpanded(list.id)" />
-              </div>
-              <!-- Buttons row -->
-              <div class="row items-center q-gutter-xs">
-                <q-btn flat round dense icon="edit" color="grey-6" @click.stop="openRenameDialog(list)" />
-                <q-btn flat round dense icon="add" color="dark" @click.stop="openAddItem(list.id)" />
-                <q-btn flat round dense icon="content_copy" color="primary" @click.stop="openCopyDialog(list)" />
-                <q-btn flat round dense icon="share" color="info" @click.stop="shareList(list)" />
-                <q-btn flat round dense icon="delete_outline" color="negative" @click.stop="confirmDeleteList(list)" />
               </div>
             </div>
+            <q-icon :name="isExpanded(list.id) ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" color="grey-5" size="22px" style="flex-shrink: 0;" />
+          </div>
 
-            <!-- Collapsible body -->
-            <div v-show="isExpanded(list.id)">
+          <!-- Action bar -->
+          <div class="row items-center q-px-md q-pb-sm" style="gap: 4px;">
+            <q-btn unelevated dense no-caps size="sm" icon="add" color="dark" class="q-px-sm" style="border-radius: 8px; height: 30px;" @click.stop="openAddItem(list.id)" />
+            <q-btn unelevated dense no-caps size="sm" icon="edit" style="border-radius: 8px; height: 30px; background: #f1f5f9; color: #475569;" class="q-px-sm" @click.stop="openRenameDialog(list)" />
+            <q-btn unelevated dense no-caps size="sm" icon="content_copy" style="border-radius: 8px; height: 30px; background: #eff6ff; color: #3b82f6;" class="q-px-sm" @click.stop="openCopyDialog(list)" />
+            <q-btn unelevated dense no-caps size="sm" icon="share" style="border-radius: 8px; height: 30px; background: #f0f9ff; color: #0ea5e9;" class="q-px-sm" @click.stop="shareList(list)" />
+            <q-space />
+            <q-btn unelevated dense no-caps size="sm" icon="delete_outline" style="border-radius: 8px; height: 30px; background: #fff1f2; color: #ef4444;" class="q-px-sm" @click.stop="confirmDeleteList(list)" />
+          </div>
+
+          <!-- Collapsible body -->
+          <div v-show="isExpanded(list.id)">
 
             <!-- Progress bar -->
-            <q-linear-progress :value="list.items.length ? getCompletedCount(list) / list.items.length : 0" color="dark"
-              rounded size="6px" track-color="grey-3" class="q-mb-md" />
+            <div class="q-px-md q-pb-sm">
+              <q-linear-progress :value="list.items.length ? getCompletedCount(list) / list.items.length : 0"
+                color="dark" rounded size="5px" track-color="grey-3" />
+            </div>
 
-            <div v-if="list.items.length" class="text-center text-caption text-grey q-mb-sm">
-              <q-icon name="swipe" size="16px" class="q-mr-xs" />
-              {{ $t('marketLists.swipeHint') }}
+            <q-separator />
+
+            <!-- Swipe hint -->
+            <div v-if="list.items.length" class="text-center q-py-xs" style="font-size: 11px; color: #94a3b8;">
+              <q-icon name="swipe" size="13px" class="q-mr-xs" />{{ $t('marketLists.swipeHint') }}
             </div>
 
             <!-- Items -->
-            <q-list dense separator>
-              <q-slide-item v-for="item in list.items" :key="item.id" @left="onLeftSwipe(list, item, $event)"
-                @right="onRightSwipe(list, item, $event)" left-color="primary" right-color="negative"
-                class="touch-target q-mb-sm" style="border-radius: 8px;">
-                <template v-slot:left>
-                  <q-icon name="edit" />
-                </template>
-                <template v-slot:right>
-                  <q-icon name="delete" />
-                </template>
-
-                <q-item class="q-pl-none q-py-none">
-                  <q-item-section avatar>
-                    <q-checkbox :model-value="item.bought" color="dark"
+            <q-list>
+              <q-slide-item v-for="item in list.items" :key="item.id"
+                @left="onLeftSwipe(list, item, $event)"
+                @right="onRightSwipe(list, item, $event)"
+                left-color="primary" right-color="negative">
+                <template v-slot:left><q-icon name="edit" /></template>
+                <template v-slot:right><q-icon name="delete" /></template>
+                <q-item class="q-px-md q-py-xs">
+                  <q-item-section avatar style="min-width: 36px;">
+                    <q-checkbox :model-value="item.bought" color="dark" dense
                       @update:model-value="marketLists.toggleBought(list.id, item.id, item.bought)" />
                   </q-item-section>
-                  <q-item-section :class="{ 'text-strike text-grey': item.bought }">
-                    <q-item-label>{{ item.name }}</q-item-label>
-                    <q-item-label caption>{{ $t('marketLists.quantityPrefix') }} {{ item.quantity }}</q-item-label>
+                  <q-item-section :class="item.bought ? 'text-strike text-grey-5' : ''">
+                    <q-item-label style="font-size: 14px;">{{ item.name }}</q-item-label>
+                    <q-item-label caption style="font-size: 11px;">{{ item.quantity }}</q-item-label>
                   </q-item-section>
                   <q-item-section side>
-                    <div class="row items-center q-gutter-xs">
-                      <span class="text-weight-medium">
-                        {{ settings.currency }}{{ settings.formatNumber(item.price || 0) }}
-                      </span>
-                    </div>
+                    <span :class="item.bought ? 'text-grey-4' : 'text-weight-medium'" style="font-size: 14px;">
+                      {{ settings.currency }}{{ settings.formatNumber(item.price || 0) }}
+                    </span>
                   </q-item-section>
                 </q-item>
               </q-slide-item>
             </q-list>
 
             <!-- Empty items -->
-            <div v-if="!list.items.length" class="text-center text-grey q-pa-md">
-              <q-icon name="playlist_add" size="28px" class="q-mb-xs" />
-              <div class="text-caption">{{ $t('marketLists.noItems') }}</div>
+            <div v-if="!list.items.length" class="text-center q-py-lg" style="color: #cbd5e1;">
+              <q-icon name="playlist_add" size="32px" class="q-mb-xs" />
+              <div style="font-size: 12px;">{{ $t('marketLists.noItems') }}</div>
             </div>
 
-            <!-- Total -->
-            <q-separator class="q-my-sm" />
-            <div class="row justify-between items-center">
-              <span class="text-weight-bold text-grey">{{ $t('marketLists.estimatedTotal') }}</span>
-              <span class="text-weight-bold" style="color: #111;">
+            <!-- Footer: total + convert -->
+            <q-separator />
+            <div class="q-px-md q-py-sm row items-center justify-between">
+              <span style="font-size: 13px; color: #64748b; font-weight: 600;">{{ $t('marketLists.estimatedTotal') }}</span>
+              <span style="font-size: 15px; font-weight: 700; color: #111;">
                 {{ settings.currency }}{{ settings.formatNumber(marketLists.getListTotal(list.id)) }}
               </span>
             </div>
 
-            <!-- Convert to Expense -->
-            <div class="q-mt-sm">
-              <q-btn v-if="!list.convertedAt" flat dense color="dark" :label="$t('marketLists.convertToExpense')" icon="receipt"
-                class="full-width" @click="convertToExpense(list)" :disable="!list.items.length" />
-              <div v-else class="row items-center justify-between">
-                <div class="row items-center q-gutter-xs text-positive">
-                  <q-icon name="check_circle" size="16px" />
-                  <span class="text-caption">{{ $t('marketLists.expenseConverted') }}</span>
+            <!-- Convert button -->
+            <div class="q-px-md q-pb-md">
+              <q-btn v-if="!list.convertedAt"
+                flat no-caps dense
+                :label="$t('marketLists.convertToExpense')"
+                icon="receipt_long"
+                class="full-width"
+                style="border-radius: 10px; border: 1.5px dashed #cbd5e1; color: #475569; font-size: 13px;"
+                @click="convertToExpense(list)"
+                :disable="!list.items.length" />
+              <div v-else class="row items-center justify-between q-pa-xs"
+                style="background: #f0fdf4; border-radius: 10px; border: 1px solid #bbf7d0;">
+                <div class="row items-center q-gutter-xs" style="color: #16a34a; font-size: 12px;">
+                  <q-icon name="check_circle" size="14px" />
+                  <span>{{ $t('marketLists.expenseConverted') }}</span>
                 </div>
-                <q-btn flat dense color="grey" :label="$t('marketLists.convertAgain')" icon="refresh"
-                  size="sm" @click="convertToExpense(list)" :disable="!list.items.length" />
+                <q-btn flat dense no-caps size="xs" :label="$t('marketLists.convertAgain')" icon="refresh"
+                  style="color: #64748b;" @click="convertToExpense(list)" :disable="!list.items.length" />
               </div>
             </div>
 
-            </div><!-- end collapsible body -->
+          </div><!-- end collapsible body -->
 
-            <!-- Collapsed summary (only when folded) -->
-            <div v-show="!isExpanded(list.id)" class="row items-center justify-between q-mt-xs">
-              <div class="row items-center q-gutter-xs text-grey-6" style="font-size:12px;">
-                <q-icon name="shopping_bag" size="14px" />
-                <span>{{ settings.currency }}{{ settings.formatNumber(marketLists.getListTotal(list.id)) }}</span>
-                <span>&middot;</span>
-                <q-icon :name="list.convertedAt ? 'check_circle' : 'radio_button_unchecked'" size="14px" :color="list.convertedAt ? 'positive' : 'grey-5'" />
-                <span>{{ list.convertedAt ? $t('marketLists.expenseConverted') : $t('marketLists.convertToExpense') }}</span>
-              </div>
+          <!-- Collapsed summary -->
+          <div v-show="!isExpanded(list.id)" class="row items-center justify-between q-px-md q-pb-sm" style="font-size: 12px; color: #94a3b8;">
+            <div class="row items-center q-gutter-xs">
+              <q-icon name="receipt_long" size="13px" />
+              <span>{{ settings.currency }}{{ settings.formatNumber(marketLists.getListTotal(list.id)) }}</span>
             </div>
-          </q-card-section>
+            <div class="row items-center q-gutter-xs">
+              <q-icon :name="list.convertedAt ? 'check_circle' : 'radio_button_unchecked'" size="13px" :color="list.convertedAt ? 'positive' : 'grey-4'" />
+              <span>{{ list.convertedAt ? $t('marketLists.expenseConverted') : $t('marketLists.convertToExpense') }}</span>
+            </div>
+          </div>
+
         </q-card>
         </div>
       </div>
