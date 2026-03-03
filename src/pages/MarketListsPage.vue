@@ -18,129 +18,141 @@
     <template v-else>
       <div class="row q-col-gutter-md">
         <div v-for="list in marketLists.lists" :key="list.id" class="col-12 col-md-6">
-        <q-card class="finance-card full-height" style="border-radius: 16px; overflow: hidden;">
+          <q-card class="finance-card full-height" style="border-radius: 16px; overflow: hidden;">
 
-          <!-- Card Header -->
-          <div class="row items-center no-wrap q-px-md q-pt-md q-pb-sm cursor-pointer" @click="toggleExpanded(list.id)">
-            <q-avatar size="36px" style="background: #f1f5f9; flex-shrink: 0;">
-              <q-icon name="shopping_cart" color="dark" size="18px" />
-            </q-avatar>
-            <div class="col q-mx-sm" style="min-width: 0;">
-              <div class="text-weight-bold" style="font-size: 15px; color: #111; word-break: break-word; line-height: 1.3;">{{ list.name }}</div>
-              <div class="row items-center q-gutter-xs q-mt-xs">
-                <div style="font-size: 11px; color: #94a3b8;">{{ getCompletedCount(list) }}/{{ list.items.length }} {{ $t('marketLists.items') }}</div>
-                <div v-if="list.convertedAt" class="row items-center q-gutter-xs" style="font-size: 11px; color: #22c55e;">
-                  <q-icon name="check_circle" size="11px" />
-                  <span>{{ $t('marketLists.expenseConverted') }}</span>
+            <!-- Card Header -->
+            <div class="row items-center no-wrap q-px-md q-pt-md q-pb-sm cursor-pointer"
+              @click="toggleExpanded(list.id)">
+              <q-avatar size="36px" style="background: #f1f5f9; flex-shrink: 0;">
+                <q-icon name="shopping_cart" color="dark" size="18px" />
+              </q-avatar>
+              <div class="col q-mx-sm" style="min-width: 0;">
+                <div class="text-weight-bold"
+                  style="font-size: 15px; color: #111; word-break: break-word; line-height: 1.3;">{{ list.name }}</div>
+                <div class="row items-center q-gutter-xs q-mt-xs">
+                  <div style="font-size: 11px; color: #94a3b8;">{{ getCompletedCount(list) }}/{{ list.items.length }} {{
+                    $t('marketLists.items') }}</div>
+                  <div v-if="list.convertedAt" class="row items-center q-gutter-xs"
+                    style="font-size: 11px; color: #22c55e;">
+                    <q-icon name="check_circle" size="11px" />
+                    <span>{{ $t('marketLists.expenseConverted') }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <q-icon :name="isExpanded(list.id) ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" color="grey-5" size="22px" style="flex-shrink: 0;" />
-          </div>
-
-          <!-- Action bar -->
-          <div class="row items-center q-px-md q-pb-sm" style="gap: 4px;">
-            <q-btn unelevated dense no-caps size="sm" icon="add" color="dark" class="q-px-sm" style="border-radius: 8px; height: 30px;" @click.stop="openAddItem(list.id)" />
-            <q-btn unelevated dense no-caps size="sm" icon="edit" style="border-radius: 8px; height: 30px; background: #f1f5f9; color: #475569;" class="q-px-sm" @click.stop="openRenameDialog(list)" />
-            <q-btn unelevated dense no-caps size="sm" icon="content_copy" style="border-radius: 8px; height: 30px; background: #eff6ff; color: #3b82f6;" class="q-px-sm" @click.stop="openCopyDialog(list)" />
-            <q-btn unelevated dense no-caps size="sm" icon="share" style="border-radius: 8px; height: 30px; background: #f0f9ff; color: #0ea5e9;" class="q-px-sm" @click.stop="shareList(list)" />
-            <q-space />
-            <q-btn unelevated dense no-caps size="sm" icon="delete_outline" style="border-radius: 8px; height: 30px; background: #fff1f2; color: #ef4444;" class="q-px-sm" @click.stop="confirmDeleteList(list)" />
-          </div>
-
-          <!-- Collapsible body -->
-          <div v-show="isExpanded(list.id)">
-
-            <!-- Progress bar -->
-            <div class="q-px-md q-pb-sm">
-              <q-linear-progress :value="list.items.length ? getCompletedCount(list) / list.items.length : 0"
-                color="dark" rounded size="5px" track-color="grey-3" />
+              <q-icon :name="isExpanded(list.id) ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" color="grey-5"
+                size="22px" style="flex-shrink: 0;" />
             </div>
 
-            <q-separator />
-
-            <!-- Swipe hint -->
-            <div v-if="list.items.length" class="text-center q-py-xs" style="font-size: 11px; color: #94a3b8;">
-              <q-icon name="swipe" size="13px" class="q-mr-xs" />{{ $t('marketLists.swipeHint') }}
+            <!-- Action bar -->
+            <div class="row items-center q-px-md q-pb-sm" style="gap: 4px;">
+              <q-btn unelevated dense no-caps size="sm" icon="add" color="dark" class="q-px-sm"
+                style="border-radius: 8px; height: 30px;" @click.stop="openAddItem(list.id)" />
+              <q-btn unelevated dense no-caps size="sm" icon="edit"
+                style="border-radius: 8px; height: 30px; background: #f1f5f9; color: #475569;" class="q-px-sm"
+                @click.stop="openRenameDialog(list)" />
+              <q-btn unelevated dense no-caps size="sm" icon="content_copy"
+                style="border-radius: 8px; height: 30px; background: #eff6ff; color: #3b82f6;" class="q-px-sm"
+                @click.stop="openCopyDialog(list)" />
+              <q-btn unelevated dense no-caps size="sm" icon="share"
+                style="border-radius: 8px; height: 30px; background: #f0f9ff; color: #0ea5e9;" class="q-px-sm"
+                @click.stop="shareList(list)" />
+              <q-space />
+              <q-btn unelevated dense no-caps size="sm" icon="delete_outline"
+                style="border-radius: 8px; height: 30px; background: #fff1f2; color: #ef4444;" class="q-px-sm"
+                @click.stop="confirmDeleteList(list)" />
             </div>
 
-            <!-- Items -->
-            <q-list>
-              <q-slide-item v-for="item in list.items" :key="item.id"
-                @left="onLeftSwipe(list, item, $event)"
-                @right="onRightSwipe(list, item, $event)"
-                left-color="primary" right-color="negative">
-                <template v-slot:left><q-icon name="edit" /></template>
-                <template v-slot:right><q-icon name="delete" /></template>
-                <q-item class="q-px-md q-py-xs">
-                  <q-item-section avatar style="min-width: 36px;">
-                    <q-checkbox :model-value="item.bought" color="dark" dense
-                      @update:model-value="marketLists.toggleBought(list.id, item.id, item.bought)" />
-                  </q-item-section>
-                  <q-item-section :class="item.bought ? 'text-strike text-grey-5' : ''">
-                    <q-item-label style="font-size: 14px;">{{ item.name }}</q-item-label>
-                    <q-item-label caption style="font-size: 11px;">{{ item.quantity }}</q-item-label>
-                  </q-item-section>
-                  <q-item-section side>
-                    <span :class="item.bought ? 'text-grey-4' : 'text-weight-medium'" style="font-size: 14px;">
-                      {{ settings.currency }}{{ settings.formatNumber(item.price || 0) }}
-                    </span>
-                  </q-item-section>
-                </q-item>
-              </q-slide-item>
-            </q-list>
+            <!-- Collapsible body -->
+            <div v-show="isExpanded(list.id)">
 
-            <!-- Empty items -->
-            <div v-if="!list.items.length" class="text-center q-py-lg" style="color: #cbd5e1;">
-              <q-icon name="playlist_add" size="32px" class="q-mb-xs" />
-              <div style="font-size: 12px;">{{ $t('marketLists.noItems') }}</div>
-            </div>
+              <!-- Progress bar -->
+              <div class="q-px-md q-pb-sm">
+                <q-linear-progress :value="list.items.length ? getCompletedCount(list) / list.items.length : 0"
+                  color="dark" rounded size="5px" track-color="grey-3" />
+              </div>
 
-            <!-- Footer: total + convert -->
-            <q-separator />
-            <div class="q-px-md q-py-sm row items-center justify-between">
-              <span style="font-size: 13px; color: #64748b; font-weight: 600;">{{ $t('marketLists.estimatedTotal') }}</span>
-              <span style="font-size: 15px; font-weight: 700; color: #111;">
-                {{ settings.currency }}{{ settings.formatNumber(marketLists.getListTotal(list.id)) }}
-              </span>
-            </div>
+              <q-separator />
 
-            <!-- Convert button -->
-            <div class="q-px-md q-pb-md">
-              <q-btn v-if="!list.convertedAt"
-                flat no-caps dense
-                :label="$t('marketLists.convertToExpense')"
-                icon="receipt_long"
-                class="full-width"
-                style="border-radius: 10px; border: 1.5px dashed #cbd5e1; color: #475569; font-size: 13px;"
-                @click="convertToExpense(list)"
-                :disable="!list.items.length" />
-              <div v-else class="row items-center justify-between q-pa-xs"
-                style="background: #f0fdf4; border-radius: 10px; border: 1px solid #bbf7d0;">
-                <div class="row items-center q-gutter-xs" style="color: #16a34a; font-size: 12px;">
-                  <q-icon name="check_circle" size="14px" />
-                  <span>{{ $t('marketLists.expenseConverted') }}</span>
+              <!-- Swipe hint -->
+              <div v-if="list.items.length" class="text-center q-py-xs" style="font-size: 11px; color: #94a3b8;">
+                <q-icon name="swipe" size="13px" class="q-mr-xs" />{{ $t('marketLists.swipeHint') }}
+              </div>
+
+              <!-- Items -->
+              <q-list>
+                <q-slide-item v-for="item in list.items" :key="item.id" @left="onLeftSwipe(list, item, $event)"
+                  @right="onRightSwipe(list, item, $event)" left-color="primary" right-color="negative">
+                  <template v-slot:left><q-icon name="edit" /></template>
+                  <template v-slot:right><q-icon name="delete" /></template>
+                  <q-item class="q-px-md q-py-xs">
+                    <q-item-section avatar style="min-width: 36px;">
+                      <q-checkbox :model-value="item.bought" color="dark" dense
+                        @update:model-value="marketLists.toggleBought(list.id, item.id, item.bought)" />
+                    </q-item-section>
+                    <q-item-section :class="item.bought ? 'text-strike text-grey-5' : ''">
+                      <q-item-label style="font-size: 14px;">{{ item.name }}</q-item-label>
+                      <q-item-label caption style="font-size: 11px;">{{ item.quantity }}</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <span :class="item.bought ? 'text-grey-4' : 'text-weight-medium'" style="font-size: 14px;">
+                        {{ settings.currency }}{{ settings.formatNumber(item.price || 0) }}
+                      </span>
+                    </q-item-section>
+                  </q-item>
+                </q-slide-item>
+              </q-list>
+
+              <!-- Empty items -->
+              <div v-if="!list.items.length" class="text-center q-py-lg" style="color: #cbd5e1;">
+                <q-icon name="playlist_add" size="32px" class="q-mb-xs" />
+                <div style="font-size: 12px;">{{ $t('marketLists.noItems') }}</div>
+              </div>
+
+              <!-- Footer: total + convert -->
+              <q-separator />
+              <div class="q-px-md q-py-sm row items-center justify-between">
+                <span style="font-size: 13px; color: #64748b; font-weight: 600;">{{ $t('marketLists.estimatedTotal')
+                  }}</span>
+                <span style="font-size: 15px; font-weight: 700; color: #111;">
+                  {{ settings.currency }}{{ settings.formatNumber(marketLists.getListTotal(list.id)) }}
+                </span>
+              </div>
+
+              <!-- Convert button -->
+              <div class="q-px-md q-pb-md">
+                <q-btn v-if="!list.convertedAt" flat no-caps dense :label="$t('marketLists.convertToExpense')"
+                  icon="receipt_long" class="full-width"
+                  style="border-radius: 10px; border: 1.5px dashed #cbd5e1; color: #475569; font-size: 13px;"
+                  @click="convertToExpense(list)" :disable="!list.items.length" />
+                <div v-else class="row items-center justify-between q-pa-xs"
+                  style="background: #f0fdf4; border-radius: 10px; border: 1px solid #bbf7d0;">
+                  <div class="row items-center q-gutter-xs" style="color: #16a34a; font-size: 12px;">
+                    <q-icon name="check_circle" size="14px" />
+                    <span>{{ $t('marketLists.expenseConverted') }}</span>
+                  </div>
+                  <q-btn flat dense no-caps size="xs" :label="$t('marketLists.convertAgain')" icon="refresh"
+                    style="color: #64748b;" @click="convertToExpense(list)" :disable="!list.items.length" />
                 </div>
-                <q-btn flat dense no-caps size="xs" :label="$t('marketLists.convertAgain')" icon="refresh"
-                  style="color: #64748b;" @click="convertToExpense(list)" :disable="!list.items.length" />
+              </div>
+
+            </div><!-- end collapsible body -->
+
+            <!-- Collapsed summary -->
+            <div v-show="!isExpanded(list.id)" class="row items-center justify-between q-px-md q-pb-sm"
+              style="font-size: 12px; color: #94a3b8;">
+              <div class="row items-center q-gutter-xs">
+                <q-icon name="receipt_long" size="13px" />
+                <span>{{ settings.currency }}{{ settings.formatNumber(marketLists.getListTotal(list.id)) }}</span>
+              </div>
+              <div class="row items-center q-gutter-xs">
+                <q-icon :name="list.convertedAt ? 'check_circle' : 'radio_button_unchecked'" size="13px"
+                  :color="list.convertedAt ? 'positive' : 'grey-4'" />
+                <span>{{ list.convertedAt ? $t('marketLists.expenseConverted') : $t('marketLists.convertToExpense')
+                  }}</span>
               </div>
             </div>
 
-          </div><!-- end collapsible body -->
-
-          <!-- Collapsed summary -->
-          <div v-show="!isExpanded(list.id)" class="row items-center justify-between q-px-md q-pb-sm" style="font-size: 12px; color: #94a3b8;">
-            <div class="row items-center q-gutter-xs">
-              <q-icon name="receipt_long" size="13px" />
-              <span>{{ settings.currency }}{{ settings.formatNumber(marketLists.getListTotal(list.id)) }}</span>
-            </div>
-            <div class="row items-center q-gutter-xs">
-              <q-icon :name="list.convertedAt ? 'check_circle' : 'radio_button_unchecked'" size="13px" :color="list.convertedAt ? 'positive' : 'grey-4'" />
-              <span>{{ list.convertedAt ? $t('marketLists.expenseConverted') : $t('marketLists.convertToExpense') }}</span>
-            </div>
-          </div>
-
-        </q-card>
+          </q-card>
         </div>
       </div>
 
@@ -240,15 +252,16 @@
     <q-dialog v-model="showConvertDialog" persistent>
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; padding: 0 16px 24px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.convertToExpenseTitle') }}</div>
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.convertToExpenseTitle')
+            }}
+          </div>
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="submitConvertExpense">
             <!-- Amount -->
             <q-input v-model.number="convertForm.amount" :label="$t('common.amount')" type="number" outlined
-              color="dark" :prefix="settings.currency"
-              :rules="[val => val > 0 || $t('common.validAmount')]"
+              color="dark" :prefix="settings.currency" :rules="[val => val > 0 || $t('common.validAmount')]"
               input-class="text-h5 text-weight-bold" style="margin-bottom: 10px;" />
 
             <!-- Category & Account -->
@@ -272,8 +285,8 @@
                 </q-select>
               </div>
               <div class="col-6">
-                <q-select v-model="convertForm.accountId" :options="accountOptions"
-                  :label="$t('common.account')" outlined color="dark" emit-value map-options
+                <q-select v-model="convertForm.accountId" :options="accountOptions" :label="$t('common.account')"
+                  outlined color="dark" emit-value map-options
                   :rules="[val => !!val || $t('common.accountRequired')]" />
               </div>
             </div>
@@ -311,8 +324,8 @@
               type="textarea" rows="2" style="margin-bottom: 10px;" />
 
             <!-- Submit -->
-            <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
-              size="lg" icon="check" :label="$t('addExpense.saveExpense')" :loading="saving" />
+            <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated size="lg"
+              icon="check" :label="$t('addExpense.saveExpense')" :loading="saving" />
           </q-form>
         </q-card-section>
       </q-card>
@@ -326,7 +339,8 @@
             <q-avatar color="negative" text-color="white" icon="delete_outline" size="36px" />
             <div class="text-h6 text-weight-bold" style="color: #222;">{{ $t('marketLists.deleteModalTitle') }}</div>
           </div>
-          <q-btn icon="close" flat round dense @click="deleteListModalOpen = false" style="background: #f1f5f9; color: #64748b;" />
+          <q-btn icon="close" flat round dense @click="deleteListModalOpen = false"
+            style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
 
         <q-card-section class="q-pt-sm">
@@ -335,7 +349,8 @@
             <q-icon name="shopping_cart" color="dark" size="22px" />
             <div class="text-weight-bold">{{ deleteListTarget?.name }}</div>
             <q-space />
-            <div class="text-caption text-grey">{{ deleteListTarget?.items?.length || 0 }} {{ $t('marketLists.items') }}</div>
+            <div class="text-caption text-grey">{{ deleteListTarget?.items?.length || 0 }} {{ $t('marketLists.items') }}
+            </div>
           </div>
 
           <!-- Linked transactions section -->
@@ -343,14 +358,16 @@
             {{ $t('marketLists.linkedTransactions') }}
           </div>
           <div v-if="deleteLinkedTransactions.length" class="q-mb-md" style="max-height: 220px; overflow-y: auto;">
-            <div v-for="tx in deleteLinkedTransactions" :key="tx.id"
-              class="row items-center q-pa-sm q-mb-xs" style="background: #fff5f5; border-radius: 10px; border: 1px solid #fecaca;">
+            <div v-for="tx in deleteLinkedTransactions" :key="tx.id" class="row items-center q-pa-sm q-mb-xs"
+              style="background: #fff5f5; border-radius: 10px; border: 1px solid #fecaca;">
               <q-avatar :style="{ background: getCategoryColor(tx.category) + '20' }" size="32px" class="q-mr-sm">
-                <q-icon :name="getCategoryIcon(tx.category)" :style="{ color: getCategoryColor(tx.category) }" size="16px" />
+                <q-icon :name="getCategoryIcon(tx.category)" :style="{ color: getCategoryColor(tx.category) }"
+                  size="16px" />
               </q-avatar>
               <div class="col">
                 <div class="text-weight-medium" style="font-size: 13px;">{{ tx.category }}</div>
-                <div class="text-caption text-grey">{{ settings.formatDate(tx.date) }} &middot; {{ getAccountName(tx.accountId) }}</div>
+                <div class="text-caption text-grey">{{ settings.formatDate(tx.date) }} &middot; {{
+                  getAccountName(tx.accountId) }}</div>
               </div>
               <div class="amount-expense text-weight-bold" style="font-size: 13px;">
                 -{{ settings.currency }}{{ settings.formatNumber(tx.amount) }}
@@ -364,43 +381,19 @@
 
           <!-- Action Buttons -->
           <div class="column q-gutter-sm">
-            <q-btn
-              v-if="deleteLinkedTransactions.length"
-              :label="$t('marketLists.deleteListWithTxRefund')"
-              icon="savings"
-              color="negative"
-              unelevated
-              class="full-width"
-              :loading="saving"
-              @click="doDeleteWithTransactions(true)"
-            />
-            <q-btn
-              v-if="deleteLinkedTransactions.length"
-              :label="$t('marketLists.deleteListWithTx')"
-              icon="delete_forever"
-              outline
-              color="negative"
-              class="full-width"
-              :loading="saving"
-              @click="doDeleteWithTransactions(false)"
-            />
-            <q-btn
-              :label="$t('marketLists.deleteListOnly')"
+            <q-btn v-if="deleteLinkedTransactions.length" :label="$t('marketLists.deleteListWithTxRefund')"
+              icon="savings" color="negative" unelevated class="full-width" :loading="saving"
+              @click="doDeleteWithTransactions(true)" />
+            <q-btn v-if="deleteLinkedTransactions.length" :label="$t('marketLists.deleteListWithTx')"
+              icon="delete_forever" outline color="negative" class="full-width" :loading="saving"
+              @click="doDeleteWithTransactions(false)" />
+            <q-btn :label="$t('marketLists.deleteListOnly')"
               :icon="deleteLinkedTransactions.length ? 'playlist_remove' : 'delete_forever'"
-              :outline="!!deleteLinkedTransactions.length"
-              :unelevated="!deleteLinkedTransactions.length"
-              :color="deleteLinkedTransactions.length ? 'grey-7' : 'negative'"
-              class="full-width"
-              :loading="saving"
-              @click="doDeleteListOnly"
-            />
-            <q-btn
-              :label="$t('common.cancel')"
-              flat
-              color="grey-7"
-              class="full-width"
-              @click="deleteListModalOpen = false"
-            />
+              :outline="!!deleteLinkedTransactions.length" :unelevated="!deleteLinkedTransactions.length"
+              :color="deleteLinkedTransactions.length ? 'grey-7' : 'negative'" class="full-width" :loading="saving"
+              @click="doDeleteListOnly" />
+            <q-btn :label="$t('common.cancel')" flat color="grey-7" class="full-width"
+              @click="deleteListModalOpen = false" />
           </div>
         </q-card-section>
       </q-card>

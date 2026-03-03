@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-        Android 15 (API 35) থেকে edge-to-edge জোর করে চালু হয়।
-        এই flag দিয়ে opt-out করা হচ্ছে যাতে
-        status bar WebView-এর উয়রে overlay না করে।
+        Android 15 (API 35) enforces edge-to-edge by default.
+        Opt out so the status bar does not overlay the WebView.
     -->
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="windowActionBar">false</item>

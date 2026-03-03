@@ -13,7 +13,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
-        <!-- ক্যামেরা নচ/কাটআউট এলাকায় কন্টেন্ট কখনো ঢুকবে না -->
+        <!-- Prevent content from rendering inside the camera notch / cutout area -->
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
 

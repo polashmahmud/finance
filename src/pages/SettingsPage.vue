@@ -91,7 +91,7 @@
               <q-item-section>
                 <q-item-label>{{ $t('settings.font') }}</q-item-label>
                 <q-item-label caption :style="{ fontFamily: settings.fontFamily }">{{ settings.fontFamily
-                }}</q-item-label>
+                  }}</q-item-label>
               </q-item-section>
               <q-item-section side>
                 <q-select v-model="selectedFont" :options="fontOptions" dense borderless emit-value map-options
@@ -100,7 +100,7 @@
                     <q-item v-bind="scope.itemProps">
                       <q-item-section>
                         <q-item-label :style="{ fontFamily: scope.opt.value + ', sans-serif' }">{{ scope.opt.label
-                        }}</q-item-label>
+                          }}</q-item-label>
                       </q-item-section>
                     </q-item>
                   </template>
@@ -141,7 +141,7 @@
               <q-item-section>
                 <q-item-label>{{ $t('settings.appLockPin') }}</q-item-label>
                 <q-item-label caption>{{ settings.appLock ? $t('settings.active') : $t('settings.inactive')
-                }}</q-item-label>
+                  }}</q-item-label>
               </q-item-section>
               <q-item-section side>
                 <q-toggle :model-value="settings.appLock" color="dark" @update:model-value="onToggleAppLock" />
@@ -429,13 +429,8 @@
 
         <q-card-actions align="right" class="q-px-md q-pb-md">
           <q-btn flat :label="$t('common.cancel')" v-close-popup :disable="resettingDb" />
-          <q-btn
-            unelevated
-            color="negative"
-            :label="resettingDb ? $t('settings.resetting') : $t('common.yes')"
-            :loading="resettingDb"
-            @click="onResetDatabase"
-          />
+          <q-btn unelevated color="negative" :label="resettingDb ? $t('settings.resetting') : $t('common.yes')"
+            :loading="resettingDb" @click="onResetDatabase" />
         </q-card-actions>
       </q-card>
     </q-dialog>
