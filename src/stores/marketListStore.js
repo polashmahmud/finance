@@ -51,6 +51,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
               name: val.name,
               date: val.date,
               createdAt: val.createdAt || 0,
+              convertedAt: val.convertedAt || null,
               items,
             }
           })

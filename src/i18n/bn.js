@@ -184,6 +184,8 @@ export default {
     estimatedTotal: 'আনুমানিক মোট',
     emptyStateMessage: 'এই লিস্টে এখনো কোনো আইটেম নেই',
     convertToExpense: 'খরচে রূপান্তর করুন',
+    expenseConverted: 'খরচে রূপান্তরিত হয়েছে',
+    convertAgain: 'আবার রূপান্তর করুন',
     convertToExpenseTitle: 'খরচে রূপান্তর করুন',
     convertToExpenseConfirm:
       'আপনি কি নিশ্চিত যে আপনি {amount} এর জন্য একটি খরচের লেনদেন তৈরি করতে চান? এটি আপনার ডিফল্ট অ্যাকাউন্টে যোগ করা হবে।',

@@ -98,8 +98,18 @@
             </div>
 
             <!-- Convert to Expense -->
-            <q-btn flat dense color="dark" :label="$t('marketLists.convertToExpense')" icon="receipt"
-              class="q-mt-sm full-width" @click="convertToExpense(list)" :disable="!list.items.length" />
+            <div class="q-mt-sm">
+              <q-btn v-if="!list.convertedAt" flat dense color="dark" :label="$t('marketLists.convertToExpense')" icon="receipt"
+                class="full-width" @click="convertToExpense(list)" :disable="!list.items.length" />
+              <div v-else class="row items-center justify-between">
+                <div class="row items-center q-gutter-xs text-positive">
+                  <q-icon name="check_circle" size="16px" />
+                  <span class="text-caption">{{ $t('marketLists.expenseConverted') }}</span>
+                </div>
+                <q-btn flat dense color="grey" :label="$t('marketLists.convertAgain')" icon="refresh"
+                  size="sm" @click="convertToExpense(list)" :disable="!list.items.length" />
+              </div>
+            </div>
           </q-card-section>
         </q-card>
         </div>
@@ -341,6 +351,7 @@ function convertToExpense(list) {
     })
     accounts.updateBalance(accounts.accounts[0]?.id, -total)
     $q.notify({ type: 'positive', message: `"${list.name}" ${t('marketLists.expenseCreated', { amount: settings.currency + total.toLocaleString() })}`, position: 'top' })
+    marketLists.updateList(list.id, { convertedAt: Date.now() })
   })
 }
 
