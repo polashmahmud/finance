@@ -53,7 +53,7 @@
         <q-card class="finance-card" style="border-radius: 16px; overflow: hidden;" v-if="filteredTransactions.length">
             <q-list separator>
                 <q-slide-item v-for="tx in filteredTransactions" :key="tx.id" @left="({ reset }) => onEditTx(tx, reset)"
-                    @right="({ reset }) => onDeleteTx(tx.id, reset)">
+                    @right="({ reset }) => onDeleteTx(tx, reset)">
                     <template v-slot:left>
                         <div class="row items-center">
                             <q-icon name="edit" color="info" />
@@ -102,6 +102,76 @@
             <q-icon name="swipe" size="16px" class="q-mr-xs" />
             {{ $t('categories.swipeHint') }}
         </div>
+
+        <!-- Delete Confirmation Dialog -->
+        <q-dialog v-model="deleteConfirmOpen" persistent>
+            <q-card style="border-radius: 28px; width: 100%; max-width: 420px; background: white;">
+                <q-card-section class="row items-center justify-between no-wrap q-pb-none">
+                    <div class="row items-center q-gutter-sm">
+                        <q-avatar color="negative" text-color="white" icon="delete" size="36px" />
+                        <div class="text-h6 text-weight-bold" style="color: #222;">{{ $t('dashboard.deleteTransactionTitle') }}</div>
+                    </div>
+                    <q-btn icon="close" flat round dense @click="cancelDeleteTx" style="background: #f1f5f9; color: #64748b;" />
+                </q-card-section>
+
+                <q-card-section class="q-pt-sm">
+                    <!-- Transaction summary -->
+                    <div class="q-pa-sm q-mb-md" style="background: #f8fafc; border-radius: 12px;">
+                        <div class="row items-center q-gutter-sm">
+                            <q-avatar :style="{ background: getCategoryColor(deleteTxData?.category) + '20' }" size="36px">
+                                <q-icon :name="getCategoryIcon(deleteTxData?.category)" :style="{ color: getCategoryColor(deleteTxData?.category) }" size="18px" />
+                            </q-avatar>
+                            <div>
+                                <div class="text-weight-medium">{{ deleteTxData?.category || $t('common.transfer') }}</div>
+                                <div class="text-caption text-grey">{{ settings.formatDate(deleteTxData?.date) }}</div>
+                            </div>
+                            <q-space />
+                            <div :class="deleteTxData?.type === 'income' ? 'amount-income' : deleteTxData?.type === 'expense' ? 'amount-expense' : 'text-blue'" class="text-weight-bold">
+                                {{ deleteTxData?.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ settings.formatNumber(deleteTxData?.amount) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account balance question -->
+                    <div v-if="deleteTxData?.accountId && (deleteTxData.type === 'expense' || deleteTxData.type === 'income')" class="text-body2 q-mb-md text-grey-8">
+                        <template v-if="deleteTxData.type === 'expense'">
+                            {{ $t('dashboard.deleteExpenseConfirm', { amount: settings.currency + settings.formatNumber(deleteTxData.amount), account: getAccountName(deleteTxData.accountId) }) }}
+                        </template>
+                        <template v-else-if="deleteTxData.type === 'income'">
+                            {{ $t('dashboard.deleteIncomeConfirm', { amount: settings.currency + settings.formatNumber(deleteTxData.amount), account: getAccountName(deleteTxData.accountId) }) }}
+                        </template>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="column q-gutter-sm">
+                        <q-btn
+                            v-if="deleteTxData?.accountId && (deleteTxData.type === 'expense' || deleteTxData.type === 'income')"
+                            :label="deleteTxData.type === 'expense' ? $t('dashboard.deleteWithRefund') : $t('dashboard.deleteWithDeduct')"
+                            :icon="deleteTxData.type === 'expense' ? 'savings' : 'money_off'"
+                            color="negative"
+                            unelevated
+                            class="full-width"
+                            @click="confirmDeleteWithBalance"
+                        />
+                        <q-btn
+                            :label="$t('dashboard.deleteOnly')"
+                            icon="delete_forever"
+                            outline
+                            color="negative"
+                            class="full-width"
+                            @click="confirmDeleteOnly"
+                        />
+                        <q-btn
+                            :label="$t('common.cancel')"
+                            flat
+                            color="grey-7"
+                            class="full-width"
+                            @click="cancelDeleteTx"
+                        />
+                    </div>
+                </q-card-section>
+            </q-card>
+        </q-dialog>
 
         <!-- Edit Dialog -->
         <q-dialog v-model="editDialogOpen">
@@ -224,6 +294,11 @@ const selectedType = ref('all')
 const editDialogOpen = ref(false)
 const monthPickerOpen = ref(false)
 const saving = ref(false)
+
+// Delete Confirmation
+const deleteConfirmOpen = ref(false)
+const deleteTxData = ref(null)
+let deleteTxResetFn = null
 
 // Picker month value in YYYY/MM format
 const pickerMonth = ref(new Date().toISOString().slice(0, 7).replace('-', '/'))
@@ -495,23 +570,50 @@ async function saveEdit() {
     saving.value = false
 }
 
-function onDeleteTx(id, reset) {
-    $q.dialog({
-        title: t('common.delete'),
-        message: t('allTransactions.deleteConfirm'),
-        ok: { label: t('common.delete'), color: 'negative', flat: true },
-        cancel: { label: t('common.cancel'), flat: true },
-    })
-        .onOk(async () => {
-            // Item will be removed from the list; no need to reset (can error if DOM is gone)
-            await transactions.deleteTransaction(id)
-        })
-        .onCancel(() => {
-            reset()
-        })
-        .onDismiss(() => {
-            reset()
-        })
+function getAccountName(accountId) {
+    return accounts.accounts.find((a) => a.id === accountId)?.name || accountId
+}
+
+function onDeleteTx(tx, reset) {
+    deleteTxData.value = tx
+    deleteTxResetFn = reset
+    deleteConfirmOpen.value = true
+}
+
+function cancelDeleteTx() {
+    deleteConfirmOpen.value = false
+    if (deleteTxResetFn) deleteTxResetFn()
+    deleteTxResetFn = null
+    deleteTxData.value = null
+}
+
+async function confirmDeleteWithBalance() {
+    if (!deleteTxData.value) return
+    const tx = deleteTxData.value
+    deleteConfirmOpen.value = false
+    if (deleteTxResetFn) deleteTxResetFn()
+    deleteTxResetFn = null
+    await transactions.deleteTransaction(tx.id)
+    if (tx.accountId) {
+        if (tx.type === 'expense') {
+            await accounts.updateBalance(tx.accountId, tx.amount)
+        } else if (tx.type === 'income') {
+            await accounts.updateBalance(tx.accountId, -tx.amount)
+        }
+    }
+    $q.notify({ type: 'positive', message: t('dashboard.transactionDeleted'), position: 'top' })
+    deleteTxData.value = null
+}
+
+async function confirmDeleteOnly() {
+    if (!deleteTxData.value) return
+    const tx = deleteTxData.value
+    deleteConfirmOpen.value = false
+    if (deleteTxResetFn) deleteTxResetFn()
+    deleteTxResetFn = null
+    await transactions.deleteTransaction(tx.id)
+    $q.notify({ type: 'positive', message: t('dashboard.transactionDeleted'), position: 'top' })
+    deleteTxData.value = null
 }
 
 onMounted(() => {
