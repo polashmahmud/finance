@@ -63,6 +63,8 @@ export default {
   // ========== Index / Dashboard ==========
   dashboard: {
     myFinance: 'My Finance',
+    hello: 'Hello',
+    user: 'User',
     totalBalance: 'Total Balance',
     accounts: 'Accounts',
     cash: 'Cash',

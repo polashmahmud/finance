@@ -62,6 +62,8 @@ export default {
   // ========== Index / Dashboard ==========
   dashboard: {
     myFinance: 'আমার ফাইন্যান্স',
+    hello: 'হ্যালো',
+    user: 'ব্যবহারকারী',
     totalBalance: 'মোট ব্যালেন্স',
     accounts: 'অ্যাকাউন্ট',
     cash: 'নগদ',
