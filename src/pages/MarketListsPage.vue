@@ -20,26 +20,28 @@
         <div v-for="list in marketLists.lists" :key="list.id" class="col-12 col-md-6">
         <q-card class="finance-card full-height">
           <q-card-section>
-            <div class="row items-center justify-between q-mb-sm">
-              <div>
-                <div class="row items-center q-gutter-sm">
-                  <q-icon name="shopping_cart" color="dark" size="20px" />
-                  <div class="text-subtitle1 text-weight-bold cursor-pointer" @click="openRenameDialog(list)">
-                    {{ list.name }}
-                    <q-icon name="edit" size="xs" color="grey" class="q-ml-xs" />
-                  </div>
+            <div class="column q-mb-sm">
+              <!-- Title row -->
+              <div class="row items-center no-wrap cursor-pointer q-mb-xs" @click="toggleExpanded(list.id)">
+                <q-icon name="shopping_cart" color="dark" size="20px" class="q-mr-sm flex-shrink-0" />
+                <div class="col" style="min-width:0">
+                  <div class="text-subtitle1 text-weight-bold" style="white-space:normal; word-break:break-word;">{{ list.name }}</div>
+                  <div class="text-caption text-grey">{{ getCompletedCount(list) }}/{{ list.items.length }} {{ $t('marketLists.items') }}</div>
                 </div>
-                <div class="text-caption text-grey q-ml-lg">{{ getCompletedCount(list) }}/{{ list.items.length }} {{
-                  $t('marketLists.items') }}
-                </div>
+                <q-btn flat round dense :icon="isExpanded(list.id) ? 'expand_less' : 'expand_more'" color="grey-6" class="q-ml-xs flex-shrink-0" @click.stop="toggleExpanded(list.id)" />
               </div>
-              <div class="row q-gutter-xs">
-                <q-btn flat round dense icon="add" color="dark" @click="openAddItem(list.id)" />
-                <q-btn flat round dense icon="content_copy" color="primary" @click="openCopyDialog(list)" />
-                <q-btn flat round dense icon="share" color="info" @click="shareList(list)" />
-                <q-btn flat round dense icon="delete_outline" color="negative" @click="confirmDeleteList(list)" />
+              <!-- Buttons row -->
+              <div class="row items-center q-gutter-xs">
+                <q-btn flat round dense icon="edit" color="grey-6" @click.stop="openRenameDialog(list)" />
+                <q-btn flat round dense icon="add" color="dark" @click.stop="openAddItem(list.id)" />
+                <q-btn flat round dense icon="content_copy" color="primary" @click.stop="openCopyDialog(list)" />
+                <q-btn flat round dense icon="share" color="info" @click.stop="shareList(list)" />
+                <q-btn flat round dense icon="delete_outline" color="negative" @click.stop="confirmDeleteList(list)" />
               </div>
             </div>
+
+            <!-- Collapsible body -->
+            <div v-show="isExpanded(list.id)">
 
             <!-- Progress bar -->
             <q-linear-progress :value="list.items.length ? getCompletedCount(list) / list.items.length : 0" color="dark"
@@ -108,6 +110,19 @@
                 </div>
                 <q-btn flat dense color="grey" :label="$t('marketLists.convertAgain')" icon="refresh"
                   size="sm" @click="convertToExpense(list)" :disable="!list.items.length" />
+              </div>
+            </div>
+
+            </div><!-- end collapsible body -->
+
+            <!-- Collapsed summary (only when folded) -->
+            <div v-show="!isExpanded(list.id)" class="row items-center justify-between q-mt-xs">
+              <div class="row items-center q-gutter-xs text-grey-6" style="font-size:12px;">
+                <q-icon name="shopping_bag" size="14px" />
+                <span>{{ settings.currency }}{{ settings.formatNumber(marketLists.getListTotal(list.id)) }}</span>
+                <span>&middot;</span>
+                <q-icon :name="list.convertedAt ? 'check_circle' : 'radio_button_unchecked'" size="14px" :color="list.convertedAt ? 'positive' : 'grey-5'" />
+                <span>{{ list.convertedAt ? $t('marketLists.expenseConverted') : $t('marketLists.convertToExpense') }}</span>
               </div>
             </div>
           </q-card-section>
@@ -449,6 +464,16 @@ const convertForm = reactive({ amount: 0, category: '', accountId: null, date: '
 // Delete list modal
 const deleteListModalOpen = ref(false)
 const deleteListTarget = ref(null)
+
+// Fold / expand per list
+const collapsedLists = ref(new Set())
+function isExpanded(listId) { return !collapsedLists.value.has(listId) }
+function toggleExpanded(listId) {
+  const s = new Set(collapsedLists.value)
+  if (s.has(listId)) s.delete(listId)
+  else s.add(listId)
+  collapsedLists.value = s
+}
 
 const deleteLinkedTransactions = computed(() => {
   if (!deleteListTarget.value) return []
