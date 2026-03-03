@@ -1,21 +1,23 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="page-container">
     <!-- Header -->
-    <div class="row items-center justify-between q-mb-md">
+    <div class="row items-center justify-between page-header">
       <div>
-        <div class="text-h5 text-weight-bold">{{ $t('accounts.title') }}</div>
-        <div class="text-caption text-grey">{{ accountStore.accounts.length }}{{ $t('accounts.countSuffix') }}</div>
+        <div class="page-title">{{ $t('accounts.title') }}</div>
+        <div class="page-subtitle">{{ accountStore.accounts.length }}{{ $t('accounts.countSuffix') }}</div>
       </div>
-      <q-btn round flat icon="add_circle" color="dark" size="lg" @click="openAddDialog" />
+      <q-btn round flat dense icon="add_circle" size="md"
+        style="color: #1a1a2e; background: rgba(26,26,46,0.06); border-radius: 14px;" @click="openAddDialog" />
     </div>
 
     <!-- Total Balance Banner -->
-    <q-card class="finance-card q-mb-lg">
-      <q-card-section class="bg-primary-gradient" style="border-radius: 16px">
-        <div class="text-center">
-          <div class="text-body2" style="opacity: 0.9">{{ $t('accounts.totalAssets') }}</div>
-          <div class="stat-value text-white">{{ settings.currency }}{{ settings.formatNumber(accountStore.totalBalance)
+    <q-card class="hero-banner q-mb-lg">
+      <q-card-section class="hero-banner-gradient">
+        <div class="text-center" style="position: relative; z-index: 1;">
+          <div class="text-body2" style="color: rgba(255,255,255,0.6); font-weight: 500;">{{ $t('accounts.totalAssets')
             }}</div>
+          <div class="stat-value text-white" style="font-size: 2rem; letter-spacing: -0.03em;">{{ settings.currency }}{{
+            settings.formatNumber(accountStore.totalBalance) }}</div>
         </div>
       </q-card-section>
     </q-card>
@@ -29,56 +31,58 @@
       <!-- Account Cards -->
       <div class="row q-col-gutter-sm">
         <div v-for="account in accountStore.accounts" :key="account.id" class="col-12 col-md-6">
-        <q-slide-item @left="(obj) => onSwipe(obj, 'edit', account)" @right="(obj) => onSwipe(obj, 'delete', account)"
-          class="finance-card">
-          <template v-slot:left>
-            <q-icon name="edit" color="dark" />
-          </template>
-          <template v-slot:right>
-            <q-icon name="delete" color="negative" />
-          </template>
+          <q-slide-item @left="(obj) => onSwipe(obj, 'edit', account)" @right="(obj) => onSwipe(obj, 'delete', account)"
+            class="finance-card">
+            <template v-slot:left>
+              <q-icon name="edit" color="dark" />
+            </template>
+            <template v-slot:right>
+              <q-icon name="delete" color="negative" />
+            </template>
 
-          <q-card class="finance-card">
-            <q-item class="touch-target">
-              <q-item-section avatar>
-                <q-avatar :style="{ background: (account.color || '#111') + '18' }" size="48px">
-                  <q-icon :name="account.icon || 'account_balance_wallet'" :style="{ color: account.color || '#111' }"
-                    size="24px" />
-                </q-avatar>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label class="text-subtitle1 text-weight-bold">{{ account.name }}</q-item-label>
-                <q-item-label caption>{{ getTypeLabel(account.type) }}</q-item-label>
+            <q-card class="finance-card">
+              <q-item class="touch-target">
+                <q-item-section avatar>
+                  <q-avatar :style="{ background: (account.color || '#111') + '18' }" size="48px">
+                    <q-icon :name="account.icon || 'account_balance_wallet'" :style="{ color: account.color || '#111' }"
+                      size="24px" />
+                  </q-avatar>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label class="text-subtitle1 text-weight-bold">{{ account.name }}</q-item-label>
+                  <q-item-label caption>{{ getTypeLabel(account.type) }}</q-item-label>
 
-                <!-- Last Transaction Info -->
-                <div v-if="getLastTx(account.id)" class="row items-center q-mt-xs q-gutter-x-xs"
-                  style="font-size: 0.75rem">
-                  <q-icon
-                    :name="getLastTx(account.id).type === 'income' ? 'arrow_downward' : (getLastTx(account.id).type === 'expense' ? 'arrow_upward' : 'sync_alt')"
-                    :color="getLastTx(account.id).type === 'income' ? 'positive' : (getLastTx(account.id).type === 'expense' ? 'negative' : 'blue')"
-                    size="12px" />
-                  <span
-                    :class="getLastTx(account.id).type === 'income' ? 'text-positive' : (getLastTx(account.id).type === 'expense' ? 'text-negative' : 'text-blue')">
-                    {{ settings.currency }}{{ settings.formatNumber(getLastTx(account.id).amount) }}
-                  </span>
-                  <span class="text-grey-6 text-caption">- {{ settings.formatDate(getLastTx(account.id).date) }}</span>
-                </div>
-                <div v-else class="text-grey-6 text-caption q-mt-xs" style="font-size: 0.7rem">{{
-                  $t('accounts.noTransactions') }}
-                </div>
-              </q-item-section>
-              <q-item-section side top>
-                <q-item-label class="text-subtitle1 text-weight-bold q-mt-sm">{{ settings.currency }}{{
-                  settings.formatNumber(account.balance) }}</q-item-label>
-                <!-- Desktop action buttons -->
-                <div class="row q-gutter-xs q-mt-xs gt-sm">
-                  <q-btn flat round dense icon="edit" size="sm" color="dark" @click.stop="openEditDialog(account)" />
-                  <q-btn flat round dense icon="delete_outline" size="sm" color="negative" @click.stop="confirmDelete(account)" />
-                </div>
-              </q-item-section>
-            </q-item>
-          </q-card>
-        </q-slide-item>
+                  <!-- Last Transaction Info -->
+                  <div v-if="getLastTx(account.id)" class="row items-center q-mt-xs q-gutter-x-xs"
+                    style="font-size: 0.75rem">
+                    <q-icon
+                      :name="getLastTx(account.id).type === 'income' ? 'arrow_downward' : (getLastTx(account.id).type === 'expense' ? 'arrow_upward' : 'sync_alt')"
+                      :color="getLastTx(account.id).type === 'income' ? 'positive' : (getLastTx(account.id).type === 'expense' ? 'negative' : 'blue')"
+                      size="12px" />
+                    <span
+                      :class="getLastTx(account.id).type === 'income' ? 'text-positive' : (getLastTx(account.id).type === 'expense' ? 'text-negative' : 'text-blue')">
+                      {{ settings.currency }}{{ settings.formatNumber(getLastTx(account.id).amount) }}
+                    </span>
+                    <span class="text-grey-6 text-caption">- {{ settings.formatDate(getLastTx(account.id).date)
+                      }}</span>
+                  </div>
+                  <div v-else class="text-grey-6 text-caption q-mt-xs" style="font-size: 0.7rem">{{
+                    $t('accounts.noTransactions') }}
+                  </div>
+                </q-item-section>
+                <q-item-section side top>
+                  <q-item-label class="text-subtitle1 text-weight-bold q-mt-sm">{{ settings.currency }}{{
+                    settings.formatNumber(account.balance) }}</q-item-label>
+                  <!-- Desktop action buttons -->
+                  <div class="row q-gutter-xs q-mt-xs gt-sm">
+                    <q-btn flat round dense icon="edit" size="sm" color="dark" @click.stop="openEditDialog(account)" />
+                    <q-btn flat round dense icon="delete_outline" size="sm" color="negative"
+                      @click.stop="confirmDelete(account)" />
+                  </div>
+                </q-item-section>
+              </q-item>
+            </q-card>
+          </q-slide-item>
         </div>
       </div>
 

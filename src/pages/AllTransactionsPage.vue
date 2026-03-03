@@ -1,15 +1,19 @@
 <template>
-    <q-page class="q-pa-md">
+    <q-page class="page-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title">{{ $t('allTransactions.title') }}</div>
+            <div class="page-subtitle">{{ $t('allTransactions.subtitle') || '' }}</div>
+        </div>
+
         <!-- Month Filter -->
-        <div class="row items-center justify-center q-mb-md">
-            <q-btn flat round dense icon="chevron_left" color="dark" @click="goToPrevMonth" :disable="!canGoPrev" />
-            <div class="cursor-pointer q-mx-sm text-center" style="min-width: 180px" @click="monthPickerOpen = true">
-                <div class="text-subtitle1 text-weight-bold row items-center justify-center q-gutter-xs">
-                    <span>{{ currentMonthLabel }}</span>
-                    <q-icon name="calendar_month" size="20px" color="dark" />
-                </div>
+        <div class="month-filter">
+            <q-btn flat round dense icon="chevron_left" size="sm" style="color: #1a1a2e" @click="goToPrevMonth" :disable="!canGoPrev" />
+            <div class="month-label" @click="monthPickerOpen = true">
+                <span>{{ currentMonthLabel }}</span>
+                <q-icon name="calendar_month" size="18px" />
             </div>
-            <q-btn flat round dense icon="chevron_right" color="dark" @click="goToNextMonth" :disable="!canGoNext" />
+            <q-btn flat round dense icon="chevron_right" size="sm" style="color: #1a1a2e" @click="goToNextMonth" :disable="!canGoNext" />
         </div>
 
         <!-- Month Picker Dialog -->
@@ -32,21 +36,23 @@
         </q-dialog>
 
         <!-- Type Filter (Tabs) -->
-        <q-card class="finance-card q-mb-md">
+        <q-card class="finance-card tab-card q-mb-md">
             <q-tabs v-model="selectedType" dense active-color="dark" indicator-color="dark" class="text-grey-6"
-                align="justify">
+                align="justify" no-caps>
                 <q-tab v-for="f in typeFilters" :key="f.value" :name="f.value" :label="f.label" />
             </q-tabs>
         </q-card>
 
         <!-- Summary -->
         <div class="row q-gutter-sm q-mb-md justify-center" v-if="filteredTransactions.length">
-            <q-chip color="positive" text-color="white" icon="trending_up" class="q-ma-none shadow-1">
+            <div class="summary-chip summary-chip-income">
+                <q-icon name="trending_up" size="16px" />
                 {{ $t('common.income') }}: {{ settings.currency }}{{ settings.formatNumber(filteredSummary.income) }}
-            </q-chip>
-            <q-chip color="negative" text-color="white" icon="trending_down" class="q-ma-none shadow-1">
+            </div>
+            <div class="summary-chip summary-chip-expense">
+                <q-icon name="trending_down" size="16px" />
                 {{ $t('common.expense') }}: {{ settings.currency }}{{ settings.formatNumber(filteredSummary.expense) }}
-            </q-chip>
+            </div>
         </div>
 
         <!-- Transaction List -->
@@ -92,9 +98,10 @@
         </q-card>
 
         <!-- Empty State -->
-        <div v-else class="text-center text-grey q-pa-xl">
-            <q-icon name="receipt_long" size="56px" class="q-mb-md" />
-            <div class="text-body1">{{ $t('dashboard.noTransactionsYet') }}</div>
+        <div v-else class="empty-state">
+            <q-icon name="receipt_long" size="56px" />
+            <div class="empty-state-title">{{ $t('dashboard.noTransactionsYet') }}</div>
+            <div class="empty-state-subtitle">{{ $t('allTransactions.emptyHint') || '' }}</div>
         </div>
 
         <!-- Swipe Hint -->

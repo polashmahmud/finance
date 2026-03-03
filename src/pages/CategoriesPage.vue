@@ -1,17 +1,17 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="page-container">
     <!-- Header -->
-    <div class="row items-center justify-between q-mb-md">
-      <div class="row items-center">
-        <q-btn flat round icon="arrow_back" @click="$router.back()" />
-        <div class="text-h6 text-weight-bold q-ml-sm">{{ $t('categories.title') }}</div>
+    <div class="back-header" style="justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <q-btn flat round dense icon="arrow_back" size="sm" style="color: #1a1a2e" @click="$router.back()" />
+        <span class="back-header-title">{{ $t('categories.title') }}</span>
       </div>
-      <q-btn round flat icon="add" color="dark" @click="openAddDialog" />
+      <q-btn round flat dense icon="add" size="sm" style="color: #1a1a2e; background: rgba(26,26,46,0.06); border-radius: 12px;" @click="openAddDialog" />
     </div>
 
     <!-- Tabs -->
-    <q-card class="finance-card q-mb-md">
-      <q-tabs v-model="tab" dense active-color="dark" indicator-color="dark" class="text-grey-6" align="justify">
+    <q-card class="finance-card tab-card q-mb-md">
+      <q-tabs v-model="tab" dense active-color="dark" indicator-color="dark" class="text-grey-6" align="justify" no-caps>
         <q-tab name="expense" :label="$t('common.expense')" />
         <q-tab name="income" :label="$t('common.income')" />
       </q-tabs>
@@ -27,9 +27,9 @@
       <q-tab-panels v-model="tab" animated class="bg-transparent">
         <!-- Expense Categories -->
         <q-tab-panel name="expense" class="q-pa-none">
-          <div v-if="categoryStore.expenseCategories.length === 0" class="text-center text-grey q-pa-xl">
-            <q-icon name="category" size="48px" class="q-mb-sm" />
-            <div>{{ $t('categories.noExpenseCategories') }}</div>
+          <div v-if="categoryStore.expenseCategories.length === 0" class="empty-state">
+            <q-icon name="category" size="48px" />
+            <div class="empty-state-title">{{ $t('categories.noExpenseCategories') }}</div>
           </div>
           <div class="row q-col-gutter-sm">
             <div v-for="cat in categoryStore.expenseCategories" :key="cat.id" class="col-12 col-md-6">
@@ -67,9 +67,9 @@
 
         <!-- Income Categories -->
         <q-tab-panel name="income" class="q-pa-none">
-          <div v-if="categoryStore.incomeCategories.length === 0" class="text-center text-grey q-pa-xl">
-            <q-icon name="category" size="48px" class="q-mb-sm" />
-            <div>{{ $t('categories.noIncomeCategories') }}</div>
+          <div v-if="categoryStore.incomeCategories.length === 0" class="empty-state">
+            <q-icon name="category" size="48px" />
+            <div class="empty-state-title">{{ $t('categories.noIncomeCategories') }}</div>
           </div>
           <div class="row q-col-gutter-sm">
             <div v-for="cat in categoryStore.incomeCategories" :key="cat.id" class="col-12 col-md-6">

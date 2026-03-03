@@ -1,21 +1,27 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-title">{{ $t('search.title') || $t('search.placeholder') }}</div>
+    </div>
+
     <!-- Search Bar -->
     <q-input v-model="searchQuery" :placeholder="$t('search.placeholder')" outlined dense rounded class="q-mb-md"
-      bg-color="white" clearable>
+      bg-color="white" clearable style="border-radius: 16px;">
       <template v-slot:prepend>
-        <q-icon name="search" />
+        <q-icon name="search" style="color: #8e8ea0" />
       </template>
     </q-input>
 
     <!-- Filter Chips -->
     <div class="row q-gutter-sm q-mb-md">
-      <q-chip v-for="filter in filterOptions" :key="filter.value" :outline="activeFilter !== filter.value"
-        :color="activeFilter === filter.value ? 'dark' : 'grey-4'"
-        :text-color="activeFilter === filter.value ? 'white' : 'dark'" clickable @click="activeFilter = filter.value"
-        size="sm">
+      <div v-for="filter in filterOptions" :key="filter.value"
+        class="summary-chip cursor-pointer"
+        :class="activeFilter === filter.value ? 'summary-chip-neutral' : ''"
+        :style="activeFilter !== filter.value ? 'background: rgba(26,26,46,0.04); color: #8e8ea0' : ''"
+        @click="activeFilter = filter.value">
         {{ filter.label }}
-      </q-chip>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -50,10 +56,10 @@
       </q-list>
 
       <!-- No results -->
-      <div v-else class="text-center text-grey q-pa-xl">
-        <q-icon name="search_off" size="60px" class="q-mb-md" />
-        <div class="text-h6">{{ $t('search.noResults') }}</div>
-        <div class="text-caption">{{ searchQuery ? $t('search.tryOther') : $t('search.searchHint') }}</div>
+      <div v-else class="empty-state">
+        <q-icon name="search_off" size="60px" />
+        <div class="empty-state-title">{{ $t('search.noResults') }}</div>
+        <div class="empty-state-subtitle">{{ searchQuery ? $t('search.tryOther') : $t('search.searchHint') }}</div>
       </div>
     </template>
   </q-page>

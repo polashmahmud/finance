@@ -1,7 +1,7 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="q-mb-md">
-      <div class="text-h5 text-weight-bold">{{ $t('settings.title') }}</div>
+  <q-page class="page-container">
+    <div class="page-header">
+      <div class="page-title">{{ $t('settings.title') }}</div>
     </div>
 
     <!-- Responsive 2-column layout on desktop -->
@@ -987,10 +987,11 @@ async function changePassword() {
 }
 
 .section-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #666;
-  margin-bottom: 8px;
-  margin-left: 4px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.75);
+  letter-spacing: -0.01em;
+  padding: 8px 4px 6px;
+  margin-bottom: 4px;
 }
 </style>

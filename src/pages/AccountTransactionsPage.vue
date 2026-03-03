@@ -1,20 +1,19 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="page-container">
     <!-- Account Header -->
     <div class="q-mb-md" v-if="account">
-      <q-card class="finance-card">
-        <q-card-section class="row items-center q-gutter-md">
-          <q-avatar :style="{ background: (account.color || '#111') + '18' }" size="48px">
-            <q-icon :name="account.icon || 'account_balance_wallet'" :style="{ color: account.color || '#111' }"
-              size="24px" />
+      <q-card class="hero-banner">
+        <q-card-section class="hero-banner-gradient row items-center q-gutter-md">
+          <q-avatar style="background: rgba(255,255,255,0.12)" size="48px">
+            <q-icon :name="account.icon || 'account_balance_wallet'" color="white" size="24px" />
           </q-avatar>
           <div class="col">
-            <div class="text-body1 text-weight-bold">{{ account.name }}</div>
-            <div class="text-caption text-grey">{{ accountTypeLabel }}</div>
+            <div class="text-body1 text-weight-bold text-white">{{ account.name }}</div>
+            <div class="text-caption" style="color: rgba(255,255,255,0.6)">{{ accountTypeLabel }}</div>
           </div>
           <div class="text-right">
-            <div class="text-caption text-grey">{{ $t('common.balance') }}</div>
-            <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{
+            <div class="text-caption" style="color: rgba(255,255,255,0.5)">{{ $t('common.balance') }}</div>
+            <div class="text-subtitle1 text-weight-bold text-white">{{ settings.currency }}{{
               settings.formatNumber(account.balance) }}</div>
           </div>
         </q-card-section>
@@ -22,15 +21,13 @@
     </div>
 
     <!-- Month Filter -->
-    <div class="row items-center justify-center q-mb-md">
-      <q-btn flat round dense icon="chevron_left" color="dark" @click="goToPrevMonth" :disable="!canGoPrev" />
-      <div class="cursor-pointer q-mx-sm text-center" style="min-width: 180px" @click="monthPickerOpen = true">
-        <div class="text-subtitle1 text-weight-bold row items-center justify-center q-gutter-xs">
-          <span>{{ currentMonthLabel }}</span>
-          <q-icon name="calendar_month" size="20px" color="dark" />
-        </div>
+    <div class="month-filter">
+      <q-btn flat round dense icon="chevron_left" size="sm" style="color: #1a1a2e" @click="goToPrevMonth" :disable="!canGoPrev" />
+      <div class="month-label" @click="monthPickerOpen = true">
+        <span>{{ currentMonthLabel }}</span>
+        <q-icon name="calendar_month" size="18px" />
       </div>
-      <q-btn flat round dense icon="chevron_right" color="dark" @click="goToNextMonth" :disable="!canGoNext" />
+      <q-btn flat round dense icon="chevron_right" size="sm" style="color: #1a1a2e" @click="goToNextMonth" :disable="!canGoNext" />
     </div>
 
     <!-- Month Picker Dialog -->
@@ -52,21 +49,23 @@
     </q-dialog>
 
     <!-- Type Filter -->
-    <q-card class="finance-card q-mb-md">
+    <q-card class="finance-card tab-card q-mb-md">
       <q-tabs v-model="selectedType" dense class="text-grey-6" active-color="dark" indicator-color="dark"
-        align="justify">
+        align="justify" no-caps>
         <q-tab v-for="f in typeFilters" :key="f.value" :name="f.value" :label="f.label" />
       </q-tabs>
     </q-card>
 
     <!-- Summary -->
     <div class="row justify-center q-gutter-sm q-mb-md" v-if="filteredTransactions.length">
-      <q-chip color="green-1" text-color="green-9" icon="trending_up" dense>
+      <div class="summary-chip summary-chip-income">
+        <q-icon name="trending_up" size="16px" />
         {{ $t('common.income') }}: {{ settings.currency }}{{ settings.formatNumber(filteredSummary.income) }}
-      </q-chip>
-      <q-chip color="red-1" text-color="red-9" icon="trending_down" dense>
+      </div>
+      <div class="summary-chip summary-chip-expense">
+        <q-icon name="trending_down" size="16px" />
         {{ $t('common.expense') }}: {{ settings.currency }}{{ settings.formatNumber(filteredSummary.expense) }}
-      </q-chip>
+      </div>
     </div>
 
     <!-- Transaction List -->
@@ -112,9 +111,9 @@
     </q-card>
 
     <!-- Empty State -->
-    <div v-else class="text-center text-grey q-pa-xl">
-      <q-icon name="receipt_long" size="56px" class="q-mb-md" />
-      <div class="text-body1">{{ $t('dashboard.noTransactionsYet') }}</div>
+    <div v-else class="empty-state">
+      <q-icon name="receipt_long" size="56px" />
+      <div class="empty-state-title">{{ $t('dashboard.noTransactionsYet') }}</div>
     </div>
 
     <!-- Edit Dialog -->
