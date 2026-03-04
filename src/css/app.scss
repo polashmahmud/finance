@@ -85,6 +85,11 @@ body {
   font-size: 0.95rem;
 }
 
+// Enable swipe on mobile for q-slide-item
+.q-slide-item {
+  touch-action: none !important;
+}
+
 .amount-income {
   color: #388e3c;
 }
