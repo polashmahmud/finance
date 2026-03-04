@@ -4,7 +4,7 @@
   "webDir": "www",
   "appIcon": {
     "android": {
-      "backgroundColor": "#26A69A",
+      "backgroundColor": "#FFFFFF",
       "foregroundImage": "public/icons/icon-512x512.png"
     }
   },
