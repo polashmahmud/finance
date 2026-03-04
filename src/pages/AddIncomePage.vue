@@ -139,8 +139,9 @@ async function saveIncome() {
     router.back()
   } catch (err) {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  } finally {
+    saving.value = false
   }
-  saving.value = false
 }
 
 onMounted(() => {

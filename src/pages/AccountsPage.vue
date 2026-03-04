@@ -271,8 +271,9 @@ async function saveAccount() {
     showDialog.value = false
   } catch (err) {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  } finally {
+    saving.value = false
   }
-  saving.value = false
 }
 
 function confirmDelete(account) {

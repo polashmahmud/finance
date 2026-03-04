@@ -10,7 +10,8 @@
             </q-avatar>
             <div class="col">
               <div class="text-body1 text-weight-bold text-white">{{ category.name }}</div>
-              <div class="text-caption" style="color: rgba(255,255,255,0.6)">{{ category.type === 'income' ? $t('common.income') :
+              <div class="text-caption" style="color: rgba(255,255,255,0.6)">{{ category.type === 'income' ?
+                $t('common.income') :
                 $t('common.expense') }}</div>
             </div>
           </div>
@@ -19,7 +20,8 @@
             style="background: rgba(255,255,255,0.08); border-radius: 12px;" @click="openBudgetModal" v-ripple>
             <div v-if="monthlyBudget">
               <div class="row justify-between items-center q-mb-xs">
-                <span class="text-caption" style="color: rgba(255,255,255,0.6)">{{ $t('categoryTransactions.budgetUsed') }}</span>
+                <span class="text-caption" style="color: rgba(255,255,255,0.6)">{{ $t('categoryTransactions.budgetUsed')
+                  }}</span>
                 <span class="text-caption" :style="{ color: isOverBudget ? '#f87171' : '#4ade80' }">
                   {{ $t('common.expense') }}: {{ settings.currency }}{{ settings.formatNumber(totalSpent) }} / {{
                     settings.currency }}{{
@@ -51,12 +53,14 @@
 
     <!-- Month Filter -->
     <div class="month-filter">
-      <q-btn flat round dense icon="chevron_left" size="sm" style="color: #1a1a2e" @click="goToPrevMonth" :disable="!canGoPrev" />
+      <q-btn flat round dense icon="chevron_left" size="sm" style="color: #1a1a2e" @click="goToPrevMonth"
+        :disable="!canGoPrev" />
       <div class="month-label" @click="monthPickerOpen = true">
         <span>{{ currentMonthLabel }}</span>
         <q-icon name="calendar_month" size="18px" />
       </div>
-      <q-btn flat round dense icon="chevron_right" size="sm" style="color: #1a1a2e" @click="goToNextMonth" :disable="!canGoNext" />
+      <q-btn flat round dense icon="chevron_right" size="sm" style="color: #1a1a2e" @click="goToNextMonth"
+        :disable="!canGoNext" />
     </div>
 
     <!-- Month Picker Dialog -->
@@ -296,8 +300,9 @@ async function saveBudget() {
     budgetModalOpen.value = false
   } catch (err) {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  } finally {
+    saving.value = false
   }
-  saving.value = false
 }
 
 const editForm = reactive({
@@ -476,8 +481,9 @@ async function saveEdit() {
     editDialogOpen.value = false
   } catch (err) {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  } finally {
+    saving.value = false
   }
-  saving.value = false
 }
 
 function onDeleteTx(id, reset) {

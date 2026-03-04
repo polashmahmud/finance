@@ -561,8 +561,9 @@ async function saveBudget() {
     budgetModalOpen.value = false
   } catch (err) {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  } finally {
+    saving.value = false
   }
-  saving.value = false
 }
 
 function goToCategoryDetails() {
@@ -590,8 +591,9 @@ async function saveQuickEntry() {
     quickEntryModalOpen.value = false
   } catch (err) {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  } finally {
+    saving.value = false
   }
-  saving.value = false
 }
 
 function goToQuickEntryDetails() {
@@ -728,8 +730,9 @@ async function saveEdit() {
     editDialogOpen.value = false
   } catch (err) {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  } finally {
+    saving.value = false
   }
-  saving.value = false
 }
 
 const incomeCategoryOptions = computed(() =>

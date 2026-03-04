@@ -22,12 +22,14 @@
 
     <!-- Month Filter -->
     <div class="month-filter">
-      <q-btn flat round dense icon="chevron_left" size="sm" style="color: #1a1a2e" @click="goToPrevMonth" :disable="!canGoPrev" />
+      <q-btn flat round dense icon="chevron_left" size="sm" style="color: #1a1a2e" @click="goToPrevMonth"
+        :disable="!canGoPrev" />
       <div class="month-label" @click="monthPickerOpen = true">
         <span>{{ currentMonthLabel }}</span>
         <q-icon name="calendar_month" size="18px" />
       </div>
-      <q-btn flat round dense icon="chevron_right" size="sm" style="color: #1a1a2e" @click="goToNextMonth" :disable="!canGoNext" />
+      <q-btn flat round dense icon="chevron_right" size="sm" style="color: #1a1a2e" @click="goToNextMonth"
+        :disable="!canGoNext" />
     </div>
 
     <!-- Month Picker Dialog -->
@@ -432,8 +434,9 @@ async function saveEdit() {
     editDialogOpen.value = false
   } catch (err) {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  } finally {
+    saving.value = false
   }
-  saving.value = false
 }
 
 function onDeleteTx(id, reset) {
