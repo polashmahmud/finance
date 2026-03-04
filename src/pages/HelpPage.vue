@@ -1,9 +1,9 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="page-container">
     <!-- Header -->
-    <div class="q-mb-lg">
-      <div class="text-h5 text-weight-bold">{{ $t('help.title') }}</div>
-      <div class="text-caption text-grey-7">{{ $t('help.subtitle') }}</div>
+    <div class="page-header">
+      <div class="page-title">{{ $t('help.title') }}</div>
+      <div class="page-subtitle">{{ $t('help.subtitle') }}</div>
     </div>
 
     <!-- Table of Contents -->

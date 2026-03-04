@@ -1,84 +1,85 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="page-container">
     <div class="row justify-center">
-    <div class="col-12 col-sm-10 col-md-8 col-lg-7">
-    <div class="row items-center q-mb-md">
-      <q-btn flat round icon="arrow_back" @click="$router.back()" />
-      <div class="text-h6 text-weight-bold q-ml-sm">{{ $t('addIncome.title') }}</div>
-    </div>
+      <div class="col-12 col-sm-10 col-md-8 col-lg-7">
+        <div class="back-header">
+          <q-btn flat round icon="arrow_back" @click="$router.back()" color="dark" />
+          <div class="back-header-title">{{ $t('addIncome.title') }}</div>
+        </div>
 
-    <q-card class="finance-card">
-      <q-card-section>
-        <q-form @submit.prevent="saveIncome">
-          <!-- Amount -->
-          <q-input v-model.number="form.amount" :label="$t('common.amount')" type="number" outlined color="dark"
-            :prefix="settings.currency" :rules="[val => val > 0 || $t('common.validAmount')]" autofocus
-            input-class="text-h5 text-weight-bold" style="margin-bottom: 10px;" />
+        <q-card class="finance-card">
+          <q-card-section>
+            <q-form @submit.prevent="saveIncome">
+              <!-- Amount -->
+              <q-input v-model.number="form.amount" :label="$t('common.amount')" type="number" outlined color="dark"
+                :prefix="settings.currency" :rules="[val => val > 0 || $t('common.validAmount')]" autofocus
+                input-class="text-h5 text-weight-bold" style="margin-bottom: 10px;" />
 
-          <!-- Category & Account -->
-          <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
-            <div class="col-6">
-              <q-select v-model="form.category" :options="incomeCategoryOptions" :label="$t('common.category')" outlined
-                color="dark" emit-value map-options :rules="[val => !!val || $t('common.categoryRequired')]">
-                <template v-slot:option="scope">
-                  <q-item v-bind="scope.itemProps">
-                    <q-item-section avatar>
-                      <q-avatar :style="{ background: scope.opt.color + '18' }" size="32px">
-                        <q-icon :name="scope.opt.icon" :style="{ color: scope.opt.color }" size="16px" />
-                      </q-avatar>
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>{{ scope.opt.label }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </template>
-              </q-select>
-            </div>
-            <div class="col-6">
-              <q-select v-model="form.accountId" :options="accountOptions" :label="$t('common.account')" outlined
-                color="dark" emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
-            </div>
-          </div>
+              <!-- Category & Account -->
+              <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
+                <div class="col-6">
+                  <q-select v-model="form.category" :options="incomeCategoryOptions" :label="$t('common.category')"
+                    outlined color="dark" emit-value map-options
+                    :rules="[val => !!val || $t('common.categoryRequired')]">
+                    <template v-slot:option="scope">
+                      <q-item v-bind="scope.itemProps">
+                        <q-item-section avatar>
+                          <q-avatar :style="{ background: scope.opt.color + '18' }" size="32px">
+                            <q-icon :name="scope.opt.icon" :style="{ color: scope.opt.color }" size="16px" />
+                          </q-avatar>
+                        </q-item-section>
+                        <q-item-section>
+                          <q-item-label>{{ scope.opt.label }}</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                    </template>
+                  </q-select>
+                </div>
+                <div class="col-6">
+                  <q-select v-model="form.accountId" :options="accountOptions" :label="$t('common.account')" outlined
+                    color="dark" emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]" />
+                </div>
+              </div>
 
-          <!-- Date & Time -->
-          <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
-            <div class="col-6">
-              <q-input v-model="form.date" :label="$t('common.date')" outlined color="dark" readonly
-                :rules="[val => !!val || $t('common.dateRequired')]">
-                <template v-slot:append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-date v-model="form.date" mask="YYYY-MM-DD" />
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
-            <div class="col-6">
-              <q-input v-model="form.time" :label="$t('common.time')" outlined color="dark" readonly
-                :rules="[val => !!val || $t('common.timeRequired')]">
-                <template v-slot:append>
-                  <q-icon name="access_time" class="cursor-pointer">
-                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-time v-model="form.time" mask="HH:mm" />
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
-          </div>
+              <!-- Date & Time -->
+              <div class="row q-col-gutter-md" style="margin-bottom: 10px;">
+                <div class="col-6">
+                  <q-input v-model="form.date" :label="$t('common.date')" outlined color="dark" readonly
+                    :rules="[val => !!val || $t('common.dateRequired')]">
+                    <template v-slot:append>
+                      <q-icon name="event" class="cursor-pointer">
+                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                          <q-date v-model="form.date" mask="YYYY-MM-DD" />
+                        </q-popup-proxy>
+                      </q-icon>
+                    </template>
+                  </q-input>
+                </div>
+                <div class="col-6">
+                  <q-input v-model="form.time" :label="$t('common.time')" outlined color="dark" readonly
+                    :rules="[val => !!val || $t('common.timeRequired')]">
+                    <template v-slot:append>
+                      <q-icon name="access_time" class="cursor-pointer">
+                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                          <q-time v-model="form.time" mask="HH:mm" />
+                        </q-popup-proxy>
+                      </q-icon>
+                    </template>
+                  </q-input>
+                </div>
+              </div>
 
-          <!-- Notes -->
-          <q-input v-model="form.notes" :label="$t('common.noteOptional')" outlined color="dark" type="textarea"
-            rows="2" style="margin-bottom: 10px;" />
+              <!-- Notes -->
+              <q-input v-model="form.notes" :label="$t('common.noteOptional')" outlined color="dark" type="textarea"
+                rows="2" style="margin-bottom: 10px;" />
 
-          <!-- Submit -->
-          <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated size="lg"
-            icon="check" :label="$t('addIncome.saveIncome')" :loading="saving" />
-        </q-form>
-      </q-card-section>
-    </q-card>
-    </div>
+              <!-- Submit -->
+              <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
+                size="lg" icon="check" :label="$t('addIncome.saveIncome')" :loading="saving" />
+            </q-form>
+          </q-card-section>
+        </q-card>
+      </div>
     </div>
   </q-page>
 </template>

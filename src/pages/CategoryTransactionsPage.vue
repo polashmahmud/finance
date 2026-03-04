@@ -1,40 +1,40 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="page-container">
     <!-- Category Header -->
     <div class="q-mb-md" v-if="category">
-      <q-card class="finance-card">
-        <q-card-section>
+      <q-card class="hero-banner">
+        <q-card-section class="hero-banner-gradient">
           <div class="row items-center q-gutter-md q-mb-md">
-            <q-avatar :style="{ background: (category.color || '#111') + '18' }" size="48px">
-              <q-icon :name="category.icon || 'category'" :style="{ color: category.color || '#111' }" size="24px" />
+            <q-avatar :style="{ background: 'rgba(255,255,255,0.12)' }" size="48px">
+              <q-icon :name="category.icon || 'category'" color="white" size="24px" />
             </q-avatar>
             <div class="col">
-              <div class="text-body1 text-weight-bold">{{ category.name }}</div>
-              <div class="text-caption text-grey">{{ category.type === 'income' ? $t('common.income') :
+              <div class="text-body1 text-weight-bold text-white">{{ category.name }}</div>
+              <div class="text-caption" style="color: rgba(255,255,255,0.6)">{{ category.type === 'income' ? $t('common.income') :
                 $t('common.expense') }}</div>
             </div>
           </div>
           <!-- Budget Info -->
-          <div v-if="category.type === 'expense'" class="q-mt-sm cursor-pointer q-pa-sm rounded-borders"
-            :class="monthlyBudget ? '' : 'bg-grey-1'" @click="openBudgetModal" v-ripple>
+          <div v-if="category.type === 'expense'" class="q-mt-sm cursor-pointer q-pa-sm"
+            style="background: rgba(255,255,255,0.08); border-radius: 12px;" @click="openBudgetModal" v-ripple>
             <div v-if="monthlyBudget">
               <div class="row justify-between items-center q-mb-xs">
-                <span class="text-caption text-grey">{{ $t('categoryTransactions.budgetUsed') }}</span>
-                <span class="text-caption" :class="isOverBudget ? 'text-negative' : 'text-positive'">
+                <span class="text-caption" style="color: rgba(255,255,255,0.6)">{{ $t('categoryTransactions.budgetUsed') }}</span>
+                <span class="text-caption" :style="{ color: isOverBudget ? '#f87171' : '#4ade80' }">
                   {{ $t('common.expense') }}: {{ settings.currency }}{{ settings.formatNumber(totalSpent) }} / {{
                     settings.currency }}{{
                     settings.formatNumber(monthlyBudget) }}
                 </span>
               </div>
               <q-linear-progress :value="Math.min(totalSpent / monthlyBudget, 1)"
-                :color="isOverBudget ? 'negative' : 'positive'" rounded size="10px" track-color="grey-3" />
-              <div v-if="isOverBudget" class="text-caption text-negative q-mt-xs">
+                :color="isOverBudget ? 'negative' : 'positive'" rounded size="10px" track-color="grey-8" />
+              <div v-if="isOverBudget" class="text-caption q-mt-xs" style="color: #f87171">
                 {{ $t('categories.overBudget', {
                   amount: settings.currency + settings.formatNumber(totalSpent -
                     monthlyBudget)
                 }) }}
               </div>
-              <div v-else class="text-caption text-positive q-mt-xs">
+              <div v-else class="text-caption q-mt-xs" style="color: #4ade80">
                 {{ $t('categoryTransactions.remaining', {
                   amount: settings.currency +
                     settings.formatNumber(monthlyBudget - totalSpent)
@@ -42,7 +42,7 @@
               </div>
             </div>
             <div v-else class="text-center">
-              <div class="text-caption text-grey-7">{{ $t('dashboard.tapToSetBudget') }}</div>
+              <div class="text-caption" style="color: rgba(255,255,255,0.5)">{{ $t('dashboard.tapToSetBudget') }}</div>
             </div>
           </div>
         </q-card-section>
@@ -50,15 +50,13 @@
     </div>
 
     <!-- Month Filter -->
-    <div class="row items-center justify-center q-mb-md">
-      <q-btn flat round dense icon="chevron_left" color="dark" @click="goToPrevMonth" :disable="!canGoPrev" />
-      <div class="cursor-pointer q-mx-sm text-center" style="min-width: 180px" @click="monthPickerOpen = true">
-        <div class="text-subtitle1 text-weight-bold row items-center justify-center q-gutter-xs">
-          <span>{{ currentMonthLabel }}</span>
-          <q-icon name="calendar_month" size="20px" color="dark" />
-        </div>
+    <div class="month-filter">
+      <q-btn flat round dense icon="chevron_left" size="sm" style="color: #1a1a2e" @click="goToPrevMonth" :disable="!canGoPrev" />
+      <div class="month-label" @click="monthPickerOpen = true">
+        <span>{{ currentMonthLabel }}</span>
+        <q-icon name="calendar_month" size="18px" />
       </div>
-      <q-btn flat round dense icon="chevron_right" color="dark" @click="goToNextMonth" :disable="!canGoNext" />
+      <q-btn flat round dense icon="chevron_right" size="sm" style="color: #1a1a2e" @click="goToNextMonth" :disable="!canGoNext" />
     </div>
 
     <!-- Month Picker Dialog -->
@@ -81,14 +79,14 @@
 
     <!-- Summary -->
     <div class="row justify-center q-gutter-sm q-mb-md" v-if="filteredTransactions.length">
-      <q-chip :color="category?.type === 'income' ? 'green-1' : 'red-1'"
-        :text-color="category?.type === 'income' ? 'green-9' : 'red-9'"
-        :icon="category?.type === 'income' ? 'trending_up' : 'trending_down'" dense>
+      <div class="summary-chip" :class="category?.type === 'income' ? 'summary-chip-income' : 'summary-chip-expense'">
+        <q-icon :name="category?.type === 'income' ? 'trending_up' : 'trending_down'" size="16px" />
         {{ $t('categoryTransactions.totalAmount') }}: {{ settings.currency }}{{ settings.formatNumber(filteredTotal) }}
-      </q-chip>
-      <q-chip color="blue-1" text-color="blue-9" icon="receipt" dense>
+      </div>
+      <div class="summary-chip summary-chip-neutral">
+        <q-icon name="receipt" size="16px" />
         {{ filteredTransactions.length }} {{ $t('categoryTransactions.transactions') }}
-      </q-chip>
+      </div>
     </div>
 
     <!-- Transaction List -->
@@ -130,9 +128,9 @@
     </q-card>
 
     <!-- Empty State -->
-    <div v-else class="text-center text-grey q-pa-xl">
-      <q-icon name="receipt_long" size="56px" class="q-mb-md" />
-      <div class="text-body1">{{ $t('dashboard.noTransactionsYet') }}</div>
+    <div v-else class="empty-state">
+      <q-icon name="receipt_long" size="56px" />
+      <div class="empty-state-title">{{ $t('dashboard.noTransactionsYet') }}</div>
     </div>
 
     <!-- Budget Modal -->

@@ -1,54 +1,55 @@
 <template>
-  <q-page class="q-pa-md">
-    <!-- Responsive two-column layout: single col on mobile/tablet, two cols on desktop -->
+  <q-page class="dashboard-page">
     <div class="row q-col-gutter-lg">
 
-      <!-- LEFT COLUMN: Greeting + Balance Card + Recent Transactions (desktop: beside right col) -->
+      <!-- LEFT COLUMN -->
       <div class="col-12 col-md-7">
 
         <!-- Greeting -->
-        <div class="q-mb-md">
-          <div class="text-caption text-grey">{{ greeting }} 👋</div>
-          <div class="text-h5 text-weight-bold">{{ $t('dashboard.myFinance') }}</div>
+        <div class="greeting-header q-mb-md q-mt-xs">
+          <div class="col">
+            <div class="text-h5 text-weight-bold" style="color: #1a1a2e; letter-spacing: -0.02em;">
+              {{ $t('dashboard.hello') }}, {{ userName }}!
+            </div>
+            <div class="text-body2" style="color: #8e8ea0; margin-top: 2px;">{{ greeting }}</div>
+          </div>
+          <div class="greeting-icon-wrap">
+            <img :src="greetingIcon.src" :alt="greetingIcon.alt"
+              style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover;" />
+          </div>
         </div>
 
         <!-- Total Balance Card -->
-        <q-card class="finance-card q-mb-md cursor-pointer" @click="$router.push('/dashboard/accounts')">
-          <q-card-section class="bg-primary-gradient"
-            style="border-radius: 16px; overflow: hidden; position: relative;">
-            <div class="row items-center no-wrap">
-              <!-- Left Content -->
-              <div class="col-6">
-                <div class="q-mb-sm">
-                  <div class="text-body2" style="opacity: 0.9; color: rgba(255,255,255,0.8)">{{
-                    $t('dashboard.totalBalance') }}</div>
-                  <div class="stat-value text-white" style="font-size: 2rem; line-height: 1.2;">{{ settings.currency
-                  }}{{ settings.formatNumber(accounts.totalBalance) }}</div>
+        <q-card class="balance-overview-card q-mb-lg cursor-pointer" @click="$router.push('/dashboard/accounts')"
+          v-ripple>
+          <q-card-section class="balance-card-gradient">
+            <!-- Animated orbs -->
+            <div class="balance-orb balance-orb-1"></div>
+            <div class="balance-orb balance-orb-2"></div>
+            <div class="balance-orb balance-orb-3"></div>
+            <div class="balance-shimmer"></div>
+            <div class="row items-center no-wrap" style="position: relative; z-index: 1;">
+              <div class="col">
+                <div class="balance-label">{{ $t('dashboard.totalBalance') }}</div>
+                <div class="balance-amount">{{ settings.currency }}{{ settings.formatNumber(accounts.totalBalance) }}
                 </div>
-                <div class="row q-gutter-md q-mt-xs">
-                  <div class="row items-center q-gutter-xs">
-                    <q-icon name="trending_up" size="18px" style="color: #4ade80" />
-                    <div>
-                      <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">{{ $t('common.income') }}</div>
-                      <div class="text-white text-weight-bold" style="font-size: 0.85rem">{{ settings.currency }}{{
-                        settings.formatNumber(transactions.totalIncome) }}</div>
-                    </div>
+                <div class="row q-gutter-sm q-mt-sm">
+                  <div class="income-chip">
+                    <q-icon name="arrow_upward" size="14px" style="color: #4ade80;" />
+                    <span class="ie-label">{{ $t('common.income') }}</span>
+                    <span class="ie-value income-value">{{ settings.currency }}{{
+                      settings.formatNumber(transactions.totalIncome) }}</span>
                   </div>
-                  <div class="row items-center q-gutter-xs">
-                    <q-icon name="trending_down" size="18px" style="color: #f87171" />
-                    <div>
-                      <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7)">{{ $t('common.expense') }}</div>
-                      <div class="text-white text-weight-bold" style="font-size: 0.85rem">{{ settings.currency }}{{
-                        settings.formatNumber(transactions.totalExpense) }}</div>
-                    </div>
+                  <div class="expense-chip">
+                    <q-icon name="arrow_downward" size="14px" style="color: #f87171;" />
+                    <span class="ie-label">{{ $t('common.expense') }}</span>
+                    <span class="ie-value expense-value">{{ settings.currency }}{{
+                      settings.formatNumber(transactions.totalExpense) }}</span>
                   </div>
                 </div>
               </div>
-              <!-- Right Emoji -->
-              <div class="col-6 flex justify-end items-center" style="height: 90px; overflow: visible;">
-                <div style="font-size: 4rem; user-select: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
-                  {{ balanceEmoji }}
-                </div>
+              <div class="balance-emoji">
+                {{ balanceEmoji }}
               </div>
             </div>
           </q-card-section>
@@ -56,12 +57,12 @@
 
         <!-- Recent Transactions (desktop: in left col) -->
         <template v-if="$q.screen.gt.sm">
-          <div class="row items-center justify-between q-mb-sm">
-            <div class="section-title q-mb-none">{{ $t('dashboard.recentTransactions') }}</div>
+          <div class="dash-section-header row items-center justify-between q-mb-sm">
+            <div class="dash-section-title">{{ $t('dashboard.recentTransactions') }}</div>
             <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right"
               @click="$router.push('/dashboard/all-transactions')" size="sm" />
           </div>
-          <q-card class="finance-card" style="border-radius: 16px; overflow: hidden;">
+          <q-card class="finance-card tx-card" style="overflow: hidden;">
             <q-list separator>
               <q-slide-item v-for="tx in transactions.recentTransactions" :key="tx.id"
                 @left="({ reset }) => onEditTx(tx, reset)" @right="({ reset }) => onDeleteTx(tx, reset)">
@@ -106,94 +107,80 @@
 
       </div>
 
-      <!-- RIGHT COLUMN: Accounts + Budget Status + Recent Transactions (mobile: at bottom) -->
+      <!-- RIGHT COLUMN -->
       <div class="col-12 col-md-5">
 
         <!-- Accounts -->
-        <div class="section-title">{{ $t('dashboard.accounts') }}</div>
-        <!-- Desktop: wrap grid, Mobile: horizontal scroll -->
-        <div v-if="$q.screen.gt.sm" class="row q-col-gutter-sm q-mb-md">
-          <div v-for="account in accounts.accounts" :key="account.id" class="col-6">
-            <q-card class="finance-card cursor-pointer full-height"
-              @click="$router.push('/dashboard/account/' + account.id + '/transactions')" v-ripple>
-              <q-card-section class="q-pa-md">
-                <div class="row items-center q-gutter-sm q-mb-sm">
-                  <q-icon :name="account.icon" :style="{ color: account.color }" size="20px" />
-                  <span class="text-caption text-grey">{{ account.type === 'Cash' ? $t('dashboard.cash') : account.type
-                    ===
-                    'Bank' ? $t('dashboard.bank') : $t('dashboard.mobile') }}</span>
-                </div>
-                <div class="text-body2 text-weight-medium">{{ account.name }}</div>
-                <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{
-                  settings.formatNumber(account.balance)
-                }}</div>
-              </q-card-section>
-            </q-card>
-          </div>
+        <div class="dash-section-header row items-center justify-between q-mb-sm">
+          <div class="dash-section-title">{{ $t('dashboard.accounts') }}</div>
         </div>
-        <div v-else class="row q-gutter-md q-mb-md" style="overflow-x: auto; flex-wrap: nowrap; padding-bottom: 8px">
-          <q-card v-for="account in accounts.accounts" :key="account.id" class="finance-card cursor-pointer"
-            style="min-width: 160px; flex-shrink: 0"
+        <div class="accounts-scroll-row q-mb-md">
+          <q-card v-for="account in accounts.accounts" :key="account.id"
+            class="finance-card account-card cursor-pointer"
             @click="$router.push('/dashboard/account/' + account.id + '/transactions')" v-ripple>
             <q-card-section class="q-pa-md">
-              <div class="row items-center q-gutter-sm q-mb-sm">
-                <q-icon :name="account.icon" :style="{ color: account.color }" size="20px" />
-                <span class="text-caption text-grey">{{ account.type === 'Cash' ? $t('dashboard.cash') : account.type
-                  ===
-                  'Bank' ? $t('dashboard.bank') : $t('dashboard.mobile') }}</span>
-              </div>
-              <div class="text-body2 text-weight-medium">{{ account.name }}</div>
-              <div class="text-subtitle1 text-weight-bold">{{ settings.currency }}{{
-                settings.formatNumber(account.balance) }}
+              <div class="row items-center no-wrap q-gutter-sm">
+                <q-avatar :style="{ background: (account.color || '#757575') + '15' }" size="42px">
+                  <q-icon :name="account.icon" :style="{ color: account.color || '#757575' }" size="22px" />
+                </q-avatar>
+                <div>
+                  <div style="font-size: 0.78rem; color: #8e8ea0; font-weight: 500;">
+                    {{ account.type === 'Cash' ? $t('dashboard.cash') : account.type === 'Bank' ? $t('dashboard.bank') :
+                      $t('dashboard.mobile') }}
+                  </div>
+                  <div class="text-subtitle2 text-weight-bold" style="color: #1a1a2e;">
+                    {{ settings.currency }}{{ settings.formatNumber(account.balance) }}
+                  </div>
+                </div>
               </div>
             </q-card-section>
           </q-card>
         </div>
 
         <!-- Budget Status -->
-        <div class="row items-center justify-between q-mb-sm">
-          <div class="section-title q-mb-none">{{ $t('dashboard.budgetStatus') }}</div>
+        <div class="dash-section-header row items-center justify-between q-mb-sm">
+          <div class="dash-section-title">{{ $t('dashboard.budgetStatus') }}</div>
           <div class="row items-center q-gutter-xs">
-            <span class="text-caption text-grey">{{ $t('dashboard.quickEntry') }}</span>
+            <span class="text-caption" style="color: #8e8ea0;">{{ $t('dashboard.quickEntry') }}</span>
             <q-toggle v-model="quickEntry" color="dark" dense @update:model-value="onQuickEntryChange" />
           </div>
         </div>
-        <div class="row q-col-gutter-sm q-mb-md">
-          <div v-for="cat in categories.expenseCategories" :key="cat.id" class="col-3 col-sm-2 col-md-3">
-            <q-card class="finance-card cursor-pointer column items-center q-pa-sm" style="min-height: 110px;"
-              @click="onBudgetCardClick(cat)">
-              <q-avatar :style="{ background: cat.color + '18' }" size="36px" class="q-mb-xs">
-                <q-icon :name="cat.icon" :style="{ color: cat.color }" size="18px" />
-              </q-avatar>
-              <div class="text-body2 text-weight-medium text-center ellipsis" style="font-size: 11px; width: 100%;">
-                {{ cat.name }}
-              </div>
-              <div v-if="getCurrentMonthBudget(cat)" class="text-caption q-mt-xs" style="font-size: 10px;">
-                {{ settings.currency }}{{ settings.formatNumber(getCategorySpent(cat.name)) }} / {{ settings.currency
-                }}{{
-                  settings.formatNumber(getCurrentMonthBudget(cat)) }}
-              </div>
-              <div v-if="getCurrentMonthBudget(cat)" class="q-mt-xs" style="width: 100%;">
-                <q-linear-progress :value="Math.min(getCategorySpent(cat.name) / getCurrentMonthBudget(cat), 1)"
-                  :color="getCategorySpent(cat.name) > getCurrentMonthBudget(cat) ? 'negative' : 'positive'" rounded
-                  size="6px" track-color="grey-3" />
-              </div>
-              <div v-else class="text-caption text-grey-5 q-mt-xs text-center leading-tight"
-                style="font-size: 10px; line-height: 1.1;">
-                {{ $t('dashboard.tapToSetBudget') }}
-              </div>
+        <div class="budget-scroll-container q-mb-md">
+          <div v-for="cat in categories.expenseCategories" :key="cat.id" class="budget-scroll-item">
+            <q-card class="budget-fill-card finance-card cursor-pointer" @click="onBudgetCardClick(cat)">
+              <!-- Fill overlay: rises from bottom based on spent percentage -->
+              <div v-if="getCurrentMonthBudget(cat)" class="budget-fill-bg" :style="{
+                background: getCategorySpent(cat.name) > getCurrentMonthBudget(cat) ? '#ef444430' : cat.color + '25',
+                height: Math.min((getCategorySpent(cat.name) / getCurrentMonthBudget(cat)) * 100, 100) + '%'
+              }"></div>
+              <q-card-section class="column items-center q-pa-sm budget-fill-content">
+                <q-avatar :style="{ background: cat.color + '18' }" size="40px" class="q-mb-xs">
+                  <q-icon :name="cat.icon" :style="{ color: cat.color }" size="20px" />
+                </q-avatar>
+                <div class="text-center ellipsis full-width" style="font-size: 11px; font-weight: 600; color: #1a1a2e;">
+                  {{ cat.name }}
+                </div>
+                <div v-if="getCurrentMonthBudget(cat)" class="text-caption q-mt-xs"
+                  style="font-size: 9px; color: #8e8ea0;">
+                  {{ settings.currency }}{{ formatShort(getCurrentMonthBudget(cat)) }}
+                </div>
+                <div v-else class="text-caption q-mt-xs text-center"
+                  style="font-size: 9px; color: #b0b0c0; line-height: 1.2;">
+                  {{ $t('dashboard.tapToSetBudget') }}
+                </div>
+              </q-card-section>
             </q-card>
           </div>
         </div>
 
         <!-- Recent Transactions (mobile/tablet: at bottom of page) -->
         <template v-if="!$q.screen.gt.sm">
-          <div class="row items-center justify-between q-mb-sm">
-            <div class="section-title q-mb-none">{{ $t('dashboard.recentTransactions') }}</div>
+          <div class="dash-section-header row items-center justify-between q-mb-sm">
+            <div class="dash-section-title">{{ $t('dashboard.recentTransactions') }}</div>
             <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right"
               @click="$router.push('/dashboard/all-transactions')" size="sm" />
           </div>
-          <q-card class="finance-card" style="border-radius: 16px; overflow: hidden;">
+          <q-card class="finance-card tx-card" style="overflow: hidden;">
             <q-list separator>
               <q-slide-item v-for="tx in transactions.recentTransactions" :key="tx.id"
                 @left="({ reset }) => onEditTx(tx, reset)" @right="({ reset }) => onDeleteTx(tx, reset)">
@@ -335,7 +322,8 @@
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="row items-center q-gutter-sm">
             <q-avatar color="negative" text-color="white" icon="delete" size="36px" />
-            <div class="text-h6 text-weight-bold" style="color: #222;">{{ $t('dashboard.deleteTransactionTitle') }}</div>
+            <div class="text-h6 text-weight-bold" style="color: #222;">{{ $t('dashboard.deleteTransactionTitle') }}
+            </div>
           </div>
           <q-btn icon="close" flat round dense @click="cancelDeleteTx" style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
@@ -345,15 +333,18 @@
           <div class="q-pa-sm q-mb-md" style="background: #f8fafc; border-radius: 12px;">
             <div class="row items-center q-gutter-sm">
               <q-avatar :style="{ background: getCategoryColor(deleteTxData?.category) + '20' }" size="36px">
-                <q-icon :name="getCategoryIcon(deleteTxData?.category)" :style="{ color: getCategoryColor(deleteTxData?.category) }" size="18px" />
+                <q-icon :name="getCategoryIcon(deleteTxData?.category)"
+                  :style="{ color: getCategoryColor(deleteTxData?.category) }" size="18px" />
               </q-avatar>
               <div>
                 <div class="text-weight-medium">{{ deleteTxData?.category }}</div>
                 <div class="text-caption text-grey">{{ settings.formatDate(deleteTxData?.date) }}</div>
               </div>
               <q-space />
-              <div :class="deleteTxData?.type === 'income' ? 'amount-income' : 'amount-expense'" class="text-weight-bold">
-                {{ deleteTxData?.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{ settings.formatNumber(deleteTxData?.amount) }}
+              <div :class="deleteTxData?.type === 'income' ? 'amount-income' : 'amount-expense'"
+                class="text-weight-bold">
+                {{ deleteTxData?.type === 'income' ? '+' : '-' }}{{ settings.currency }}{{
+                  settings.formatNumber(deleteTxData?.amount) }}
               </div>
             </div>
           </div>
@@ -361,39 +352,28 @@
           <!-- Account balance question -->
           <div v-if="deleteTxData?.accountId" class="text-body2 q-mb-md text-grey-8">
             <template v-if="deleteTxData.type === 'expense'">
-              {{ $t('dashboard.deleteExpenseConfirm', { amount: settings.currency + settings.formatNumber(deleteTxData.amount), account: getAccountName(deleteTxData.accountId) }) }}
+              {{ $t('dashboard.deleteExpenseConfirm', {
+                amount: settings.currency +
+                  settings.formatNumber(deleteTxData.amount), account: getAccountName(deleteTxData.accountId)
+              }) }}
             </template>
             <template v-else-if="deleteTxData.type === 'income'">
-              {{ $t('dashboard.deleteIncomeConfirm', { amount: settings.currency + settings.formatNumber(deleteTxData.amount), account: getAccountName(deleteTxData.accountId) }) }}
+              {{ $t('dashboard.deleteIncomeConfirm', {
+                amount: settings.currency +
+                  settings.formatNumber(deleteTxData.amount), account: getAccountName(deleteTxData.accountId)
+              }) }}
             </template>
           </div>
 
           <!-- Action Buttons -->
           <div class="column q-gutter-sm">
-            <q-btn
-              v-if="deleteTxData?.accountId && (deleteTxData.type === 'expense' || deleteTxData.type === 'income')"
+            <q-btn v-if="deleteTxData?.accountId && (deleteTxData.type === 'expense' || deleteTxData.type === 'income')"
               :label="deleteTxData.type === 'expense' ? $t('dashboard.deleteWithRefund') : $t('dashboard.deleteWithDeduct')"
-              :icon="deleteTxData.type === 'expense' ? 'savings' : 'money_off'"
-              color="negative"
-              unelevated
-              class="full-width"
-              @click="confirmDeleteWithBalance"
-            />
-            <q-btn
-              :label="$t('dashboard.deleteOnly')"
-              icon="delete_forever"
-              outline
-              color="negative"
-              class="full-width"
-              @click="confirmDeleteOnly"
-            />
-            <q-btn
-              :label="$t('common.cancel')"
-              flat
-              color="grey-7"
-              class="full-width"
-              @click="cancelDeleteTx"
-            />
+              :icon="deleteTxData.type === 'expense' ? 'savings' : 'money_off'" color="negative" unelevated
+              class="full-width" @click="confirmDeleteWithBalance" />
+            <q-btn :label="$t('dashboard.deleteOnly')" icon="delete_forever" outline color="negative" class="full-width"
+              @click="confirmDeleteOnly" />
+            <q-btn :label="$t('common.cancel')" flat color="grey-7" class="full-width" @click="cancelDeleteTx" />
           </div>
         </q-card-section>
       </q-card>
@@ -480,6 +460,7 @@ import { useAccountStore } from 'stores/accountStore'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
+import { useAuthStore } from 'stores/authStore'
 
 const { t } = useI18n()
 const $q = useQuasar()
@@ -488,6 +469,7 @@ const accounts = useAccountStore()
 const transactions = useTransactionStore()
 const categories = useCategoryStore()
 const settings = useSettingsStore()
+const authStore = useAuthStore()
 
 const editDialogOpen = ref(false)
 const saving = ref(false)
@@ -651,10 +633,35 @@ const greeting = computed(() => {
   return t('greetings.night')
 })
 
+const userName = computed(() => {
+  return authStore.userProfile?.name || authStore.user?.email?.split('@')[0] || t('dashboard.user')
+})
+
+const greetingIcon = computed(() => {
+  // Returns image paths for different times of day
+  // sunrise.png - morning (5am-12pm)
+  // mid-day.png - afternoon (12pm-5pm)
+  // sunset.png - evening (5pm-8pm)
+  // night.png - night (8pm-5am)
+  if (hour >= 5 && hour < 12) return { src: '/img/sunrise.png', alt: 'morning' }
+  if (hour >= 12 && hour < 17) return { src: '/img/mid-day.png', alt: 'afternoon' }
+  if (hour >= 17 && hour < 20) return { src: '/img/sunset.png', alt: 'evening' }
+  return { src: '/img/night.png', alt: 'night' }
+})
+
 function getCategorySpent(categoryName) {
   return transactions.transactions
     .filter((t) => t.type === 'expense' && t.category === categoryName)
     .reduce((sum, t) => sum + t.amount, 0)
+}
+
+function formatShort(num) {
+  if (num == null) return '0'
+  const n = Math.abs(num)
+  if (n >= 10000000) return (num / 10000000).toFixed(1).replace(/\.0$/, '') + 'Cr'
+  if (n >= 100000) return (num / 100000).toFixed(1).replace(/\.0$/, '') + 'L'
+  if (n >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K'
+  return settings.formatNumber(num)
 }
 
 function getCategoryColor(categoryName) {
@@ -796,3 +803,332 @@ async function confirmDeleteOnly() {
   deleteTxData.value = null
 }
 </script>
+
+<style scoped>
+.dashboard-page {
+  padding: 12px 16px 80px;
+}
+
+/* Greeting header */
+.greeting-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.greeting-icon-wrap {
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+/* Section headers */
+.dash-section-header {
+  padding: 8px 4px 0;
+}
+
+.dash-section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.75);
+  letter-spacing: -0.01em;
+}
+
+/* Balance Card */
+.balance-overview-card {
+  border-radius: 20px !important;
+  border: none !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18) !important;
+  overflow: hidden;
+}
+
+.balance-card-gradient {
+  background: linear-gradient(145deg, #2d2d3a 0%, #1a1a2a 50%, #111118 100%) !important;
+  background-size: 200% 200% !important;
+  animation: gradientShift 8s ease infinite;
+  padding: 22px 24px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.balance-card-gradient::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  right: -15%;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Floating orbs */
+.balance-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(40px);
+  opacity: 0.35;
+}
+
+.balance-orb-1 {
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+  top: -30px;
+  right: -20px;
+  animation: orbFloat1 6s ease-in-out infinite;
+}
+
+.balance-orb-2 {
+  width: 90px;
+  height: 90px;
+  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+  bottom: -20px;
+  left: 20%;
+  animation: orbFloat2 8s ease-in-out infinite;
+}
+
+.balance-orb-3 {
+  width: 70px;
+  height: 70px;
+  background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
+  top: 50%;
+  right: 30%;
+  animation: orbFloat3 7s ease-in-out infinite;
+}
+
+/* Shimmer sweep */
+.balance-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(105deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.03) 40%,
+      rgba(255, 255, 255, 0.07) 50%,
+      rgba(255, 255, 255, 0.03) 60%,
+      transparent 100%);
+  animation: shimmerSweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes gradientShift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes orbFloat1 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(-15px, 10px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(10px, -8px) scale(0.95);
+  }
+}
+
+@keyframes orbFloat2 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  40% {
+    transform: translate(20px, -12px) scale(1.15);
+  }
+
+  70% {
+    transform: translate(-10px, 8px) scale(0.9);
+  }
+}
+
+@keyframes orbFloat3 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(-12px, -15px) scale(1.1);
+  }
+}
+
+@keyframes shimmerSweep {
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 200%;
+  }
+}
+
+.balance-label {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.balance-amount {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-top: 4px;
+}
+
+.income-chip,
+.expense-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+}
+
+.income-chip {
+  background: rgba(74, 222, 128, 0.12);
+}
+
+.expense-chip {
+  background: rgba(248, 113, 113, 0.12);
+}
+
+.ie-label {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.ie-value {
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.income-value {
+  color: #4ade80;
+}
+
+.expense-value {
+  color: #f87171;
+}
+
+.balance-emoji {
+  font-size: 4.5rem;
+  user-select: none;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+  line-height: 1;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+/* Account cards */
+.accounts-scroll-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.accounts-scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
+.account-card {
+  min-width: 155px;
+  flex-shrink: 0;
+}
+
+/* Budget scroll */
+.budget-scroll-container {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.budget-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.budget-scroll-item {
+  flex: 0 0 auto;
+  width: 80px;
+}
+
+/* Budget fill card */
+.budget-fill-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 108px;
+}
+
+.budget-fill-bg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transition: height 0.5s ease;
+  border-radius: 0 0 16px 16px;
+  pointer-events: none;
+}
+
+.budget-fill-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Transaction card */
+.tx-card {
+  border-radius: 18px !important;
+}
+
+/* Desktop refinements */
+@media (min-width: 600px) {
+  .dashboard-page {
+    padding-bottom: 24px;
+  }
+
+  .accounts-scroll-row {
+    flex-wrap: wrap;
+  }
+
+  .account-card {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+  }
+
+  .budget-scroll-container {
+    flex-wrap: wrap;
+  }
+
+  .budget-scroll-item {
+    width: calc(33.33% - 6px);
+  }
+}
+</style>

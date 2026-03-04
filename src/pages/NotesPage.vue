@@ -1,12 +1,12 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="page-container">
     <!-- Header -->
     <div class="row items-center justify-between q-mb-md">
       <div>
-        <div class="text-h5 text-weight-bold">{{ $t('notes.title') }}</div>
-        <div class="text-caption text-grey">{{ noteStore.notes.length }}{{ $t('notes.countSuffix') }}</div>
+        <div class="page-title">{{ $t('notes.title') }}</div>
+        <div class="page-subtitle">{{ noteStore.notes.length }}{{ $t('notes.countSuffix') }}</div>
       </div>
-      <q-btn round flat icon="add_circle" color="dark" size="lg" @click="openAddDialog" />
+      <q-btn round flat dense icon="add_circle" size="md" style="color: #1a1a2e; background: rgba(26,26,46,0.06); border-radius: 14px;" @click="openAddDialog" />
     </div>
 
     <!-- Loading -->
@@ -17,7 +17,7 @@
     <template v-else>
       <!-- Pinned Notes -->
       <div v-if="pinnedNotes.length" class="q-mb-md">
-        <div class="section-title">{{ $t('notes.pinned') }}</div>
+        <div class="page-section-title">{{ $t('notes.pinned') }}</div>
         <div class="row q-col-gutter-sm">
           <div v-for="note in pinnedNotes" :key="note.id" class="col-12 col-md-6">
           <q-card class="finance-card full-height" style="border-left: 4px solid #111;">
@@ -45,7 +45,7 @@
 
       <!-- Other Notes -->
       <div v-if="unpinnedNotes.length">
-        <div class="section-title">{{ $t('notes.allNotes') }}</div>
+        <div class="page-section-title">{{ $t('notes.allNotes') }}</div>
         <div class="row q-col-gutter-sm">
           <div v-for="note in unpinnedNotes" :key="note.id" class="col-12 col-md-6">
           <q-card class="finance-card full-height">
@@ -70,10 +70,10 @@
       </div>
 
       <!-- Empty State -->
-      <div v-if="!noteStore.notes.length" class="text-center text-grey q-mt-xl">
-        <q-icon name="note" size="60px" class="q-mb-md" />
-        <div class="text-h6">{{ $t('notes.noNotes') }}</div>
-        <div class="text-body2">{{ $t('notes.addPrompt') }}</div>
+      <div v-if="!noteStore.notes.length" class="empty-state">
+        <q-icon name="note" size="60px" />
+        <div class="empty-state-title">{{ $t('notes.noNotes') }}</div>
+        <div class="empty-state-subtitle">{{ $t('notes.addPrompt') }}</div>
       </div>
     </template>
 

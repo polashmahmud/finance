@@ -63,6 +63,8 @@ export default {
   // ========== Index / Dashboard ==========
   dashboard: {
     myFinance: 'My Finance',
+    hello: 'Hello',
+    user: 'User',
     totalBalance: 'Total Balance',
     accounts: 'Accounts',
     cash: 'Cash',
@@ -327,6 +329,7 @@ export default {
     preferences: 'Preferences',
     currency: 'Currency',
     language: 'Language',
+    timezone: 'Timezone',
     dateFormat: 'Date Format',
     security: 'Security',
     appLockPin: 'App Lock (PIN)',

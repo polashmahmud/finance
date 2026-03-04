@@ -19,6 +19,7 @@ export const useSettingsStore = defineStore('settings', () => {
   const language = ref('bn')
   const fontFamily = ref('Tiro Bangla')
   const dateFormat = ref('DD MMM, YYYY')
+  const timezone = ref('Asia/Dhaka')
   const darkMode = ref(false)
   const appLock = ref(false)
   // PIN is stored internally as a SHA-256 hash and never exposed in the return object.
@@ -62,6 +63,7 @@ export const useSettingsStore = defineStore('settings', () => {
         if (s.language) language.value = s.language
         if (s.fontFamily) fontFamily.value = s.fontFamily
         if (s.dateFormat) dateFormat.value = s.dateFormat
+        if (s.timezone) timezone.value = s.timezone
         if (s.darkMode !== undefined) {
           darkMode.value = s.darkMode
           Dark.set(s.darkMode)
@@ -103,6 +105,7 @@ export const useSettingsStore = defineStore('settings', () => {
         language: language.value,
         fontFamily: fontFamily.value,
         dateFormat: dateFormat.value,
+        timezone: timezone.value,
         darkMode: darkMode.value,
         balanceEmojis: balanceEmojis.value,
       }),
@@ -145,6 +148,11 @@ export const useSettingsStore = defineStore('settings', () => {
     saveSettings()
   }
 
+  function setTimezone(tz) {
+    timezone.value = tz
+    saveSettings()
+  }
+
   function setBalanceEmojis(newEmojis) {
     balanceEmojis.value = newEmojis
     saveSettings()
@@ -167,8 +175,41 @@ export const useSettingsStore = defineStore('settings', () => {
 
   function formatDate(dateString, overrideFormat = null) {
     if (!dateString) return ''
-    const dateObj = new Date(dateString)
+
+    // Parse the date string and convert to the selected timezone
+    let dateObj = new Date(dateString)
     if (isNaN(dateObj)) return dateString
+
+    // Get the timezone offset for the selected timezone
+    // We need to convert the UTC date to the user's selected timezone
+    const targetTimezone = timezone.value
+
+    // Create a formatter to get the date parts in the target timezone
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: targetTimezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    })
+
+    // Parse the formatted date parts and create a new date object
+    const parts = formatter.formatToParts(dateObj)
+    const getPart = (type) => parts.find((p) => p.type === type)?.value || '0'
+
+    // Create a new date using the timezone-adjusted values
+    // This effectively shifts the date to display in the selected timezone
+    const tzYear = parseInt(getPart('year'))
+    const tzMonth = parseInt(getPart('month')) - 1 // Months are 0-indexed
+    const tzDay = parseInt(getPart('day'))
+    const tzHour = parseInt(getPart('hour'))
+    const tzMinute = parseInt(getPart('minute'))
+    const tzSecond = parseInt(getPart('second'))
+
+    dateObj = new Date(Date.UTC(tzYear, tzMonth, tzDay, tzHour, tzMinute, tzSecond))
 
     // Bengali Date Names
     const bnOptions = {
@@ -248,6 +289,7 @@ export const useSettingsStore = defineStore('settings', () => {
     language,
     fontFamily,
     dateFormat,
+    timezone,
     darkMode,
     appLock,
     // NOTE: raw PIN / hash is intentionally NOT returned here to prevent
@@ -260,6 +302,7 @@ export const useSettingsStore = defineStore('settings', () => {
     setLanguage,
     setFont,
     setDateFormat,
+    setTimezone,
     setBalanceEmojis,
     formatDate,
     formatNumber,

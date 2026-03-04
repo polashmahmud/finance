@@ -1,10 +1,10 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="page-container">
     <div class="row justify-center">
       <div class="col-12 col-sm-10 col-md-8 col-lg-7">
-        <div class="row items-center q-mb-md">
-          <q-btn flat round icon="arrow_back" @click="$router.back()" />
-          <div class="text-h6 text-weight-bold q-ml-sm">{{ $t('transferPage.title') }}</div>
+        <div class="back-header">
+          <q-btn flat round icon="arrow_back" @click="$router.back()" color="dark" />
+          <div class="back-header-title">{{ $t('transferPage.title') }}</div>
         </div>
 
         <q-card class="finance-card">

@@ -1,15 +1,15 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="page-container">
     <div class="row items-center justify-between q-mb-md">
       <div>
-        <div class="text-h5 text-weight-bold">{{ $t('reports.title') }}</div>
-        <div class="text-caption text-grey">{{ $t('reports.subtitle') }}</div>
+        <div class="page-title">{{ $t('reports.title') }}</div>
+        <div class="page-subtitle">{{ $t('reports.subtitle') }}</div>
       </div>
 
       <q-btn flat no-caps class="finance-card q-px-md text-weight-medium bg-white" style="border-radius: 12px">
         <div class="row items-center q-gutter-x-sm">
-          <q-icon name="calendar_month" size="18px" color="primary" />
-          <span>{{ displayMonth }}</span>
+          <q-icon name="calendar_month" size="18px" style="color: #1a1a2e" />
+          <span style="color: #1a1a2e">{{ displayMonth }}</span>
           <q-icon name="arrow_drop_down" size="18px" color="grey-7" />
         </div>
         <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -26,28 +26,31 @@
 
     <template v-else>
       <!-- Summary Chips -->
-      <div class="row q-col-gutter-sm q-mb-md">
+      <div class="row q-col-gutter-sm q-mb-md" style="flex-wrap: wrap;">
         <div class="col-auto">
-          <q-chip color="dark" text-color="white" icon="trending_up" class="q-ma-none shadow-1">
+          <div class="summary-chip summary-chip-income">
+            <q-icon name="trending_up" size="16px" />
             {{ $t('common.income') }} {{ settings.currency }}{{ settings.formatNumber(totalIncome) }}
-          </q-chip>
+          </div>
         </div>
         <div class="col-auto">
-          <q-chip color="dark" text-color="white" icon="trending_down" class="q-ma-none shadow-1">
+          <div class="summary-chip summary-chip-expense">
+            <q-icon name="trending_down" size="16px" />
             {{ $t('common.expense') }} {{ settings.currency }}{{ settings.formatNumber(totalExpense) }}
-          </q-chip>
+          </div>
         </div>
         <div class="col-auto">
-          <q-chip color="dark" text-color="white" icon="savings" class="q-ma-none shadow-1">
+          <div class="summary-chip summary-chip-neutral">
+            <q-icon name="savings" size="16px" />
             {{ $t('reports.savings') }} {{ settings.currency }}{{ settings.formatNumber(netSavings) }}
-          </q-chip>
+          </div>
         </div>
       </div>
 
       <!-- Report Tabs -->
-      <q-card class="finance-card q-mb-md">
+      <q-card class="finance-card tab-card q-mb-md">
         <q-tabs v-model="reportTab" dense active-color="dark" indicator-color="dark" class="text-grey-6"
-          align="justify">
+          align="justify" no-caps>
           <q-tab name="overview" :label="$t('reports.overview')" />
           <q-tab name="category" :label="$t('reports.categoryTab')" />
           <q-tab name="budget" :label="$t('reports.budget')" />

@@ -1,7 +1,7 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="q-mb-md">
-      <div class="text-h5 text-weight-bold">{{ $t('settings.title') }}</div>
+  <q-page class="page-container">
+    <div class="page-header">
+      <div class="page-title">{{ $t('settings.title') }}</div>
     </div>
 
     <!-- Responsive 2-column layout on desktop -->
@@ -91,7 +91,7 @@
               <q-item-section>
                 <q-item-label>{{ $t('settings.font') }}</q-item-label>
                 <q-item-label caption :style="{ fontFamily: settings.fontFamily }">{{ settings.fontFamily
-                  }}</q-item-label>
+                }}</q-item-label>
               </q-item-section>
               <q-item-section side>
                 <q-select v-model="selectedFont" :options="fontOptions" dense borderless emit-value map-options
@@ -100,7 +100,7 @@
                     <q-item v-bind="scope.itemProps">
                       <q-item-section>
                         <q-item-label :style="{ fontFamily: scope.opt.value + ', sans-serif' }">{{ scope.opt.label
-                          }}</q-item-label>
+                        }}</q-item-label>
                       </q-item-section>
                     </q-item>
                   </template>
@@ -122,6 +122,21 @@
                   map-options @update:model-value="onDateFormatChange" style="min-width: 130px" />
               </q-item-section>
             </q-item>
+
+            <!-- Timezone -->
+            <q-item class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="schedule" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.timezone') }}</q-item-label>
+                <q-item-label caption>{{ settings.timezone }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-select v-model="selectedTimezone" :options="timezoneOptions" dense borderless emit-value map-options
+                  @update:model-value="onTimezoneChange" style="min-width: 180px" />
+              </q-item-section>
+            </q-item>
           </q-list>
         </q-card>
 
@@ -141,7 +156,7 @@
               <q-item-section>
                 <q-item-label>{{ $t('settings.appLockPin') }}</q-item-label>
                 <q-item-label caption>{{ settings.appLock ? $t('settings.active') : $t('settings.inactive')
-                  }}</q-item-label>
+                }}</q-item-label>
               </q-item-section>
               <q-item-section side>
                 <q-toggle :model-value="settings.appLock" color="dark" @update:model-value="onToggleAppLock" />
@@ -545,6 +560,7 @@ const selectedCurrency = ref(settings.currencyCode)
 const selectedLang = ref(settings.language)
 const selectedFont = ref(settings.fontFamily)
 const selectedDateFormat = ref(settings.dateFormat)
+const selectedTimezone = ref(settings.timezone)
 
 const dateFormatOptions = [
   { label: 'DD MMM, YYYY', value: 'DD MMM, YYYY' },
@@ -552,6 +568,128 @@ const dateFormatOptions = [
   { label: 'MM/DD/YYYY', value: 'MM/DD/YYYY' },
   { label: 'YYYY-MM-DD', value: 'YYYY-MM-DD' },
   { label: 'DD MMMM YYYY', value: 'DD MMMM YYYY' }
+]
+
+const timezoneOptions = [
+  // Asia
+  { label: 'GMT+6 - Bangladesh', value: 'Asia/Dhaka' },
+  { label: 'GMT+5:30 - India', value: 'Asia/Kolkata' },
+  { label: 'GMT+5:30 - Sri Lanka', value: 'Asia/Colombo' },
+  { label: 'GMT+5 - Pakistan', value: 'Asia/Karachi' },
+  { label: 'GMT+5:45 - Nepal', value: 'Asia/Kathmandu' },
+  { label: 'GMT+6 - Bhutan', value: 'Asia/Thimphu' },
+  { label: 'GMT+6:30 - Myanmar', value: 'Asia/Yangon' },
+  { label: 'GMT+7 - Thailand', value: 'Asia/Bangkok' },
+  { label: 'GMT+7 - Indonesia', value: 'Asia/Jakarta' },
+  { label: 'GMT+8 - Singapore', value: 'Asia/Singapore' },
+  { label: 'GMT+8 - Hong Kong', value: 'Asia/Hong_Kong' },
+  { label: 'GMT+8 - China', value: 'Asia/Shanghai' },
+  { label: 'GMT+8 - Taiwan', value: 'Asia/Taipei' },
+  { label: 'GMT+8 - Philippines', value: 'Asia/Manila' },
+  { label: 'GMT+8 - Malaysia', value: 'Asia/Kuala_Lumpur' },
+  { label: 'GMT+9 - Japan', value: 'Asia/Tokyo' },
+  { label: 'GMT+9 - South Korea', value: 'Asia/Seoul' },
+  { label: 'GMT+2 - Israel', value: 'Asia/Jerusalem' },
+  { label: 'GMT+4 - UAE', value: 'Asia/Dubai' },
+  { label: 'GMT+3 - Saudi Arabia', value: 'Asia/Riyadh' },
+  { label: 'GMT+3 - Qatar', value: 'Asia/Qatar' },
+  { label: 'GMT+3 - Kuwait', value: 'Asia/Kuwait' },
+  { label: 'GMT+3 - Bahrain', value: 'Asia/Bahrain' },
+  { label: 'GMT+4 - Oman', value: 'Asia/Muscat' },
+  { label: 'GMT+3 - Jordan', value: 'Asia/Amman' },
+  { label: 'GMT+2 - Lebanon', value: 'Asia/Beirut' },
+  { label: 'GMT+2 - Syria', value: 'Asia/Damascus' },
+  { label: 'GMT+3 - Iraq', value: 'Asia/Baghdad' },
+  { label: 'GMT+3:30 - Iran', value: 'Asia/Tehran' },
+  { label: 'GMT+4:30 - Afghanistan', value: 'Asia/Kabul' },
+  { label: 'GMT+5 - Uzbekistan', value: 'Asia/Tashkent' },
+  { label: 'GMT+6 - Kazakhstan', value: 'Asia/Almaty' },
+  // Europe
+  { label: 'GMT+0 - UK', value: 'Europe/London' },
+  { label: 'GMT+1 - France', value: 'Europe/Paris' },
+  { label: 'GMT+1 - Germany', value: 'Europe/Berlin' },
+  { label: 'GMT+1 - Italy', value: 'Europe/Rome' },
+  { label: 'GMT+1 - Spain', value: 'Europe/Madrid' },
+  { label: 'GMT+1 - Netherlands', value: 'Europe/Amsterdam' },
+  { label: 'GMT+1 - Belgium', value: 'Europe/Brussels' },
+  { label: 'GMT+1 - Austria', value: 'Europe/Vienna' },
+  { label: 'GMT+1 - Switzerland', value: 'Europe/Zurich' },
+  { label: 'GMT+1 - Sweden', value: 'Europe/Stockholm' },
+  { label: 'GMT+1 - Norway', value: 'Europe/Oslo' },
+  { label: 'GMT+1 - Denmark', value: 'Europe/Copenhagen' },
+  { label: 'GMT+2 - Finland', value: 'Europe/Helsinki' },
+  { label: 'GMT+2 - Greece', value: 'Europe/Athens' },
+  { label: 'GMT+1 - Poland', value: 'Europe/Warsaw' },
+  { label: 'GMT+1 - Czechia', value: 'Europe/Prague' },
+  { label: 'GMT+1 - Hungary', value: 'Europe/Budapest' },
+  { label: 'GMT+0 - Portugal', value: 'Europe/Lisbon' },
+  { label: 'GMT+0 - Ireland', value: 'Europe/Dublin' },
+  { label: 'GMT+1 - Slovakia', value: 'Europe/Bratislava' },
+  { label: 'GMT+1 - Slovenia', value: 'Europe/Ljubljana' },
+  { label: 'GMT+1 - Croatia', value: 'Europe/Zagreb' },
+  { label: 'GMT+1 - Serbia', value: 'Europe/Belgrade' },
+  { label: 'GMT+1 - Bosnia', value: 'Europe/Sarajevo' },
+  { label: 'GMT+1 - Macedonia', value: 'Europe/Skopje' },
+  { label: 'GMT+1 - Albania', value: 'Europe/Tirane' },
+  { label: 'GMT+1 - Montenegro', value: 'Europe/Podgorica' },
+  { label: 'GMT+3 - Belarus', value: 'Europe/Minsk' },
+  { label: 'GMT+2 - Ukraine', value: 'Europe/Kiev' },
+  { label: 'GMT+3 - Russia', value: 'Europe/Moscow' },
+  { label: 'GMT+3 - Turkey', value: 'Europe/Istanbul' },
+  // Africa
+  { label: 'GMT+2 - Egypt', value: 'Africa/Cairo' },
+  { label: 'GMT+1 - Nigeria', value: 'Africa/Lagos' },
+  { label: 'GMT+2 - South Africa', value: 'Africa/Johannesburg' },
+  { label: 'GMT+3 - Kenya', value: 'Africa/Nairobi' },
+  { label: 'GMT+1 - Morocco', value: 'Africa/Casablanca' },
+  { label: 'GMT+3 - Ethiopia', value: 'Africa/Addis_Ababa' },
+  { label: 'GMT+2 - Sudan', value: 'Africa/Khartoum' },
+  { label: 'GMT+0 - Ghana', value: 'Africa/Accra' },
+  { label: 'GMT+3 - Tanzania', value: 'Africa/Dar_es_Salaam' },
+  { label: 'GMT+3 - Uganda', value: 'Africa/Kampala' },
+  { label: 'GMT+1 - Algeria', value: 'Africa/Algiers' },
+  { label: 'GMT+1 - Tunisia', value: 'Africa/Tunis' },
+  // Americas
+  { label: 'GMT-5 - Eastern Time', value: 'America/New_York' },
+  { label: 'GMT-6 - Central Time', value: 'America/Chicago' },
+  { label: 'GMT-7 - Mountain Time', value: 'America/Denver' },
+  { label: 'GMT-8 - Pacific Time', value: 'America/Los_Angeles' },
+  { label: 'GMT-9 - Alaska', value: 'America/Anchorage' },
+  { label: 'GMT-7 - Arizona', value: 'America/Phoenix' },
+  { label: 'GMT-5 - Canada', value: 'America/Toronto' },
+  { label: 'GMT-8 - Canada', value: 'America/Vancouver' },
+  { label: 'GMT-5 - Canada', value: 'America/Montreal' },
+  { label: 'GMT-6 - Mexico', value: 'America/Mexico_City' },
+  { label: 'GMT-5 - Colombia', value: 'America/Bogota' },
+  { label: 'GMT-5 - Peru', value: 'America/Lima' },
+  { label: 'GMT-4 - Chile', value: 'America/Santiago' },
+  { label: 'GMT-3 - Argentina', value: 'America/Buenos_Aires' },
+  { label: 'GMT-3 - Brazil', value: 'America/Sao_Paulo' },
+  { label: 'GMT-5 - Brazil', value: 'America/Rio_Branco' },
+  { label: 'GMT-4 - Brazil', value: 'America/Manaus' },
+  { label: 'GMT-5 - Cuba', value: 'America/Havana' },
+  { label: 'GMT-5 - Jamaica', value: 'America/Jamaica' },
+  { label: 'GMT-5 - Panama', value: 'America/Panama' },
+  { label: 'GMT-6 - Costa Rica', value: 'America/Costa_Rica' },
+  { label: 'GMT-6 - Guatemala', value: 'America/Guatemala' },
+  { label: 'GMT-6 - El Salvador', value: 'America/San_Salvador' },
+  { label: 'GMT-6 - Honduras', value: 'America/Tegucigalpa' },
+  { label: 'GMT-6 - Nicaragua', value: 'America/Managua' },
+  { label: 'GMT-4 - Dominican Rep.', value: 'America/Domingo' },
+  { label: 'GMT-4 - Puerto Rico', value: 'America/Puerto_Rico' },
+  { label: 'GMT-4 - Venezuela', value: 'America/Caracas' },
+  // Oceania
+  { label: 'GMT+11 - Sydney', value: 'Australia/Sydney' },
+  { label: 'GMT+11 - Melbourne', value: 'Australia/Melbourne' },
+  { label: 'GMT+10 - Brisbane', value: 'Australia/Brisbane' },
+  { label: 'GMT+8 - Perth', value: 'Australia/Perth' },
+  { label: 'GMT+10:30 - Adelaide', value: 'Australia/Adelaide' },
+  { label: 'GMT+9:30 - Darwin', value: 'Australia/Darwin' },
+  { label: 'GMT+13 - New Zealand', value: 'Pacific/Auckland' },
+  { label: 'GMT-10 - Hawaii', value: 'Pacific/Honolulu' },
+  { label: 'GMT+10 - Guam', value: 'Pacific/Guam' },
+  // UTC
+  { label: 'UTC', value: 'UTC' },
 ]
 
 const currencyOptions = [
@@ -607,6 +745,10 @@ function onFontChange(font) {
 
 function onDateFormatChange(format) {
   settings.setDateFormat(format)
+}
+
+function onTimezoneChange(tz) {
+  settings.setTimezone(tz)
 }
 
 // --- User Profile Modal Functions ---
@@ -987,10 +1129,11 @@ async function changePassword() {
 }
 
 .section-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #666;
-  margin-bottom: 8px;
-  margin-left: 4px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.75);
+  letter-spacing: -0.01em;
+  padding: 8px 4px 6px;
+  margin-bottom: 4px;
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="page-container">
     <!-- Header -->
     <div class="row items-center justify-between q-mb-md">
       <div>
-        <div class="text-h5 text-weight-bold">{{ $t('marketLists.title') }}</div>
-        <div class="text-caption text-grey">{{ marketLists.lists.length }}{{ $t('marketLists.countSuffix') }}</div>
+        <div class="page-title">{{ $t('marketLists.title') }}</div>
+        <div class="page-subtitle">{{ marketLists.lists.length }}{{ $t('marketLists.countSuffix') }}</div>
       </div>
-      <q-btn round flat icon="add_circle" color="dark" size="lg" @click="openNewListDialog" />
+      <q-btn round flat dense icon="add_circle" size="md" style="color: #1a1a2e; background: rgba(26,26,46,0.06); border-radius: 14px;" @click="openNewListDialog" />
     </div>
 
     <!-- Loading -->

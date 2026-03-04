@@ -62,6 +62,8 @@ export default {
   // ========== Index / Dashboard ==========
   dashboard: {
     myFinance: 'আমার ফাইন্যান্স',
+    hello: 'হ্যালো',
+    user: 'ব্যবহারকারী',
     totalBalance: 'মোট ব্যালেন্স',
     accounts: 'অ্যাকাউন্ট',
     cash: 'নগদ',
@@ -329,6 +331,7 @@ export default {
     preferences: 'পছন্দসমূহ',
     currency: 'মুদ্রা',
     language: 'ভাষা',
+    timezone: 'টাইমজোন',
     dateFormat: 'তারিখের বিন্যাস',
     security: 'নিরাপত্তা',
     appLockPin: 'অ্যাপ লক (পিন)',
