@@ -331,6 +331,7 @@ export default {
     preferences: 'পছন্দসমূহ',
     currency: 'মুদ্রা',
     language: 'ভাষা',
+    timezone: 'টাইমজোন',
     dateFormat: 'তারিখের বিন্যাস',
     security: 'নিরাপত্তা',
     appLockPin: 'অ্যাপ লক (পিন)',

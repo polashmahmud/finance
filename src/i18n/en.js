@@ -329,6 +329,7 @@ export default {
     preferences: 'Preferences',
     currency: 'Currency',
     language: 'Language',
+    timezone: 'Timezone',
     dateFormat: 'Date Format',
     security: 'Security',
     appLockPin: 'App Lock (PIN)',
