@@ -5,8 +5,14 @@
   "plugins": {
     "StatusBar": {
       "overlaysWebView": false,
-      "style": "DARK",
-      "backgroundColor": "#ffffff"
+      "style": "LIGHT",
+      "backgroundColor": "#FFFFFF"
+    }
+  },
+  "android": {
+    "statusBar": {
+      "overlaysWebView": false,
+      "color": "#FFFFFF"
     }
   }
 }

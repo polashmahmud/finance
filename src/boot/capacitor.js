@@ -6,12 +6,14 @@ export default boot(async () => {
   if (!Capacitor.isNativePlatform()) return
 
   try {
-    // Prevent the status bar from overlapping the WebView
+    // Set status bar to not overlay the WebView (show separately)
     await StatusBar.setOverlaysWebView({ overlay: false })
-    // Dark style so icons are visible on a light background
-    await StatusBar.setStyle({ style: Style.Dark })
-    // White background to match the app header
+    // Use light style for dark icons on white background
+    await StatusBar.setStyle({ style: Style.Light })
+    // Set white background to match the app header
     await StatusBar.setBackgroundColor({ color: '#ffffff' })
+    // Show the status bar
+    await StatusBar.show()
   } catch {
     // StatusBar plugin unavailable (e.g. running in browser)
   }
