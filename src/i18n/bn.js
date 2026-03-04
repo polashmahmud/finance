@@ -34,6 +34,9 @@ export default {
     savedOffline: 'অফলাইনে সংরক্ষিত — স্বয়ংক্রিয়ভাবে সিঙ্ক হবে।',
     yes: 'হ্যাঁ, রিসেট করুন',
     areYouSure: 'আপনি কি নিশ্চিত?',
+    refreshingData: 'ডেটা রিফ্রেশ হচ্ছে...',
+    refreshComplete: 'ডেটা সফলভাবে রিফ্রেশ হয়েছে',
+    refreshFailed: 'ডেটা রিফ্রেশ করতে ব্যর্থ হয়েছে',
   },
 
   // ========== Greetings ==========

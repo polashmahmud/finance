@@ -106,12 +106,44 @@ export const useCategoryStore = defineStore('categories', () => {
     }
   }
 
+  // Fetch categories - stops existing listener and starts fresh one, returns promise that resolves when loaded
+  function fetchCategories() {
+    return new Promise((resolve) => {
+      const catRef = getUserCategoriesRef()
+      if (!catRef) {
+        resolve()
+        return
+      }
+
+      // Stop existing listener
+      if (unsubscribe) unsubscribe()
+
+      loading.value = true
+
+      // Set up new listener
+      unsubscribe = onSnapshot(
+        catRef,
+        (snapshot) => {
+          categories.value = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          loading.value = false
+          resolve() // Resolve promise when data is loaded
+        },
+        (error) => {
+          console.error('Error fetching categories:', error)
+          loading.value = false
+          resolve() // Resolve anyway to not block the UI
+        },
+      )
+    })
+  }
+
   return {
     categories,
     incomeCategories,
     expenseCategories,
     loading,
     listenCategories,
+    fetchCategories,
     addCategory,
     updateCategory,
     deleteCategory,

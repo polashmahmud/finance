@@ -156,7 +156,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <q-pull-to-refresh @refresh="onRefresh" color="dark" spinner-size="42px">
+        <router-view />
+      </q-pull-to-refresh>
     </q-page-container>
 
     <!-- Floating Action Button (mobile only) -->
@@ -219,6 +221,9 @@ import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from 'stores/authStore'
 import { useSettingsStore } from 'stores/settingsStore'
+import { useAccountStore } from 'stores/accountStore'
+import { useTransactionStore } from 'stores/transactionStore'
+import { useCategoryStore } from 'stores/categoryStore'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -226,6 +231,9 @@ const router = useRouter()
 const $q = useQuasar()
 const authStore = useAuthStore()
 const settings = useSettingsStore()
+const accountStore = useAccountStore()
+const transactionStore = useTransactionStore()
+const categoryStore = useCategoryStore()
 
 const currentTab = ref('home')
 const quickAddOpen = ref(false)
@@ -237,6 +245,36 @@ function handleOnline() {
 }
 function handleOffline() {
   isOnline.value = false
+}
+
+// Pull to refresh handler
+async function onRefresh(done) {
+  try {
+    // Wait for all stores to fetch fresh data (these stop old listeners and start new ones)
+    await Promise.all([
+      accountStore.fetchAccounts(),
+      transactionStore.fetchTransactions(),
+      categoryStore.fetchCategories()
+    ])
+
+    $q.notify({
+      type: 'positive',
+      icon: 'refresh',
+      message: t('common.refreshComplete'),
+      position: 'top',
+      timeout: 1500
+    })
+  } catch (error) {
+    console.error('Refresh error:', error)
+    $q.notify({
+      type: 'negative',
+      icon: 'error_outline',
+      message: t('common.refreshFailed'),
+      position: 'top'
+    })
+  } finally {
+    if (done) done()
+  }
 }
 
 onMounted(() => {

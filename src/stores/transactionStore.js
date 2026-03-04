@@ -131,6 +131,39 @@ export const useTransactionStore = defineStore('transactions', () => {
     }
   }
 
+  // Fetch transactions - stops existing listener and starts fresh one, returns promise that resolves when loaded
+  function fetchTransactions() {
+    return new Promise((resolve) => {
+      const txRef = getUserTransactionsRef()
+      if (!txRef) {
+        resolve()
+        return
+      }
+
+      // Stop existing listener
+      if (unsubscribe) unsubscribe()
+
+      loading.value = true
+
+      // Set up new listener
+      unsubscribe = onSnapshot(
+        txRef,
+        (snapshot) => {
+          transactions.value = snapshot.docs
+            .map((doc) => ({ id: doc.id, ...doc.data() }))
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+          loading.value = false
+          resolve() // Resolve promise when data is loaded
+        },
+        (error) => {
+          console.error('Error fetching transactions:', error)
+          loading.value = false
+          resolve() // Resolve anyway to not block the UI
+        },
+      )
+    })
+  }
+
   return {
     transactions,
     totalIncome,
@@ -138,6 +171,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     recentTransactions,
     loading,
     listenTransactions,
+    fetchTransactions,
     addTransaction,
     updateTransaction,
     deleteTransaction,

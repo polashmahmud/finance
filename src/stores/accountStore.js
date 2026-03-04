@@ -99,11 +99,43 @@ export const useAccountStore = defineStore('accounts', () => {
     }
   }
 
+  // Fetch accounts - stops existing listener and starts fresh one, returns promise that resolves when loaded
+  function fetchAccounts() {
+    return new Promise((resolve) => {
+      const accountsRef = getUserAccountsRef()
+      if (!accountsRef) {
+        resolve()
+        return
+      }
+
+      // Stop existing listener
+      if (unsubscribe) unsubscribe()
+
+      loading.value = true
+
+      // Set up new listener
+      unsubscribe = onSnapshot(
+        accountsRef,
+        (snapshot) => {
+          accounts.value = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          loading.value = false
+          resolve() // Resolve promise when data is loaded
+        },
+        (error) => {
+          console.error('Error fetching accounts:', error)
+          loading.value = false
+          resolve() // Resolve anyway to not block the UI
+        },
+      )
+    })
+  }
+
   return {
     accounts,
     totalBalance,
     loading,
     listenAccounts,
+    fetchAccounts,
     addAccount,
     updateAccount,
     updateBalance,

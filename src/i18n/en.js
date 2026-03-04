@@ -35,6 +35,9 @@ export default {
     yes: 'Yes, Reset',
     no: 'No',
     areYouSure: 'Are you sure?',
+    refreshingData: 'Refreshing data...',
+    refreshComplete: 'Data refreshed successfully',
+    refreshFailed: 'Failed to refresh data',
   },
 
   // ========== Greetings ==========
