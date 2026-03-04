@@ -2,6 +2,12 @@
   "appId": "org.capacitor.quasar.app",
   "appName": "My Finance",
   "webDir": "www",
+  "appIcon": {
+    "android": {
+      "backgroundColor": "#26A69A",
+      "foregroundImage": "public/icons/icon-512x512.png"
+    }
+  },
   "plugins": {
     "StatusBar": {
       "overlaysWebView": false,
