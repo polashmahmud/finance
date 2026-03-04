@@ -6,6 +6,13 @@ const routes = [
     children: [{ path: '', component: () => import('pages/LandingPage.vue') }],
   },
 
+  // Privacy Policy page (public)
+  {
+    path: '/privacy-policy',
+    component: () => import('layouts/LandingLayout.vue'),
+    children: [{ path: '', component: () => import('pages/PrivacyPolicyPage.vue') }],
+  },
+
   // Auth routes
   {
     path: '/login',

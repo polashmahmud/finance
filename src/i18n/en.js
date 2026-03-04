@@ -665,4 +665,50 @@ export default {
       rights: 'All rights reserved.',
     },
   },
+
+  // ========== Privacy Policy ==========
+  privacyPolicy: {
+    title: 'Privacy Policy',
+    lastUpdated: 'Last Updated',
+    introduction: {
+      title: 'Introduction',
+      content:
+        'This Privacy Policy describes how we collect, use, and protect your personal information when you use our Finance App. By using our app, you agree to the terms of this policy.',
+    },
+    dataCollection: {
+      title: 'Data We Collect',
+      content: 'We collect the following information to provide and improve our services:',
+      item1: 'Personal information (name, email) provided during account registration',
+      item2: 'Financial data (income, expenses, accounts, budgets) you enter in the app',
+      item3: 'Device information and usage data for analytics purposes',
+    },
+    dataUsage: {
+      title: 'How We Use Your Data',
+      content: 'Your data is used for the following purposes:',
+      item1: 'To provide and maintain the app functionality',
+      item2: 'To sync your data across devices using Firebase',
+      item3: 'To improve user experience and app performance',
+    },
+    dataSecurity: {
+      title: 'Data Security',
+      content:
+        'We implement appropriate security measures to protect your personal information. Your data is stored securely using Firebase, and you can enable PIN lock for additional security. However, no method of transmission over the internet is 100% secure.',
+    },
+    thirdParty: {
+      title: 'Third-Party Services',
+      content:
+        'We use Firebase (Google) for authentication and data storage. Their privacy policy applies to how they handle your data. We do not sell or share your personal information with third parties for marketing purposes.',
+    },
+    userRights: {
+      title: 'Your Rights',
+      content: 'You have the following rights regarding your data:',
+      item1: 'Access your personal data at any time',
+      item2: 'Request deletion of your account and all associated data',
+      item3: 'Enable or disable PIN lock for app security',
+    },
+    contact: {
+      title: 'Contact Us',
+      content: 'If you have any questions about this Privacy Policy, please contact us:',
+    },
+  },
 }
