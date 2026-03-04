@@ -3,16 +3,6 @@ import { ref, computed } from 'vue'
 import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
 
-// When offline, Firestore persistence queues writes but the Promise never resolves
-// until server ack. Use this to fire-and-forget when offline so UI stays responsive.
-function offlineWrite(operation) {
-  if (!navigator.onLine) {
-    operation().catch((err) => console.warn('[Offline] Write queued for sync:', err))
-    return Promise.resolve()
-  }
-  return operation()
-}
-
 export const useTransactionStore = defineStore('transactions', () => {
   const transactions = ref([])
   const loading = ref(false)
@@ -81,28 +71,34 @@ export const useTransactionStore = defineStore('transactions', () => {
       notes: tx.notes || '',
       createdAt: Date.now(),
     }
-    // When offline: add to local state immediately so UI shows the entry,
-    // then queue the Firestore write (persistentLocalCache syncs when online)
-    if (!navigator.onLine) {
-      const tempId = `offline_${Date.now()}`
-      transactions.value.unshift({ id: tempId, ...docData })
-      addDoc(txRef, docData)
-        .then((ref) => {
-          // Replace temp entry with real Firestore ID once sync completes
-          const idx = transactions.value.findIndex((t) => t.id === tempId)
-          if (idx >= 0) transactions.value[idx].id = ref.id
-        })
-        .catch((err) => console.warn('[Offline] Transaction queued for sync:', err))
-      return
-    }
-    await addDoc(txRef, docData)
+    // Optimistic update: add to local state immediately for instant UI feedback.
+    // onSnapshot will reconcile with Firestore cache once the write is processed.
+    const tempId = `temp_${Date.now()}`
+    transactions.value.unshift({ id: tempId, ...docData })
+
+    // Fire-and-forget: persistentLocalCache queues writes automatically.
+    // Don't await – navigator.onLine is unreliable on mobile, and awaiting
+    // addDoc hangs indefinitely when offline because the Promise only resolves
+    // after server acknowledgment.
+    addDoc(txRef, docData)
+      .then((ref) => {
+        const idx = transactions.value.findIndex((t) => t.id === tempId)
+        if (idx >= 0) transactions.value[idx].id = ref.id
+      })
+      .catch((err) => console.warn('[Firestore] Transaction write queued:', err))
   }
 
   async function updateTransaction(id, data) {
     const uid = auth.currentUser?.uid
     if (!uid) return
+    // Optimistic update
+    const idx = transactions.value.findIndex((t) => t.id === id)
+    if (idx >= 0) Object.assign(transactions.value[idx], data)
+
     const txRef = doc(firestore, `users/${uid}/transactions/${id}`)
-    await offlineWrite(() => updateDoc(txRef, data))
+    updateDoc(txRef, data).catch((err) =>
+      console.warn('[Firestore] Transaction update queued:', err),
+    )
   }
 
   async function deleteTransaction(id) {
@@ -110,7 +106,9 @@ export const useTransactionStore = defineStore('transactions', () => {
     if (!uid) return
     // Optimistically remove from local state immediately
     transactions.value = transactions.value.filter((t) => t.id !== id)
-    await offlineWrite(() => deleteDoc(doc(firestore, `users/${uid}/transactions/${id}`)))
+    deleteDoc(doc(firestore, `users/${uid}/transactions/${id}`)).catch((err) =>
+      console.warn('[Firestore] Transaction delete queued:', err),
+    )
   }
 
   function searchTransactions(query) {

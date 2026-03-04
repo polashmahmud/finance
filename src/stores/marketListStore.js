@@ -11,14 +11,6 @@ import {
 } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
 
-function offlineWrite(operation) {
-  if (!navigator.onLine) {
-    operation().catch((err) => console.warn('[Offline] Write queued for sync:', err))
-    return Promise.resolve()
-  }
-  return operation()
-}
-
 export const useMarketListStore = defineStore('marketLists', () => {
   const lists = ref([])
   const loading = ref(false)
@@ -78,20 +70,41 @@ export const useMarketListStore = defineStore('marketLists', () => {
       createdAt: Date.now(),
       items: {},
     }
-    await offlineWrite(() => setDoc(newDocRef, docData))
+    // Optimistic update
+    lists.value.unshift({
+      id: newDocRef.id,
+      name: docData.name,
+      date: docData.date,
+      createdAt: docData.createdAt,
+      convertedAt: null,
+      items: [],
+    })
+
+    setDoc(newDocRef, docData).catch((err) => console.warn('[Firestore] List write queued:', err))
     return newDocRef.id
   }
 
   async function deleteList(id) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await offlineWrite(() => deleteDoc(doc(firestore, `users/${uid}/marketLists/${id}`)))
+    // Optimistic removal
+    lists.value = lists.value.filter((l) => l.id !== id)
+
+    deleteDoc(doc(firestore, `users/${uid}/marketLists/${id}`)).catch((err) =>
+      console.warn('[Firestore] List delete queued:', err),
+    )
   }
 
   async function updateList(id, data) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await offlineWrite(() => updateDoc(doc(firestore, `users/${uid}/marketLists/${id}`), data))
+    // Optimistic update
+    const idx = lists.value.findIndex((l) => l.id === id)
+    if (idx >= 0) Object.assign(lists.value[idx], data)
+
+    updateDoc(doc(firestore, `users/${uid}/marketLists/${id}`), data).catch((err) =>
+      console.warn('[Firestore] List update queued:', err),
+    )
   }
 
   async function updateItem(listId, itemId, data) {
@@ -103,8 +116,15 @@ export const useMarketListStore = defineStore('marketLists', () => {
       updates[`items.${itemId}.${key}`] = data[key]
     }
 
-    await offlineWrite(() =>
-      updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), updates),
+    // Optimistic update
+    const list = lists.value.find((l) => l.id === listId)
+    if (list) {
+      const item = list.items.find((i) => i.id === itemId)
+      if (item) Object.assign(item, data)
+    }
+
+    updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), updates).catch((err) =>
+      console.warn('[Firestore] Item update queued:', err),
     )
   }
 
@@ -113,39 +133,52 @@ export const useMarketListStore = defineStore('marketLists', () => {
     if (!uid) return
 
     const itemId = Date.now().toString()
-
-    const updates = {
-      [`items.${itemId}`]: {
-        name: item.name,
-        quantity: item.quantity || '',
-        price: item.price || 0,
-        bought: false,
-      },
+    const itemData = {
+      name: item.name,
+      quantity: item.quantity || '',
+      price: item.price || 0,
+      bought: false,
     }
 
-    await offlineWrite(() =>
-      updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), updates),
+    // Optimistic update
+    const list = lists.value.find((l) => l.id === listId)
+    if (list) {
+      list.items.push({ id: itemId, ...itemData })
+    }
+
+    const updates = { [`items.${itemId}`]: itemData }
+    updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), updates).catch((err) =>
+      console.warn('[Firestore] Item add queued:', err),
     )
   }
 
   async function toggleBought(listId, itemId, currentValue) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await offlineWrite(() =>
-      updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), {
-        [`items.${itemId}.bought`]: !currentValue,
-      }),
-    )
+    // Optimistic update
+    const list = lists.value.find((l) => l.id === listId)
+    if (list) {
+      const item = list.items.find((i) => i.id === itemId)
+      if (item) item.bought = !currentValue
+    }
+
+    updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), {
+      [`items.${itemId}.bought`]: !currentValue,
+    }).catch((err) => console.warn('[Firestore] Toggle bought queued:', err))
   }
 
   async function removeItem(listId, itemId) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await offlineWrite(() =>
-      updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), {
-        [`items.${itemId}`]: deleteField(),
-      }),
-    )
+    // Optimistic removal
+    const list = lists.value.find((l) => l.id === listId)
+    if (list) {
+      list.items = list.items.filter((i) => i.id !== itemId)
+    }
+
+    updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), {
+      [`items.${itemId}`]: deleteField(),
+    }).catch((err) => console.warn('[Firestore] Item remove queued:', err))
   }
 
   function getListTotal(listId) {

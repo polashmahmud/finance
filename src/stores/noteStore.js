@@ -3,14 +3,6 @@ import { ref } from 'vue'
 import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
 
-function offlineWrite(operation) {
-  if (!navigator.onLine) {
-    operation().catch((err) => console.warn('[Offline] Write queued for sync:', err))
-    return Promise.resolve()
-  }
-  return operation()
-}
-
 export const useNoteStore = defineStore('notes', () => {
   const notes = ref([])
   const loading = ref(false)
@@ -47,39 +39,63 @@ export const useNoteStore = defineStore('notes', () => {
   async function addNote(note) {
     const notesRef = getUserNotesRef()
     if (!notesRef) return
-    await offlineWrite(() =>
-      addDoc(notesRef, {
-        title: note.title,
-        description: note.description || '',
-        pinned: false,
-        createdAt: Date.now(),
-      }),
-    )
+    const docData = {
+      title: note.title,
+      description: note.description || '',
+      pinned: false,
+      createdAt: Date.now(),
+    }
+    // Optimistic update
+    const tempId = `temp_${Date.now()}`
+    notes.value.unshift({ id: tempId, ...docData })
+
+    addDoc(notesRef, docData)
+      .then((ref) => {
+        const idx = notes.value.findIndex((n) => n.id === tempId)
+        if (idx >= 0) notes.value[idx].id = ref.id
+      })
+      .catch((err) => console.warn('[Firestore] Note write queued:', err))
   }
 
   async function updateNote(id, data) {
     const uid = auth.currentUser?.uid
     if (!uid) return
+    // Optimistic update
+    const idx = notes.value.findIndex((n) => n.id === id)
+    if (idx >= 0) {
+      notes.value[idx].title = data.title
+      notes.value[idx].description = data.description || ''
+    }
+
     const noteRef = doc(firestore, `users/${uid}/notes/${id}`)
-    await offlineWrite(() =>
-      updateDoc(noteRef, {
-        title: data.title,
-        description: data.description || '',
-      }),
-    )
+    updateDoc(noteRef, {
+      title: data.title,
+      description: data.description || '',
+    }).catch((err) => console.warn('[Firestore] Note update queued:', err))
   }
 
   async function deleteNote(id) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    await offlineWrite(() => deleteDoc(doc(firestore, `users/${uid}/notes/${id}`)))
+    // Optimistic removal
+    notes.value = notes.value.filter((n) => n.id !== id)
+
+    deleteDoc(doc(firestore, `users/${uid}/notes/${id}`)).catch((err) =>
+      console.warn('[Firestore] Note delete queued:', err),
+    )
   }
 
   async function togglePin(id, currentValue) {
     const uid = auth.currentUser?.uid
     if (!uid) return
+    // Optimistic update
+    const note = notes.value.find((n) => n.id === id)
+    if (note) note.pinned = !currentValue
+
     const noteRef = doc(firestore, `users/${uid}/notes/${id}`)
-    await offlineWrite(() => updateDoc(noteRef, { pinned: !currentValue }))
+    updateDoc(noteRef, { pinned: !currentValue }).catch((err) =>
+      console.warn('[Firestore] Pin toggle queued:', err),
+    )
   }
 
   function stopListening() {
