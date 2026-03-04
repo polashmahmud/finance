@@ -14,9 +14,8 @@
             <div class="text-body2" style="color: #8e8ea0; margin-top: 2px;">{{ greeting }}</div>
           </div>
           <div class="greeting-icon-wrap">
-            <q-avatar :style="{ background: greetingIcon.bg }" size="52px">
-              <q-icon :name="greetingIcon.icon" :style="{ color: greetingIcon.color }" size="28px" />
-            </q-avatar>
+            <img :src="greetingIcon.src" :alt="greetingIcon.alt"
+              style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover;" />
           </div>
         </div>
 
@@ -639,10 +638,15 @@ const userName = computed(() => {
 })
 
 const greetingIcon = computed(() => {
-  if (hour >= 5 && hour < 12) return { icon: 'wb_sunny', color: '#f59e0b', bg: '#fef3c7' }
-  if (hour >= 12 && hour < 17) return { icon: 'wb_sunny', color: '#ef6c00', bg: '#fff3e0' }
-  if (hour >= 17 && hour < 20) return { icon: 'wb_twilight', color: '#e65100', bg: '#fbe9e7' }
-  return { icon: 'dark_mode', color: '#5c6bc0', bg: '#e8eaf6' }
+  // Returns image paths for different times of day
+  // sunrise.png - morning (5am-12pm)
+  // mid-day.png - afternoon (12pm-5pm)
+  // sunset.png - evening (5pm-8pm)
+  // night.png - night (8pm-5am)
+  if (hour >= 5 && hour < 12) return { src: '/img/sunrise.png', alt: 'morning' }
+  if (hour >= 12 && hour < 17) return { src: '/img/mid-day.png', alt: 'afternoon' }
+  if (hour >= 17 && hour < 20) return { src: '/img/sunset.png', alt: 'evening' }
+  return { src: '/img/night.png', alt: 'night' }
 })
 
 function getCategorySpent(categoryName) {
