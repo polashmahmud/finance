@@ -660,6 +660,7 @@ export default {
     },
     footer: {
       rights: 'সকল অধিকার সংরক্ষিত।',
+      privacyPolicy: 'প্রাইভেসি পলিসি',
     },
   },
 

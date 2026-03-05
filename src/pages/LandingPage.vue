@@ -168,6 +168,11 @@
           </span>
         </div>
         <div class="row items-center q-gutter-md">
+          <router-link to="/privacy-policy"
+            class="text-grey-6"
+            style="font-size: 0.85rem; text-decoration: none;">
+            {{ $t('landing.footer.privacyPolicy') }}
+          </router-link>
           <a href="https://github.com/polashmahmud/finance" target="_blank" rel="noopener noreferrer"
             class="row items-center q-gutter-xs text-grey-6 no-decoration"
             style="font-size: 0.85rem; text-decoration: none;">
