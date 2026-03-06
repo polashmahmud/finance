@@ -85,9 +85,9 @@ body {
   font-size: 0.95rem;
 }
 
-// Enable swipe on mobile for q-slide-item
+// Enable horizontal swipe on mobile for q-slide-item while allowing vertical scroll
 .q-slide-item {
-  touch-action: none !important;
+  touch-action: pan-y !important;
 }
 
 .amount-income {
