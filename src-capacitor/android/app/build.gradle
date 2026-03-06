@@ -4,7 +4,7 @@ android {
     namespace "org.capacitor.quasar.app"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "org.capacitor.quasar.app"
+        applicationId "com.polashmahmud.finance"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
