@@ -43,6 +43,7 @@ const routes = [
       { path: 'categories', component: () => import('pages/CategoriesPage.vue') },
       { path: 'market-lists', component: () => import('pages/MarketListsPage.vue') },
       { path: 'notes', component: () => import('pages/NotesPage.vue') },
+      { path: 'loans', component: () => import('pages/LoansPage.vue') },
       { path: 'reports', component: () => import('pages/ReportsPage.vue') },
       { path: 'search', component: () => import('pages/SearchPage.vue') },
       { path: 'settings', component: () => import('pages/SettingsPage.vue') },

@@ -120,6 +120,13 @@
             <q-item-section>{{ $t('nav.note') }}</q-item-section>
           </q-item>
 
+          <q-item clickable v-ripple to="/dashboard/loans" active-class="sidebar-item-active">
+            <q-item-section avatar>
+              <q-icon name="account_balance" />
+            </q-item-section>
+            <q-item-section>{{ $t('nav.loans') }}</q-item-section>
+          </q-item>
+
           <q-separator class="q-my-sm" />
 
           <q-item clickable v-ripple to="/dashboard/categories" active-class="sidebar-item-active">
@@ -177,7 +184,7 @@
         <!-- Grid -->
         <q-card-section class="q-pt-none">
           <div class="row q-col-gutter-sm">
-            <div :class="index < 3 ? 'col-4' : 'col-6'" v-for="(action, index) in quickAddActions" :key="index">
+            <div class="col-4" v-for="(action, index) in quickAddActions" :key="index">
               <div class="cursor-pointer text-center"
                 :style="{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: action.bgColor, borderRadius: '16px', padding: '16px 8px', transition: 'background-color 0.2s', height: '100px' }"
                 v-ripple @click="navigateTo(action.route)">
@@ -297,7 +304,8 @@ const quickAddActions = computed(() => [
   { label: t('common.expense'), icon: 'trending_down', color: '#ef4444', bgColor: '#fef2f2', route: '/dashboard/add-expense' },
   { label: t('common.transfer'), icon: 'sync_alt', color: '#3b82f6', bgColor: '#eff6ff', route: '/dashboard/transfer' },
   { label: t('nav.marketList'), icon: 'shopping_cart', color: '#22c55e', bgColor: '#f0fdf4', route: '/dashboard/market-lists' },
-  { label: t('nav.note'), icon: 'description', color: '#0f172a', bgColor: '#fffbeb', route: '/dashboard/notes' }
+  { label: t('nav.note'), icon: 'description', color: '#0f172a', bgColor: '#fffbeb', route: '/dashboard/notes' },
+  { label: t('nav.loans'), icon: 'account_balance', color: '#8b5cf6', bgColor: '#f5f3ff', route: '/dashboard/loans' }
 ])
 
 function navigateTo(path) {
