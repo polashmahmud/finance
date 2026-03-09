@@ -1,34 +1,51 @@
 <template>
-  <q-card class="finance-card cursor-pointer" :style="{ borderLeft: '4px solid ' + color, opacity: settled ? 0.7 : 1 }">
-    <q-card-section class="q-py-sm" @click="$emit('click')">
-      <div class="row items-center justify-between no-wrap">
-        <div class="col">
-          <div class="row items-center q-gutter-xs q-mb-xs">
-            <div class="text-subtitle1 text-weight-bold" style="line-height: 1.3;">{{ loan.personName }}</div>
-            <q-chip v-if="settled" color="positive" text-color="white" dense size="xs">
-              {{ $t('loans.settled') }}
-            </q-chip>
-          </div>
-          <div class="text-h6 text-weight-bold" :style="{ color: color }">
-            {{ settings.currency }}{{ settings.formatNumber(loan.amount) }}
-          </div>
-          <q-linear-progress :value="progress" rounded size="6px" class="q-mt-xs q-mb-xs"
-            :color="loan.type === 'receivable' ? 'positive' : 'negative'" track-color="grey-3" />
-          <div class="row items-center justify-between">
-            <div class="text-caption text-grey-7">
-              {{ $t('loans.paid') }}: {{ settings.currency }}{{ settings.formatNumber(loan.paidAmount || 0) }}
-            </div>
-            <div v-if="remaining > 0" class="text-caption text-weight-medium" :style="{ color }">
-              {{ $t('loans.remaining') }}: {{ settings.currency }}{{ settings.formatNumber(remaining) }}
+  <q-card class="finance-card cursor-pointer loan-card" :style="{ opacity: settled ? 0.65 : 1 }">
+    <q-card-section class="q-pa-none" @click="$emit('click')">
+      <div class="q-pa-md">
+        <!-- Header row: name + status badge -->
+        <div class="row items-center justify-between no-wrap q-mb-sm">
+          <div class="row items-center q-gutter-sm" style="min-width: 0;">
+            <q-avatar :style="{ background: color + '15' }" size="38px">
+              <q-icon name="person" :style="{ color }" size="20px" />
+            </q-avatar>
+            <div style="min-width: 0;">
+              <div class="text-subtitle1 text-weight-bold ellipsis" style="line-height: 1.3;">{{ loan.personName }}</div>
+              <div class="text-caption text-grey-6">{{ formatDate(loan.date) }}</div>
             </div>
           </div>
-          <div class="text-caption text-grey q-mt-xs">{{ formatDate(loan.date) }}</div>
+          <q-chip v-if="settled" color="positive" text-color="white" dense size="sm" icon="check_circle">
+            {{ $t('loans.settled') }}
+          </q-chip>
         </div>
-        <div class="column q-gutter-xs q-ml-sm">
-          <q-btn v-if="!settled" flat round dense icon="payment" :style="{ color }"
-            @click.stop="$emit('pay')" />
-          <q-btn flat round dense icon="delete_outline" color="negative"
-            @click.stop="$emit('delete')" />
+
+        <!-- Amount -->
+        <div class="text-h5 text-weight-bold q-mb-xs" :style="{ color }">
+          {{ settings.currency }}{{ settings.formatNumber(loan.amount) }}
+        </div>
+
+        <!-- Progress -->
+        <q-linear-progress :value="progress" rounded size="8px" class="q-mb-sm"
+          :color="loan.type === 'receivable' ? 'positive' : 'negative'" track-color="grey-3" />
+
+        <!-- Stats row -->
+        <div class="row items-center justify-between q-mb-xs">
+          <div class="text-caption" style="color: #64748b;">
+            {{ $t('loans.paid') }}: <span class="text-weight-medium" style="color: #334155;">{{ settings.currency }}{{ settings.formatNumber(loan.paidAmount || 0) }}</span>
+          </div>
+          <div v-if="remaining > 0" class="text-caption text-weight-bold" :style="{ color }">
+            {{ $t('loans.remaining') }}: {{ settings.currency }}{{ settings.formatNumber(remaining) }}
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="row justify-end q-gutter-xs q-mt-xs">
+          <q-btn v-if="!settled" flat dense no-caps size="sm" :style="{ color }" icon="payment"
+            :label="loan.type === 'receivable' ? $t('loans.receiveBtn') : $t('loans.payBtn')"
+            @click.stop="$emit('pay')" style="border-radius: 8px;" />
+          <q-btn flat dense no-caps size="sm" color="dark" icon="edit"
+            @click.stop="$emit('edit')" style="border-radius: 8px;" />
+          <q-btn flat dense no-caps size="sm" color="negative" icon="delete_outline"
+            @click.stop="$emit('delete')" style="border-radius: 8px;" />
         </div>
       </div>
     </q-card-section>
@@ -45,7 +62,7 @@ const props = defineProps({
   settled: { type: Boolean, default: false },
 })
 
-defineEmits(['click', 'delete', 'pay'])
+defineEmits(['click', 'delete', 'pay', 'edit'])
 
 const settings = useSettingsStore()
 

@@ -48,14 +48,14 @@
       </q-tabs>
 
       <!-- Receivable Tab -->
-      <q-tab-panels v-model="activeTab" animated>
+      <q-tab-panels v-model="activeTab" animated style="background: transparent;">
         <q-tab-panel name="receivable" class="q-pa-none">
           <div v-if="activeLoans(loanStore.receivables).length" class="q-mb-md">
             <div class="page-section-title">{{ $t('loans.activeLoans') }}</div>
             <div class="row q-col-gutter-sm">
               <div v-for="loan in activeLoans(loanStore.receivables)" :key="loan.id" class="col-12 col-md-6">
                 <loan-card :loan="loan" color="#22c55e" @click="openDetail(loan)" @delete="confirmDelete(loan)"
-                  @pay="openPaymentDialog(loan)" />
+                  @pay="openPaymentDialog(loan)" @edit="openEditDialog(loan)" />
               </div>
             </div>
           </div>
@@ -65,7 +65,7 @@
             <div class="row q-col-gutter-sm">
               <div v-for="loan in settledLoans(loanStore.receivables)" :key="loan.id" class="col-12 col-md-6">
                 <loan-card :loan="loan" color="#22c55e" settled @click="openDetail(loan)"
-                  @delete="confirmDelete(loan)" />
+                  @delete="confirmDelete(loan)" @edit="openEditDialog(loan)" />
               </div>
             </div>
           </div>
@@ -83,7 +83,7 @@
             <div class="row q-col-gutter-sm">
               <div v-for="loan in activeLoans(loanStore.payables)" :key="loan.id" class="col-12 col-md-6">
                 <loan-card :loan="loan" color="#ef4444" @click="openDetail(loan)" @delete="confirmDelete(loan)"
-                  @pay="openPaymentDialog(loan)" />
+                  @pay="openPaymentDialog(loan)" @edit="openEditDialog(loan)" />
               </div>
             </div>
           </div>
@@ -93,7 +93,7 @@
             <div class="row q-col-gutter-sm">
               <div v-for="loan in settledLoans(loanStore.payables)" :key="loan.id" class="col-12 col-md-6">
                 <loan-card :loan="loan" color="#ef4444" settled @click="openDetail(loan)"
-                  @delete="confirmDelete(loan)" />
+                  @delete="confirmDelete(loan)" @edit="openEditDialog(loan)" />
               </div>
             </div>
           </div>
@@ -148,6 +148,49 @@
 
             <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
               :label="addForm.type === 'receivable' ? $t('loans.addReceivable') : $t('loans.addPayable')" :loading="saving" />
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- Edit Loan Dialog -->
+    <q-dialog v-model="showEditDialog">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
+        <q-card-section class="row items-center justify-between no-wrap q-pb-none">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
+            {{ $t('loans.editLoan') }}
+          </div>
+          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+        </q-card-section>
+        <q-card-section>
+          <q-form @submit.prevent="updateLoan">
+            <!-- Person Name -->
+            <q-input v-model="editForm.personName" :label="$t('loans.personName')" outlined dense color="dark"
+              :rules="[(val) => (val && val.length > 0) || $t('common.nameRequired')]" style="margin-bottom: 10px;" />
+
+            <!-- Amount -->
+            <q-input v-model.number="editForm.amount" :label="$t('common.amount')" type="number" outlined dense
+              color="dark" :prefix="settings.currency"
+              :rules="[val => val > 0 || $t('common.validAmount')]" style="margin-bottom: 10px;" />
+
+            <!-- Date -->
+            <q-input v-model="editForm.date" :label="$t('common.date')" outlined dense color="dark" readonly
+              :rules="[val => !!val || $t('common.dateRequired')]" style="margin-bottom: 10px;">
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                    <q-date v-model="editForm.date" mask="YYYY-MM-DD" />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+
+            <!-- Notes -->
+            <q-input v-model="editForm.notes" :label="$t('common.noteOptional')" outlined dense color="dark"
+              type="textarea" rows="2" style="margin-bottom: 10px;" />
+
+            <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
+              :label="$t('common.update')" :loading="editSaving" />
           </q-form>
         </q-card-section>
       </q-card>
@@ -261,21 +304,45 @@
             <!-- Payment History -->
             <div class="page-section-title">{{ $t('loans.paymentHistory') }}</div>
             <div v-if="detailLoan?.payments?.length">
-              <q-card v-for="(p, idx) in sortedPayments" :key="idx" class="finance-card q-mb-sm">
-                <q-card-section class="q-py-sm">
-                  <div class="row items-center justify-between">
-                    <div>
-                      <div class="text-subtitle2 text-weight-bold"
-                        :style="{ color: detailLoan?.type === 'receivable' ? '#22c55e' : '#ef4444' }">
-                        {{ settings.currency }}{{ settings.formatNumber(p.amount) }}
+              <div class="text-center q-mb-xs text-grey-6" style="font-size: 12px;">
+                <q-icon name="swipe" size="16px" class="q-mr-xs" />
+                {{ $t('loans.swipeHint') }}
+              </div>
+              <q-card class="finance-card" style="overflow: hidden;">
+                <q-list separator>
+                  <q-slide-item v-for="(p, idx) in sortedPayments" :key="p.createdAt || idx"
+                    @left="({ reset }) => onEditPayment(p, reset)"
+                    @right="({ reset }) => onDeletePayment(p, reset)">
+                    <template v-slot:left>
+                      <div class="row items-center">
+                        <q-icon name="edit" color="info" />
                       </div>
-                      <div class="text-caption text-grey-7">{{ formatDate(p.date) }}</div>
-                      <div v-if="p.notes" class="text-caption text-grey-6">{{ p.notes }}</div>
-                    </div>
-                    <q-icon name="check_circle"
-                      :color="detailLoan?.type === 'receivable' ? 'positive' : 'negative'" size="24px" />
-                  </div>
-                </q-card-section>
+                    </template>
+                    <template v-slot:right>
+                      <div class="row items-center">
+                        <q-icon name="delete" color="negative" />
+                      </div>
+                    </template>
+                    <q-item class="touch-target">
+                      <q-item-section avatar>
+                        <q-avatar :style="{ background: (detailLoan?.type === 'receivable' ? '#22c55e' : '#ef4444') + '15' }" size="40px">
+                          <q-icon name="payment" :style="{ color: detailLoan?.type === 'receivable' ? '#22c55e' : '#ef4444' }" size="20px" />
+                        </q-avatar>
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label class="text-weight-bold"
+                          :style="{ color: detailLoan?.type === 'receivable' ? '#22c55e' : '#ef4444' }">
+                          {{ settings.currency }}{{ settings.formatNumber(p.amount) }}
+                        </q-item-label>
+                        <q-item-label caption>{{ formatDate(p.date) }}<span v-if="p.notes"> &middot; {{ p.notes }}</span></q-item-label>
+                      </q-item-section>
+                      <q-item-section side>
+                        <q-icon name="check_circle"
+                          :color="detailLoan?.type === 'receivable' ? 'positive' : 'negative'" size="22px" />
+                      </q-item-section>
+                    </q-item>
+                  </q-slide-item>
+                </q-list>
               </q-card>
             </div>
             <div v-else class="empty-state q-mt-md">
@@ -291,6 +358,66 @@
               @click="openPaymentFromDetail" />
           </div>
         </q-page-container>
+      </q-card>
+    </q-dialog>
+
+    <!-- Edit Payment Dialog -->
+    <q-dialog v-model="showEditPaymentDialog">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
+        <q-card-section class="row items-center justify-between no-wrap q-pb-none">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
+            {{ $t('loans.editPayment') }}
+          </div>
+          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+        </q-card-section>
+        <q-card-section>
+          <q-form @submit.prevent="saveEditedPayment">
+            <q-input v-model.number="editPaymentForm.amount" :label="$t('common.amount')" type="number" outlined dense
+              color="dark" :prefix="settings.currency"
+              :rules="[val => val > 0 || $t('common.validAmount')]" style="margin-bottom: 10px;" />
+
+            <q-select v-model="editPaymentForm.accountId" :options="accountOptions" :label="$t('common.account')" outlined
+              dense color="dark" emit-value map-options style="margin-bottom: 10px;" />
+
+            <q-input v-model="editPaymentForm.date" :label="$t('common.date')" outlined dense color="dark" readonly
+              :rules="[val => !!val || $t('common.dateRequired')]" style="margin-bottom: 10px;">
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                    <q-date v-model="editPaymentForm.date" mask="YYYY-MM-DD" />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+
+            <q-input v-model="editPaymentForm.notes" :label="$t('common.noteOptional')" outlined dense color="dark"
+              type="textarea" rows="2" style="margin-bottom: 10px;" />
+
+            <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
+              :label="$t('common.update')" :loading="editPaymentSaving" />
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- Delete Payment Confirm Dialog -->
+    <q-dialog v-model="showDeletePaymentDialog">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 420px; background: white;">
+        <q-card-section>
+          <div class="text-h6 text-weight-bold q-mb-sm">{{ $t('loans.deletePaymentTitle') }}</div>
+          <div class="text-body2 text-grey-8 q-mb-md">
+            {{ settings.currency }}{{ settings.formatNumber(deletingPayment?.amount || 0) }} — {{ $t('loans.deletePaymentConfirm') }}
+          </div>
+          <div class="column q-gutter-sm">
+            <q-btn v-if="deletingPayment?.accountId"
+              :label="detailLoan?.type === 'receivable' ? $t('loans.deletePaymentDeduct') : $t('loans.deletePaymentRefund')"
+              :icon="detailLoan?.type === 'receivable' ? 'money_off' : 'savings'"
+              color="negative" unelevated class="full-width" @click="deletePaymentWithRefund" />
+            <q-btn :label="$t('loans.deletePaymentOnly')" icon="delete_forever" outline color="negative"
+              class="full-width" @click="deletePaymentOnly" />
+            <q-btn :label="$t('common.cancel')" flat color="grey-7" class="full-width" @click="cancelDeletePayment" />
+          </div>
+        </q-card-section>
       </q-card>
     </q-dialog>
   </q-page>
@@ -315,12 +442,21 @@ const settings = useSettingsStore()
 
 const activeTab = ref('receivable')
 const showAddDialog = ref(false)
+const showEditDialog = ref(false)
 const showPaymentDialog = ref(false)
 const showDetailDialog = ref(false)
 const saving = ref(false)
+const editSaving = ref(false)
+const editPaymentSaving = ref(false)
 const paymentSaving = ref(false)
 const payingLoan = ref(null)
 const detailLoan = ref(null)
+const editingLoanId = ref(null)
+const showEditPaymentDialog = ref(false)
+const editingPaymentIndex = ref(null)
+const showDeletePaymentDialog = ref(false)
+const deletingPayment = ref(null)
+const deletingPaymentIndex = ref(null)
 
 const now = new Date()
 
@@ -328,6 +464,20 @@ const addForm = reactive({
   type: 'receivable',
   personName: '',
   amount: null,
+  date: now.toISOString().slice(0, 10),
+  notes: '',
+})
+
+const editForm = reactive({
+  personName: '',
+  amount: null,
+  date: now.toISOString().slice(0, 10),
+  notes: '',
+})
+
+const editPaymentForm = reactive({
+  amount: null,
+  accountId: null,
   date: now.toISOString().slice(0, 10),
   notes: '',
 })
@@ -407,6 +557,37 @@ async function saveLoan() {
   saving.value = false
 }
 
+function openEditDialog(loan) {
+  editingLoanId.value = loan.id
+  editForm.personName = loan.personName
+  editForm.amount = loan.amount
+  editForm.date = loan.date
+  editForm.notes = loan.notes || ''
+  showEditDialog.value = true
+}
+
+async function updateLoan() {
+  if (!editForm.personName || !editForm.amount || editForm.amount <= 0) return
+  editSaving.value = true
+  try {
+    await loanStore.updateLoan(editingLoanId.value, {
+      personName: editForm.personName,
+      amount: editForm.amount,
+      date: editForm.date,
+      notes: editForm.notes,
+    })
+    // Refresh detail dialog if same loan is open
+    if (showDetailDialog.value && detailLoan.value?.id === editingLoanId.value) {
+      detailLoan.value = loanStore.loans.find((l) => l.id === editingLoanId.value)
+    }
+    $q.notify({ type: 'positive', message: t('loans.loanUpdated'), position: 'top' })
+    showEditDialog.value = false
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  editSaving.value = false
+}
+
 function openPaymentDialog(loan) {
   payingLoan.value = loan
   payForm.amount = null
@@ -443,11 +624,12 @@ async function savePayment() {
     const balanceChange = isReceivable ? payForm.amount : -payForm.amount
     await accountStore.updateBalance(payForm.accountId, balanceChange)
 
-    // Record payment in loan
+    // Record payment in loan (include accountId for later edit/refund)
     await loanStore.addPayment(loan.id, {
       amount: payForm.amount,
       date: payForm.date,
       notes: payForm.notes,
+      accountId: payForm.accountId,
     })
 
     // Refresh detail if open
@@ -466,6 +648,110 @@ async function savePayment() {
 function openDetail(loan) {
   detailLoan.value = loan
   showDetailDialog.value = true
+}
+
+function onEditPayment(payment, reset) {
+  reset()
+  const originalIndex = detailLoan.value.payments.findIndex((p) => p.createdAt === payment.createdAt)
+  if (originalIndex < 0) return
+  editingPaymentIndex.value = originalIndex
+  editPaymentForm.amount = payment.amount
+  editPaymentForm.accountId = payment.accountId || null
+  editPaymentForm.date = payment.date
+  editPaymentForm.notes = payment.notes || ''
+  showEditPaymentDialog.value = true
+}
+
+async function saveEditedPayment() {
+  if (!editPaymentForm.amount || editPaymentForm.amount <= 0) return
+  editPaymentSaving.value = true
+  try {
+    const loan = detailLoan.value
+    const oldPayment = loan.payments[editingPaymentIndex.value]
+    const oldAmount = oldPayment?.amount || 0
+    const newAmount = editPaymentForm.amount
+    const diff = newAmount - oldAmount
+    const oldAccountId = oldPayment?.accountId || null
+    const newAccountId = editPaymentForm.accountId || null
+
+    await loanStore.updatePayment(loan.id, editingPaymentIndex.value, {
+      amount: newAmount,
+      accountId: newAccountId,
+      date: editPaymentForm.date,
+      notes: editPaymentForm.notes,
+    })
+
+    // Adjust account balances
+    const isReceivable = loan.type === 'receivable'
+    if (oldAccountId && oldAccountId === newAccountId && diff !== 0) {
+      // Same account, adjust by difference
+      const balanceChange = isReceivable ? diff : -diff
+      await accountStore.updateBalance(oldAccountId, balanceChange)
+    } else {
+      // Different accounts: reverse old, apply new
+      if (oldAccountId) {
+        const reverseChange = isReceivable ? -oldAmount : oldAmount
+        await accountStore.updateBalance(oldAccountId, reverseChange)
+      }
+      if (newAccountId) {
+        const applyChange = isReceivable ? newAmount : -newAmount
+        await accountStore.updateBalance(newAccountId, applyChange)
+      }
+    }
+
+    detailLoan.value = loanStore.loans.find((l) => l.id === loan.id)
+    $q.notify({ type: 'positive', message: t('loans.paymentUpdated'), position: 'top' })
+    showEditPaymentDialog.value = false
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  editPaymentSaving.value = false
+}
+
+function onDeletePayment(payment, reset) {
+  reset()
+  const originalIndex = detailLoan.value.payments.findIndex((p) => p.createdAt === payment.createdAt)
+  if (originalIndex < 0) return
+  deletingPayment.value = payment
+  deletingPaymentIndex.value = originalIndex
+  showDeletePaymentDialog.value = true
+}
+
+async function deletePaymentOnly() {
+  if (deletingPaymentIndex.value == null) return
+  showDeletePaymentDialog.value = false
+  await loanStore.deletePayment(detailLoan.value.id, deletingPaymentIndex.value)
+  detailLoan.value = loanStore.loans.find((l) => l.id === detailLoan.value.id)
+  $q.notify({ type: 'positive', message: t('loans.paymentDeleted'), position: 'top' })
+  deletingPayment.value = null
+  deletingPaymentIndex.value = null
+}
+
+async function deletePaymentWithRefund() {
+  if (deletingPaymentIndex.value == null) return
+  showDeletePaymentDialog.value = false
+  const payment = deletingPayment.value
+  const loan = detailLoan.value
+  const isReceivable = loan.type === 'receivable'
+
+  await loanStore.deletePayment(loan.id, deletingPaymentIndex.value)
+
+  // Reverse account balance
+  if (payment.accountId) {
+    const reverseChange = isReceivable ? -payment.amount : payment.amount
+    await accountStore.updateBalance(payment.accountId, reverseChange)
+  }
+
+  detailLoan.value = loanStore.loans.find((l) => l.id === loan.id)
+  $q.notify({ type: 'positive', message: t('loans.paymentDeleted'), position: 'top' })
+  deletingPayment.value = null
+  deletingPaymentIndex.value = null
+}
+
+function cancelDeletePayment() {
+  showDeletePaymentDialog.value = false
+  deletingPayment.value = null
+  deletingPaymentIndex.value = null
 }
 
 function confirmDelete(loan) {

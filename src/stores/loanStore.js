@@ -93,6 +93,7 @@ export const useLoanStore = defineStore('loans', () => {
       amount: payment.amount,
       date: payment.date || new Date().toISOString().slice(0, 10),
       notes: payment.notes || '',
+      accountId: payment.accountId || null,
       transactionId: payment.transactionId || null,
       createdAt: Date.now(),
     }
@@ -112,6 +113,50 @@ export const useLoanStore = defineStore('loans', () => {
       payments: newPayments,
       settled,
     }).catch((err) => console.warn('[Firestore] Payment update queued:', err))
+  }
+
+  async function updatePayment(loanId, paymentIndex, updatedPayment) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const loan = loans.value.find((l) => l.id === loanId)
+    if (!loan) return
+
+    const newPayments = [...(loan.payments || [])]
+    const oldAmount = newPayments[paymentIndex]?.amount || 0
+    newPayments[paymentIndex] = { ...newPayments[paymentIndex], ...updatedPayment }
+    const diff = (updatedPayment.amount || oldAmount) - oldAmount
+    const newPaidAmount = (loan.paidAmount || 0) + diff
+    const settled = newPaidAmount >= loan.amount
+
+    loan.payments = newPayments
+    loan.paidAmount = newPaidAmount
+    loan.settled = settled
+
+    const loanRef = doc(firestore, `users/${uid}/loans/${loanId}`)
+    updateDoc(loanRef, { payments: newPayments, paidAmount: newPaidAmount, settled }).catch((err) =>
+      console.warn('[Firestore] Payment update queued:', err),
+    )
+  }
+
+  async function deletePayment(loanId, paymentIndex) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const loan = loans.value.find((l) => l.id === loanId)
+    if (!loan) return
+
+    const removedAmount = loan.payments[paymentIndex]?.amount || 0
+    const newPayments = loan.payments.filter((_, i) => i !== paymentIndex)
+    const newPaidAmount = (loan.paidAmount || 0) - removedAmount
+    const settled = newPaidAmount >= loan.amount
+
+    loan.payments = newPayments
+    loan.paidAmount = newPaidAmount
+    loan.settled = settled
+
+    const loanRef = doc(firestore, `users/${uid}/loans/${loanId}`)
+    updateDoc(loanRef, { payments: newPayments, paidAmount: newPaidAmount, settled }).catch((err) =>
+      console.warn('[Firestore] Payment delete queued:', err),
+    )
   }
 
   async function updateLoan(id, data) {
@@ -180,6 +225,8 @@ export const useLoanStore = defineStore('loans', () => {
     fetchLoans,
     addLoan,
     addPayment,
+    updatePayment,
+    deletePayment,
     updateLoan,
     deleteLoan,
     stopListening,
