@@ -112,7 +112,7 @@
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
-            {{ $t('loans.newLoan') }}
+            {{ addForm.type === 'receivable' ? $t('loans.newReceivable') : $t('loans.newPayable') }}
           </div>
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
@@ -147,7 +147,7 @@
               type="textarea" rows="2" style="margin-bottom: 10px;" />
 
             <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
-              :label="$t('loans.addLoan')" :loading="saving" />
+              :label="addForm.type === 'receivable' ? $t('loans.addReceivable') : $t('loans.addPayable')" :loading="saving" />
           </q-form>
         </q-card-section>
       </q-card>
