@@ -88,6 +88,7 @@ body {
 // Enable horizontal swipe on mobile for q-slide-item while allowing vertical scroll
 .q-slide-item {
   touch-action: pan-y !important;
+  background: transparent !important;
 }
 
 .amount-income {

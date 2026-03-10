@@ -42,14 +42,10 @@
         </div>
 
         <!-- Action buttons -->
-        <div class="row justify-end q-gutter-xs q-mt-xs">
-          <q-btn v-if="!settled" flat dense no-caps size="sm" :style="{ color }" icon="payment"
+        <div v-if="!settled" class="row justify-end q-gutter-xs q-mt-xs">
+          <q-btn flat dense no-caps size="sm" :style="{ color }" icon="payment"
             :label="loan.type === 'receivable' ? $t('loans.receiveBtn') : loan.type === 'loan' ? $t('loans.installments') : $t('loans.payBtn')"
             @click.stop="$emit('pay')" style="border-radius: 8px;" />
-          <q-btn flat dense no-caps size="sm" color="dark" icon="edit"
-            @click.stop="$emit('edit')" style="border-radius: 8px;" />
-          <q-btn flat dense no-caps size="sm" color="negative" icon="delete_outline"
-            @click.stop="$emit('delete')" style="border-radius: 8px;" />
         </div>
       </div>
     </q-card-section>

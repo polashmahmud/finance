@@ -12,7 +12,7 @@
 
     <!-- Summary Cards -->
     <div class="row q-col-gutter-sm q-mb-md">
-      <div class="col-6">
+      <div class="col-6 col-md-4">
         <q-card class="finance-card" style="border-left: 4px solid #22c55e;">
           <q-card-section class="q-py-sm q-px-md">
             <div class="text-caption text-grey-7">{{ $t('loans.totalReceivable') }}</div>
@@ -22,7 +22,7 @@
           </q-card-section>
         </q-card>
       </div>
-      <div class="col-6">
+      <div class="col-6 col-md-4">
         <q-card class="finance-card" style="border-left: 4px solid #ef4444;">
           <q-card-section class="q-py-sm q-px-md">
             <div class="text-caption text-grey-7">{{ $t('loans.totalPayable') }}</div>
@@ -32,7 +32,7 @@
           </q-card-section>
         </q-card>
       </div>
-      <div v-if="loanStore.loanEntries.length" class="col-12">
+      <div v-if="loanStore.loanEntries.length" class="col-12 col-md-4">
         <q-card class="finance-card" style="border-left: 4px solid #f59e0b;">
           <q-card-section class="q-py-sm q-px-md">
             <div class="text-caption text-grey-7">{{ $t('loans.totalLoan') }}</div>
@@ -64,9 +64,17 @@
           <div v-if="activeLoans(loanStore.receivables).length" class="q-mb-md">
             <div class="page-section-title">{{ $t('loans.activeLoans') }}</div>
             <div class="row q-col-gutter-sm">
-              <div v-for="loan in activeLoans(loanStore.receivables)" :key="loan.id" class="col-12 col-md-6">
-                <loan-card :loan="loan" color="#22c55e" @click="openDetail(loan)" @delete="confirmDelete(loan)"
-                  @pay="openPaymentDialog(loan)" @edit="openEditDialog(loan)" />
+              <div v-for="loan in activeLoans(loanStore.receivables)" :key="loan.id" class="col-12 col-md-4">
+                <q-slide-item @left="(obj) => onSwipe(obj, 'edit', loan)" @right="(obj) => onSwipe(obj, 'delete', loan)">
+                  <template v-slot:left>
+                    <q-icon name="edit" color="dark" />
+                  </template>
+                  <template v-slot:right>
+                    <q-icon name="delete" color="negative" />
+                  </template>
+                  <loan-card :loan="loan" color="#22c55e" @click="openDetail(loan)"
+                    @pay="openPaymentDialog(loan)" />
+                </q-slide-item>
               </div>
             </div>
           </div>
@@ -74,9 +82,16 @@
           <div v-if="settledLoans(loanStore.receivables).length" class="q-mb-md">
             <div class="page-section-title">{{ $t('loans.settledLoans') }}</div>
             <div class="row q-col-gutter-sm">
-              <div v-for="loan in settledLoans(loanStore.receivables)" :key="loan.id" class="col-12 col-md-6">
-                <loan-card :loan="loan" color="#22c55e" settled @click="openDetail(loan)"
-                  @delete="confirmDelete(loan)" @edit="openEditDialog(loan)" />
+              <div v-for="loan in settledLoans(loanStore.receivables)" :key="loan.id" class="col-12 col-md-4">
+                <q-slide-item @left="(obj) => onSwipe(obj, 'edit', loan)" @right="(obj) => onSwipe(obj, 'delete', loan)">
+                  <template v-slot:left>
+                    <q-icon name="edit" color="dark" />
+                  </template>
+                  <template v-slot:right>
+                    <q-icon name="delete" color="negative" />
+                  </template>
+                  <loan-card :loan="loan" color="#22c55e" settled @click="openDetail(loan)" />
+                </q-slide-item>
               </div>
             </div>
           </div>
@@ -92,9 +107,17 @@
           <div v-if="activeLoans(loanStore.payables).length" class="q-mb-md">
             <div class="page-section-title">{{ $t('loans.activeLoans') }}</div>
             <div class="row q-col-gutter-sm">
-              <div v-for="loan in activeLoans(loanStore.payables)" :key="loan.id" class="col-12 col-md-6">
-                <loan-card :loan="loan" color="#ef4444" @click="openDetail(loan)" @delete="confirmDelete(loan)"
-                  @pay="openPaymentDialog(loan)" @edit="openEditDialog(loan)" />
+              <div v-for="loan in activeLoans(loanStore.payables)" :key="loan.id" class="col-12 col-md-4">
+                <q-slide-item @left="(obj) => onSwipe(obj, 'edit', loan)" @right="(obj) => onSwipe(obj, 'delete', loan)">
+                  <template v-slot:left>
+                    <q-icon name="edit" color="dark" />
+                  </template>
+                  <template v-slot:right>
+                    <q-icon name="delete" color="negative" />
+                  </template>
+                  <loan-card :loan="loan" color="#ef4444" @click="openDetail(loan)"
+                    @pay="openPaymentDialog(loan)" />
+                </q-slide-item>
               </div>
             </div>
           </div>
@@ -102,9 +125,16 @@
           <div v-if="settledLoans(loanStore.payables).length" class="q-mb-md">
             <div class="page-section-title">{{ $t('loans.settledLoans') }}</div>
             <div class="row q-col-gutter-sm">
-              <div v-for="loan in settledLoans(loanStore.payables)" :key="loan.id" class="col-12 col-md-6">
-                <loan-card :loan="loan" color="#ef4444" settled @click="openDetail(loan)"
-                  @delete="confirmDelete(loan)" @edit="openEditDialog(loan)" />
+              <div v-for="loan in settledLoans(loanStore.payables)" :key="loan.id" class="col-12 col-md-4">
+                <q-slide-item @left="(obj) => onSwipe(obj, 'edit', loan)" @right="(obj) => onSwipe(obj, 'delete', loan)">
+                  <template v-slot:left>
+                    <q-icon name="edit" color="dark" />
+                  </template>
+                  <template v-slot:right>
+                    <q-icon name="delete" color="negative" />
+                  </template>
+                  <loan-card :loan="loan" color="#ef4444" settled @click="openDetail(loan)" />
+                </q-slide-item>
               </div>
             </div>
           </div>
@@ -120,9 +150,17 @@
           <div v-if="activeLoans(loanStore.loanEntries).length" class="q-mb-md">
             <div class="page-section-title">{{ $t('loans.activeLoans') }}</div>
             <div class="row q-col-gutter-sm">
-              <div v-for="loan in activeLoans(loanStore.loanEntries)" :key="loan.id" class="col-12 col-md-6">
-                <loan-card :loan="loan" color="#f59e0b" @click="openDetail(loan)" @delete="confirmDelete(loan)"
-                  @pay="openDetail(loan)" @edit="openEditDialog(loan)" />
+              <div v-for="loan in activeLoans(loanStore.loanEntries)" :key="loan.id" class="col-12 col-md-4">
+                <q-slide-item @left="(obj) => onSwipe(obj, 'edit', loan)" @right="(obj) => onSwipe(obj, 'delete', loan)">
+                  <template v-slot:left>
+                    <q-icon name="edit" color="dark" />
+                  </template>
+                  <template v-slot:right>
+                    <q-icon name="delete" color="negative" />
+                  </template>
+                  <loan-card :loan="loan" color="#f59e0b" @click="openDetail(loan)"
+                    @pay="openDetail(loan)" />
+                </q-slide-item>
               </div>
             </div>
           </div>
@@ -130,9 +168,16 @@
           <div v-if="settledLoans(loanStore.loanEntries).length" class="q-mb-md">
             <div class="page-section-title">{{ $t('loans.settledLoans') }}</div>
             <div class="row q-col-gutter-sm">
-              <div v-for="loan in settledLoans(loanStore.loanEntries)" :key="loan.id" class="col-12 col-md-6">
-                <loan-card :loan="loan" color="#f59e0b" settled @click="openDetail(loan)"
-                  @delete="confirmDelete(loan)" @edit="openEditDialog(loan)" />
+              <div v-for="loan in settledLoans(loanStore.loanEntries)" :key="loan.id" class="col-12 col-md-4">
+                <q-slide-item @left="(obj) => onSwipe(obj, 'edit', loan)" @right="(obj) => onSwipe(obj, 'delete', loan)">
+                  <template v-slot:left>
+                    <q-icon name="edit" color="dark" />
+                  </template>
+                  <template v-slot:right>
+                    <q-icon name="delete" color="negative" />
+                  </template>
+                  <loan-card :loan="loan" color="#f59e0b" settled @click="openDetail(loan)" />
+                </q-slide-item>
               </div>
             </div>
           </div>
@@ -144,6 +189,12 @@
           </div>
         </q-tab-panel>
       </q-tab-panels>
+
+      <!-- Swipe Hint -->
+      <div v-if="loanStore.loans.length" class="text-center q-pa-md text-grey-6 q-mt-sm" style="font-size: 12px;">
+        <q-icon name="swipe" size="16px" class="q-mr-xs" />
+        {{ $t('categories.swipeHint') }}
+      </div>
     </template>
 
     <!-- Add Loan Dialog -->
@@ -705,6 +756,19 @@ const sortedPayments = computed(() => {
   if (!detailLoan.value?.payments) return []
   return [...detailLoan.value.payments].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
 })
+
+function onSwipe({ reset }, action, loan) {
+  setTimeout(() => {
+    if (action === 'edit') {
+      openEditDialog(loan)
+    } else if (action === 'delete') {
+      confirmDelete(loan)
+    }
+  }, 300)
+  setTimeout(() => {
+    reset()
+  }, 100)
+}
 
 function activeLoans(list) {
   return list.filter((l) => !l.settled)
