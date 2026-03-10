@@ -458,31 +458,49 @@
               <div class="page-section-title">{{ $t('loans.installmentSchedule') }}</div>
               <q-card v-if="detailLoan?.installments?.length" class="finance-card" style="overflow: hidden;">
                 <q-list separator>
-                  <q-item v-for="(inst, idx) in detailLoan.installments" :key="idx" class="touch-target">
-                    <q-item-section avatar>
-                      <q-avatar :style="{ background: inst.paid ? '#22c55e15' : '#f59e0b15' }" size="40px">
-                        <q-icon :name="inst.paid ? 'check_circle' : 'schedule'"
-                          :style="{ color: inst.paid ? '#22c55e' : '#f59e0b' }" size="20px" />
-                      </q-avatar>
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label class="text-weight-bold">
-                        {{ $t('loans.installment') }} #{{ inst.number }}
-                      </q-item-label>
-                      <q-item-label caption>
-                        {{ formatDate(inst.dueDate) }}
-                        <span v-if="inst.paid" class="text-positive"> &middot; {{ $t('loans.paidOn') }} {{ formatDate(inst.paidDate) }}</span>
-                      </q-item-label>
-                    </q-item-section>
-                    <q-item-section side class="text-right">
-                      <div class="text-weight-bold q-mb-xs" :style="{ color: inst.paid ? '#22c55e' : '#333' }">
-                        {{ settings.currency }}{{ settings.formatNumber(inst.paid ? inst.paidAmount : inst.amount) }}
+                  <div v-for="(inst, idx) in detailLoan.installments" :key="idx">
+                    <q-item class="touch-target" style="flex-direction: column; align-items: stretch; padding: 0;">
+                      <div class="row items-center q-pa-sm q-px-md">
+                        <q-item-section avatar>
+                          <q-avatar :style="{ background: inst.paid ? '#22c55e15' : (inst.paidAmount > 0 ? '#f59e0b30' : '#f59e0b15') }" size="40px">
+                            <q-icon :name="inst.paid ? 'check_circle' : (inst.paidAmount > 0 ? 'pending' : 'schedule')"
+                              :style="{ color: inst.paid ? '#22c55e' : '#f59e0b' }" size="20px" />
+                          </q-avatar>
+                        </q-item-section>
+                        <q-item-section>
+                          <q-item-label class="text-weight-bold">
+                            {{ $t('loans.installment') }} #{{ inst.number }}
+                          </q-item-label>
+                          <q-item-label caption>
+                            {{ formatDate(inst.dueDate) }}
+                            <span v-if="inst.paid" class="text-positive"> &middot; {{ $t('loans.paidOn') }} {{ formatDate(inst.paidDate) }}</span>
+                            <span v-else-if="inst.paidAmount > 0" style="color: #f59e0b;"> &middot; {{ $t('loans.installmentPaidSoFar') }}: {{ settings.currency }}{{ settings.formatNumber(inst.paidAmount) }}</span>
+                          </q-item-label>
+                        </q-item-section>
+                        <q-item-section side class="text-right">
+                          <div class="text-weight-bold q-mb-xs" :style="{ color: inst.paid ? '#22c55e' : '#333' }">
+                            {{ settings.currency }}{{ settings.formatNumber(inst.paid ? inst.paidAmount : inst.amount) }}
+                          </div>
+                          <q-btn v-if="!inst.paid && !detailLoan?.settled" flat dense size="sm" color="positive"
+                            icon="payment" :label="$t('loans.confirmPay')"
+                            @click.stop="openConfirmInstallment(inst, idx)" style="border-radius: 8px;" />
+                        </q-item-section>
                       </div>
-                      <q-btn v-if="!inst.paid && !detailLoan?.settled" flat dense size="sm" color="positive"
-                        icon="check" :label="$t('loans.confirmPay')"
-                        @click="openConfirmInstallment(inst, idx)" style="border-radius: 8px;" />
-                    </q-item-section>
-                  </q-item>
+                      <!-- Sub-payment history -->
+                      <div v-if="inst.payments && inst.payments.length" style="background: #f8fafc; border-top: 1px solid #e2e8f0;">
+                        <div v-for="(p, pIdx) in [...inst.payments].sort((a,b) => (a.createdAt||0)-(b.createdAt||0))" :key="pIdx"
+                          class="row items-center justify-between q-px-md q-py-xs" style="font-size: 0.82rem;">
+                          <div class="row items-center q-gutter-xs">
+                            <q-icon name="subdirectory_arrow_right" size="14px" color="grey-5" />
+                            <span class="text-grey-7">{{ formatDate(p.date) }}</span>
+                          </div>
+                          <span class="text-weight-medium" style="color: #f59e0b;">
+                            +{{ settings.currency }}{{ settings.formatNumber(p.amount) }}
+                          </span>
+                        </div>
+                      </div>
+                    </q-item>
+                  </div>
                 </q-list>
               </q-card>
             </template>
@@ -626,6 +644,9 @@
             <div class="text-caption text-grey-7">
               {{ $t('loans.scheduledAmount') }}: {{ settings.currency }}{{ settings.formatNumber(confirmingInstallment?.amount || 0) }}
             </div>
+            <div v-if="confirmingInstallment?.paidAmount > 0" class="text-caption" style="color: #f59e0b;">
+              {{ $t('loans.installmentPaidSoFar') }}: {{ settings.currency }}{{ settings.formatNumber(confirmingInstallment?.paidAmount || 0) }}
+            </div>
             <div class="text-caption text-grey-7">
               {{ $t('loans.dueDate') }}: {{ formatDate(confirmingInstallment?.dueDate) }}
             </div>
@@ -634,12 +655,14 @@
             <q-input v-model.number="confirmInstallmentAmount" :label="$t('loans.actualPaidAmount')" type="number"
               outlined dense color="dark" :prefix="settings.currency"
               :rules="[val => val > 0 || $t('common.validAmount')]" style="margin-bottom: 10px;" />
+            <q-checkbox v-model="confirmMarkAsPaid" :label="$t('loans.markAsPaid')" color="positive" class="q-mb-md" />
             <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
               :label="$t('loans.confirmPay')" :loading="confirmingInstallmentSaving" />
           </q-form>
         </q-card-section>
       </q-card>
     </q-dialog>
+
   </q-page>
 </template>
 
@@ -681,6 +704,7 @@ const showConfirmInstallmentDialog = ref(false)
 const confirmingInstallment = ref(null)
 const confirmingInstallmentIndex = ref(null)
 const confirmInstallmentAmount = ref(null)
+const confirmMarkAsPaid = ref(true)
 const confirmingInstallmentSaving = ref(false)
 
 const now = new Date()
@@ -844,7 +868,10 @@ function getFrequencyLabel(freq) {
 function openConfirmInstallment(inst, idx) {
   confirmingInstallment.value = inst
   confirmingInstallmentIndex.value = idx
-  confirmInstallmentAmount.value = inst.amount
+  const alreadyPaid = inst.paidAmount || 0
+  const remaining = Math.max(0, inst.amount - alreadyPaid)
+  confirmInstallmentAmount.value = remaining > 0 ? remaining : inst.amount
+  confirmMarkAsPaid.value = true
   showConfirmInstallmentDialog.value = true
 }
 
@@ -854,8 +881,23 @@ async function doConfirmInstallment() {
   try {
     const loan = detailLoan.value
     const amount = confirmInstallmentAmount.value
+    const inst = confirmingInstallment.value
 
-    await loanStore.confirmInstallment(loan.id, confirmingInstallmentIndex.value, amount)
+    const alreadyPaid = inst.paidAmount || 0
+    const newTotal = alreadyPaid + amount
+    const markAsPaid = confirmMarkAsPaid.value || newTotal >= inst.amount
+
+    await loanStore.addInstallmentPayment(
+      loan.id,
+      confirmingInstallmentIndex.value,
+      {
+        amount,
+        accountId: loan.accountId,
+        date: new Date().toISOString().slice(0, 10),
+        notes: '',
+      },
+      markAsPaid,
+    )
 
     // Deduct from account
     await accountStore.updateBalance(loan.accountId, -amount)
@@ -868,7 +910,7 @@ async function doConfirmInstallment() {
       accountId: loan.accountId,
       date: new Date().toISOString().slice(0, 10),
       time: new Date().toTimeString().slice(0, 5),
-      notes: `${t('loans.installment')} #${confirmingInstallmentIndex.value + 1} - ${loan.personName}`,
+      notes: `${t('loans.installment')} #${inst.number} - ${loan.personName}`,
     }
     await transactionStore.addTransaction(txData)
 

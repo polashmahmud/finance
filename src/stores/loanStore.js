@@ -305,22 +305,38 @@ export const useLoanStore = defineStore('loans', () => {
     loan.totalAmount = totalPaid + newRemainingTotal
   }
 
-  async function confirmInstallment(loanId, installmentIndex, paidAmount) {
+  // Add a (partial) payment to an installment.
+  // markAsPaid: if true, or if cumulativePaid >= scheduledAmount, mark inst.paid = true
+  async function addInstallmentPayment(loanId, installmentIndex, paymentData, markAsPaid) {
     const uid = auth.currentUser?.uid
     if (!uid) return
     const loan = loans.value.find((l) => l.id === loanId)
     if (!loan || !loan.installments) return
 
     const inst = loan.installments[installmentIndex]
-    if (!inst || inst.paid) return
+    if (!inst) return
 
-    inst.paid = true
-    inst.paidAmount = paidAmount
-    inst.paidDate = new Date().toISOString().slice(0, 10)
+    if (!inst.payments) inst.payments = []
+    inst.payments.push({
+      amount: paymentData.amount,
+      date: paymentData.date || new Date().toISOString().slice(0, 10),
+      notes: paymentData.notes || '',
+      accountId: paymentData.accountId || null,
+      createdAt: Date.now(),
+    })
+
+    const cumulative = inst.payments.reduce((s, p) => s + (p.amount || 0), 0)
+    inst.paidAmount = cumulative
+
+    const shouldMarkPaid = markAsPaid || cumulative >= inst.amount
+    if (shouldMarkPaid && !inst.paid) {
+      inst.paid = true
+      inst.paidDate = new Date().toISOString().slice(0, 10)
+    }
 
     recalculateInstallments(loan)
 
-    const newPaidAmount = loan.installments.reduce((sum, i) => sum + (i.paid ? i.paidAmount : 0), 0)
+    const newPaidAmount = loan.installments.reduce((sum, i) => sum + (i.paidAmount || 0), 0)
     loan.paidAmount = newPaidAmount
 
     const allPaid = loan.installments.every((i) => i.paid)
@@ -332,7 +348,37 @@ export const useLoanStore = defineStore('loans', () => {
       totalAmount: loan.totalAmount,
       paidAmount: loan.paidAmount,
       settled: loan.settled,
-    }).catch((err) => console.warn('[Firestore] Installment confirm queued:', err))
+    }).catch((err) => console.warn('[Firestore] Installment payment queued:', err))
+  }
+
+  // Reset an installment to unpaid state (clear all sub-payments)
+  async function resetInstallment(loanId, installmentIndex) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const loan = loans.value.find((l) => l.id === loanId)
+    if (!loan || !loan.installments) return
+
+    const inst = loan.installments[installmentIndex]
+    if (!inst) return
+
+    const removedAmount = inst.paidAmount || 0
+    inst.payments = []
+    inst.paidAmount = 0
+    inst.paid = false
+    inst.paidDate = null
+
+    const newPaidAmount = Math.max(0, (loan.paidAmount || 0) - removedAmount)
+    loan.paidAmount = newPaidAmount
+    loan.settled = false
+    recalculateInstallments(loan)
+
+    const loanRef = doc(firestore, `users/${uid}/loans/${loanId}`)
+    updateDoc(loanRef, {
+      installments: loan.installments,
+      totalAmount: loan.totalAmount,
+      paidAmount: loan.paidAmount,
+      settled: loan.settled,
+    }).catch((err) => console.warn('[Firestore] Installment reset queued:', err))
   }
 
   function stopListening() {
@@ -386,7 +432,8 @@ export const useLoanStore = defineStore('loans', () => {
     addPayment,
     updatePayment,
     deletePayment,
-    confirmInstallment,
+    addInstallmentPayment,
+    resetInstallment,
     updateLoan,
     deleteLoan,
     stopListening,
