@@ -137,6 +137,35 @@
           </q-card>
         </div>
 
+        <!-- Loan Summary -->
+        <div class="dash-section-header row items-center justify-between q-mb-sm">
+          <div class="dash-section-title">{{ $t('nav.loans') }}</div>
+          <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right"
+            @click="$router.push('/dashboard/loans')" size="sm" />
+        </div>
+        <q-card class="finance-card q-mb-md cursor-pointer" @click="$router.push('/dashboard/loans')" v-ripple>
+          <q-card-section class="q-pa-md">
+            <div class="row q-col-gutter-sm">
+              <div class="col-6">
+                <div class="loan-summary-item" style="border-left: 3px solid #22c55e;">
+                  <div class="text-caption text-grey-7">{{ $t('loans.totalReceivable') }}</div>
+                  <div class="text-subtitle1 text-weight-bold" style="color: #22c55e;">
+                    {{ settings.currency }}{{ settings.formatNumber(loans.totalReceivable) }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="loan-summary-item" style="border-left: 3px solid #ef4444;">
+                  <div class="text-caption text-grey-7">{{ $t('loans.totalPayable') }}</div>
+                  <div class="text-subtitle1 text-weight-bold" style="color: #ef4444;">
+                    {{ settings.currency }}{{ settings.formatNumber(loans.totalPayable) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </q-card-section>
+        </q-card>
+
         <!-- Budget Status -->
         <div class="dash-section-header row items-center justify-between q-mb-sm">
           <div class="dash-section-title">{{ $t('dashboard.budgetStatus') }}</div>
@@ -461,6 +490,7 @@ import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
 import { useAuthStore } from 'stores/authStore'
+import { useLoanStore } from 'stores/loanStore'
 
 const { t } = useI18n()
 const $q = useQuasar()
@@ -470,6 +500,7 @@ const transactions = useTransactionStore()
 const categories = useCategoryStore()
 const settings = useSettingsStore()
 const authStore = useAuthStore()
+const loans = useLoanStore()
 
 const editDialogOpen = ref(false)
 const saving = ref(false)
@@ -619,12 +650,14 @@ onMounted(() => {
   accounts.listenAccounts()
   categories.listenCategories()
   transactions.listenTransactions()
+  loans.listenLoans()
 })
 
 onUnmounted(() => {
   accounts.stopListening()
   categories.stopListening()
   transactions.stopListening()
+  loans.stopListening()
 })
 
 const hour = new Date().getHours()
@@ -1063,6 +1096,12 @@ async function confirmDeleteOnly() {
 .account-card {
   min-width: 155px;
   flex-shrink: 0;
+}
+
+.loan-summary-item {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
 }
 
 /* Budget scroll */

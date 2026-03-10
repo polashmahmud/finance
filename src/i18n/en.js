@@ -656,11 +656,22 @@ export default {
       f6Title: 'Secure & Private',
       f6Desc:
         'Your data stays yours. PIN lock and Firebase authentication keep your finances protected.',
+      f7Title: 'Loan Tracking',
+      f7Desc:
+        'Track money you lent or borrowed. Manage receivables, payables, and installment loans with payment history.',
     },
     cta: {
       title: 'Ready to take control?',
       subtitle: 'Join thousands of users managing their finances smarter.',
       button: 'Start for Free',
+    },
+    getApp: {
+      navLabel: 'Android App',
+      heroBtn: 'Download on Android',
+      title: 'Take it everywhere with the Android App',
+      subtitle:
+        'Download the free Android app and manage your income, expenses, loans and budgets right from your pocket. Syncs automatically with your account.',
+      availableOn: 'Available on',
     },
     footer: {
       rights: 'All rights reserved.',
