@@ -32,6 +32,16 @@
           </q-card-section>
         </q-card>
       </div>
+      <div v-if="loanStore.loanEntries.length" class="col-12">
+        <q-card class="finance-card" style="border-left: 4px solid #f59e0b;">
+          <q-card-section class="q-py-sm q-px-md">
+            <div class="text-caption text-grey-7">{{ $t('loans.totalLoan') }}</div>
+            <div class="text-h6 text-weight-bold" style="color: #f59e0b;">
+              {{ settings.currency }}{{ settings.formatNumber(loanStore.totalLoanAmount) }}
+            </div>
+          </q-card-section>
+        </q-card>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -45,6 +55,7 @@
         narrow-indicator>
         <q-tab name="receivable" :label="$t('loans.receivable')" />
         <q-tab name="payable" :label="$t('loans.payable')" />
+        <q-tab name="loan" :label="$t('loans.loan')" />
       </q-tabs>
 
       <!-- Receivable Tab -->
@@ -104,6 +115,34 @@
             <div class="empty-state-subtitle">{{ $t('loans.addPrompt') }}</div>
           </div>
         </q-tab-panel>
+
+        <q-tab-panel name="loan" class="q-pa-none">
+          <div v-if="activeLoans(loanStore.loanEntries).length" class="q-mb-md">
+            <div class="page-section-title">{{ $t('loans.activeLoans') }}</div>
+            <div class="row q-col-gutter-sm">
+              <div v-for="loan in activeLoans(loanStore.loanEntries)" :key="loan.id" class="col-12 col-md-6">
+                <loan-card :loan="loan" color="#f59e0b" @click="openDetail(loan)" @delete="confirmDelete(loan)"
+                  @pay="openDetail(loan)" @edit="openEditDialog(loan)" />
+              </div>
+            </div>
+          </div>
+
+          <div v-if="settledLoans(loanStore.loanEntries).length" class="q-mb-md">
+            <div class="page-section-title">{{ $t('loans.settledLoans') }}</div>
+            <div class="row q-col-gutter-sm">
+              <div v-for="loan in settledLoans(loanStore.loanEntries)" :key="loan.id" class="col-12 col-md-6">
+                <loan-card :loan="loan" color="#f59e0b" settled @click="openDetail(loan)"
+                  @delete="confirmDelete(loan)" @edit="openEditDialog(loan)" />
+              </div>
+            </div>
+          </div>
+
+          <div v-if="!loanStore.loanEntries.length" class="empty-state">
+            <q-icon name="account_balance_wallet" size="60px" />
+            <div class="empty-state-title">{{ $t('loans.noLoans') }}</div>
+            <div class="empty-state-subtitle">{{ $t('loans.addPrompt') }}</div>
+          </div>
+        </q-tab-panel>
       </q-tab-panels>
     </template>
 
@@ -112,23 +151,33 @@
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
-            {{ addForm.type === 'receivable' ? $t('loans.newReceivable') : $t('loans.newPayable') }}
+            {{ addForm.type === 'receivable' ? $t('loans.newReceivable') : addForm.type === 'payable' ? $t('loans.newPayable') : $t('loans.newLoanEntry') }}
           </div>
           <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
         </q-card-section>
         <q-card-section>
-          <q-form @submit.prevent="saveLoan">
-            <!-- Type -->
-            <q-option-group v-model="addForm.type" :options="loanTypeOptions" inline color="dark" class="q-mb-md" />
+          <!-- Type Tabs -->
+          <q-tabs v-model="addForm.type" dense active-color="dark" indicator-color="dark" class="q-mb-md"
+            narrow-indicator>
+            <q-tab name="receivable" :label="$t('loans.receivable')" />
+            <q-tab name="payable" :label="$t('loans.payable')" />
+            <q-tab name="loan" :label="$t('loans.loan')" />
+          </q-tabs>
 
+          <q-form @submit.prevent="addForm.type === 'loan' ? saveLoanEntry() : saveLoan()">
             <!-- Person Name -->
             <q-input v-model="addForm.personName" :label="$t('loans.personName')" outlined dense color="dark"
               :rules="[(val) => (val && val.length > 0) || $t('common.nameRequired')]" style="margin-bottom: 10px;" />
 
             <!-- Amount -->
-            <q-input v-model.number="addForm.amount" :label="$t('common.amount')" type="number" outlined dense
+            <q-input v-model.number="addForm.amount" :label="addForm.type === 'loan' ? $t('loans.principal') : $t('common.amount')" type="number" outlined dense
               color="dark" :prefix="settings.currency"
               :rules="[val => val > 0 || $t('common.validAmount')]" style="margin-bottom: 10px;" />
+
+            <!-- Interest Rate (loan only) -->
+            <q-input v-if="addForm.type === 'loan'" v-model.number="addForm.interestRate"
+              :label="$t('loans.interestRate')" type="number" outlined dense color="dark" suffix="%"
+              :rules="[val => val >= 0 || $t('loans.validRate')]" style="margin-bottom: 10px;" />
 
             <!-- Date -->
             <q-input v-model="addForm.date" :label="$t('common.date')" outlined dense color="dark" readonly
@@ -142,12 +191,48 @@
               </template>
             </q-input>
 
+            <!-- Installment Count (loan only) -->
+            <q-input v-if="addForm.type === 'loan'" v-model.number="addForm.installmentCount"
+              :label="$t('loans.installmentCount')" type="number" outlined dense color="dark"
+              :rules="[val => val > 0 || $t('loans.validInstallments')]" style="margin-bottom: 10px;" />
+
+            <!-- Installment Frequency (loan only) -->
+            <q-select v-if="addForm.type === 'loan'" v-model="addForm.installmentFrequency"
+              :options="frequencyOptions" :label="$t('loans.installmentFrequency')" outlined dense color="dark"
+              emit-value map-options style="margin-bottom: 10px;" />
+
+            <!-- Account (loan only) -->
+            <q-select v-if="addForm.type === 'loan'" v-model="addForm.accountId"
+              :options="accountOptions" :label="$t('common.account')" outlined dense color="dark"
+              emit-value map-options :rules="[val => !!val || $t('common.accountRequired')]"
+              style="margin-bottom: 10px;" />
+
+            <!-- Calculated Preview (loan only) -->
+            <div v-if="addForm.type === 'loan' && addForm.amount > 0 && addForm.interestRate >= 0 && addForm.installmentCount > 0"
+              class="q-mb-md" style="background: #f8fafc; border-radius: 12px; padding: 12px;">
+              <div class="text-caption text-grey-7 q-mb-xs">{{ $t('loans.loanSummary') }}</div>
+              <div class="row q-col-gutter-xs">
+                <div class="col-6">
+                  <div class="text-caption">{{ $t('loans.totalInterest') }}</div>
+                  <div class="text-weight-bold">{{ settings.currency }}{{ settings.formatNumber(addForm.amount * (addForm.interestRate || 0) / 100) }}</div>
+                </div>
+                <div class="col-6">
+                  <div class="text-caption">{{ $t('loans.totalWithInterest') }}</div>
+                  <div class="text-weight-bold">{{ settings.currency }}{{ settings.formatNumber(addForm.amount * (1 + (addForm.interestRate || 0) / 100)) }}</div>
+                </div>
+                <div class="col-12 q-mt-xs">
+                  <div class="text-caption">{{ $t('loans.perInstallment') }}</div>
+                  <div class="text-weight-bold text-primary">{{ settings.currency }}{{ settings.formatNumber(Math.round(addForm.amount * (1 + (addForm.interestRate || 0) / 100) / addForm.installmentCount * 100) / 100) }}</div>
+                </div>
+              </div>
+            </div>
+
             <!-- Notes -->
             <q-input v-model="addForm.notes" :label="$t('common.noteOptional')" outlined dense color="dark"
               type="textarea" rows="2" style="margin-bottom: 10px;" />
 
             <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
-              :label="addForm.type === 'receivable' ? $t('loans.addReceivable') : $t('loans.addPayable')" :loading="saving" />
+              :label="addForm.type === 'receivable' ? $t('loans.addReceivable') : addForm.type === 'payable' ? $t('loans.addPayable') : $t('loans.addLoanEntry')" :loading="saving" />
           </q-form>
         </q-card-section>
       </q-card>
@@ -273,35 +358,84 @@
           <div style="max-width: 700px; margin: 0 auto; padding: 16px;">
             <!-- Summary Card -->
             <q-card class="finance-card q-mb-md"
-              :style="{ borderLeft: '4px solid ' + (detailLoan?.type === 'receivable' ? '#22c55e' : '#ef4444') }">
+              :style="{ borderLeft: '4px solid ' + (detailLoan?.type === 'loan' ? '#f59e0b' : detailLoan?.type === 'receivable' ? '#22c55e' : '#ef4444') }">
               <q-card-section>
                 <div class="row items-center justify-between q-mb-sm">
                   <div class="text-caption text-grey-7">
-                    {{ detailLoan?.type === 'receivable' ? $t('loans.lentTo') : $t('loans.borrowedFrom') }}
+                    {{ detailLoan?.type === 'receivable' ? $t('loans.lentTo') : detailLoan?.type === 'loan' ? $t('loans.loan') : $t('loans.borrowedFrom') }}
                   </div>
                   <div class="text-caption text-grey-7">{{ formatDate(detailLoan?.date) }}</div>
                 </div>
                 <div class="text-h5 text-weight-bold q-mb-sm">
-                  {{ settings.currency }}{{ settings.formatNumber(detailLoan?.amount || 0) }}
+                  {{ settings.currency }}{{ settings.formatNumber(detailLoan?.type === 'loan' ? (detailLoan?.totalAmount || 0) : (detailLoan?.amount || 0)) }}
+                </div>
+                <div v-if="detailLoan?.type === 'loan'" class="text-caption text-grey-7 q-mb-xs"
+                  style="margin-top: -6px;">
+                  {{ $t('loans.principal') }}: {{ settings.currency }}{{ settings.formatNumber(detailLoan?.amount || 0) }}
+                  &middot; {{ $t('loans.interest') }}: {{ detailLoan?.interestRate }}%
+                  ({{ settings.currency }}{{ settings.formatNumber((detailLoan?.totalAmount || 0) - (detailLoan?.amount || 0)) }})
                 </div>
                 <q-linear-progress :value="progressValue" rounded size="8px" class="q-mb-xs"
-                  :color="detailLoan?.type === 'receivable' ? 'positive' : 'negative'" track-color="grey-3" />
+                  :color="detailLoan?.type === 'loan' ? 'amber-8' : detailLoan?.type === 'receivable' ? 'positive' : 'negative'" track-color="grey-3" />
                 <div class="row items-center justify-between">
                   <div class="text-caption text-grey-7">
                     {{ $t('loans.paid') }}: {{ settings.currency }}{{ settings.formatNumber(detailLoan?.paidAmount || 0) }}
                   </div>
                   <div class="text-caption text-weight-medium"
-                    :style="{ color: detailLoan?.type === 'receivable' ? '#22c55e' : '#ef4444' }">
+                    :style="{ color: detailLoan?.type === 'loan' ? '#f59e0b' : detailLoan?.type === 'receivable' ? '#22c55e' : '#ef4444' }">
                     {{ $t('loans.remaining') }}: {{ settings.currency }}{{ settings.formatNumber(detailRemaining) }}
                   </div>
                 </div>
                 <div v-if="detailLoan?.notes" class="text-caption text-grey-7 q-mt-sm">
                   {{ detailLoan.notes }}
                 </div>
+                <div v-if="detailLoan?.type === 'loan'" class="row q-mt-sm q-gutter-xs">
+                  <q-chip dense size="sm" color="amber-8" text-color="white" icon="percent">
+                    {{ detailLoan.interestRate }}%
+                  </q-chip>
+                  <q-chip dense size="sm" color="blue-grey-7" text-color="white" icon="event_repeat">
+                    {{ detailLoan.installmentCount }} {{ getFrequencyLabel(detailLoan.installmentFrequency) }}
+                  </q-chip>
+                </div>
               </q-card-section>
             </q-card>
 
-            <!-- Payment History -->
+            <!-- Installment Schedule (for loan type) -->
+            <template v-if="detailLoan?.type === 'loan'">
+              <div class="page-section-title">{{ $t('loans.installmentSchedule') }}</div>
+              <q-card v-if="detailLoan?.installments?.length" class="finance-card" style="overflow: hidden;">
+                <q-list separator>
+                  <q-item v-for="(inst, idx) in detailLoan.installments" :key="idx" class="touch-target">
+                    <q-item-section avatar>
+                      <q-avatar :style="{ background: inst.paid ? '#22c55e15' : '#f59e0b15' }" size="40px">
+                        <q-icon :name="inst.paid ? 'check_circle' : 'schedule'"
+                          :style="{ color: inst.paid ? '#22c55e' : '#f59e0b' }" size="20px" />
+                      </q-avatar>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label class="text-weight-bold">
+                        {{ $t('loans.installment') }} #{{ inst.number }}
+                      </q-item-label>
+                      <q-item-label caption>
+                        {{ formatDate(inst.dueDate) }}
+                        <span v-if="inst.paid" class="text-positive"> &middot; {{ $t('loans.paidOn') }} {{ formatDate(inst.paidDate) }}</span>
+                      </q-item-label>
+                    </q-item-section>
+                    <q-item-section side class="text-right">
+                      <div class="text-weight-bold q-mb-xs" :style="{ color: inst.paid ? '#22c55e' : '#333' }">
+                        {{ settings.currency }}{{ settings.formatNumber(inst.paid ? inst.paidAmount : inst.amount) }}
+                      </div>
+                      <q-btn v-if="!inst.paid && !detailLoan?.settled" flat dense size="sm" color="positive"
+                        icon="check" :label="$t('loans.confirmPay')"
+                        @click="openConfirmInstallment(inst, idx)" style="border-radius: 8px;" />
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-card>
+            </template>
+
+            <!-- Payment History (for receivable/payable) -->
+            <template v-else>
             <div class="page-section-title">{{ $t('loans.paymentHistory') }}</div>
             <div v-if="detailLoan?.payments?.length">
               <div class="text-center q-mb-xs text-grey-6" style="font-size: 12px;">
@@ -356,6 +490,7 @@
               :icon="detailLoan?.type === 'receivable' ? 'call_received' : 'call_made'"
               :label="detailLoan?.type === 'receivable' ? $t('loans.receivePayment') : $t('loans.makePayment')"
               @click="openPaymentFromDetail" />
+            </template>
           </div>
         </q-page-container>
       </q-card>
@@ -420,6 +555,38 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <!-- Confirm Installment Dialog -->
+    <q-dialog v-model="showConfirmInstallmentDialog">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
+        <q-card-section class="row items-center justify-between no-wrap q-pb-none">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
+            {{ $t('loans.confirmInstallment') }}
+          </div>
+          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+        </q-card-section>
+        <q-card-section>
+          <div class="q-mb-md" style="background: #f8fafc; border-radius: 12px; padding: 12px;">
+            <div class="text-subtitle2 text-weight-bold">
+              {{ $t('loans.installment') }} #{{ confirmingInstallment?.number }}
+            </div>
+            <div class="text-caption text-grey-7">
+              {{ $t('loans.scheduledAmount') }}: {{ settings.currency }}{{ settings.formatNumber(confirmingInstallment?.amount || 0) }}
+            </div>
+            <div class="text-caption text-grey-7">
+              {{ $t('loans.dueDate') }}: {{ formatDate(confirmingInstallment?.dueDate) }}
+            </div>
+          </div>
+          <q-form @submit.prevent="doConfirmInstallment">
+            <q-input v-model.number="confirmInstallmentAmount" :label="$t('loans.actualPaidAmount')" type="number"
+              outlined dense color="dark" :prefix="settings.currency"
+              :rules="[val => val > 0 || $t('common.validAmount')]" style="margin-bottom: 10px;" />
+            <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
+              :label="$t('loans.confirmPay')" :loading="confirmingInstallmentSaving" />
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -457,6 +624,11 @@ const editingPaymentIndex = ref(null)
 const showDeletePaymentDialog = ref(false)
 const deletingPayment = ref(null)
 const deletingPaymentIndex = ref(null)
+const showConfirmInstallmentDialog = ref(false)
+const confirmingInstallment = ref(null)
+const confirmingInstallmentIndex = ref(null)
+const confirmInstallmentAmount = ref(null)
+const confirmingInstallmentSaving = ref(false)
 
 const now = new Date()
 
@@ -466,6 +638,10 @@ const addForm = reactive({
   amount: null,
   date: now.toISOString().slice(0, 10),
   notes: '',
+  interestRate: null,
+  installmentCount: null,
+  installmentFrequency: 'monthly',
+  accountId: null,
 })
 
 const editForm = reactive({
@@ -489,17 +665,19 @@ const payForm = reactive({
   notes: '',
 })
 
-const loanTypeOptions = computed(() => [
-  { label: t('loans.receivable'), value: 'receivable' },
-  { label: t('loans.payable'), value: 'payable' },
-])
-
 const accountOptions = computed(() =>
   accountStore.accounts.map((a) => ({
     label: `${a.name} (${settings.currency}${settings.formatNumber(a.balance || 0)})`,
     value: a.id,
   })),
 )
+
+const frequencyOptions = computed(() => [
+  { label: t('loans.daily'), value: 'daily' },
+  { label: t('loans.weekly'), value: 'weekly' },
+  { label: t('loans.monthly'), value: 'monthly' },
+  { label: t('loans.yearly'), value: 'yearly' },
+])
 
 const remainingAmount = computed(() => {
   if (!payingLoan.value) return 0
@@ -508,12 +686,19 @@ const remainingAmount = computed(() => {
 
 const detailRemaining = computed(() => {
   if (!detailLoan.value) return 0
-  return (detailLoan.value.amount || 0) - (detailLoan.value.paidAmount || 0)
+  const total = detailLoan.value.type === 'loan'
+    ? (detailLoan.value.totalAmount || detailLoan.value.amount || 0)
+    : (detailLoan.value.amount || 0)
+  return total - (detailLoan.value.paidAmount || 0)
 })
 
 const progressValue = computed(() => {
-  if (!detailLoan.value || !detailLoan.value.amount) return 0
-  return (detailLoan.value.paidAmount || 0) / detailLoan.value.amount
+  if (!detailLoan.value) return 0
+  const total = detailLoan.value.type === 'loan'
+    ? (detailLoan.value.totalAmount || detailLoan.value.amount || 0)
+    : (detailLoan.value.amount || 0)
+  if (!total) return 0
+  return (detailLoan.value.paidAmount || 0) / total
 })
 
 const sortedPayments = computed(() => {
@@ -541,6 +726,10 @@ function openAddDialog() {
   addForm.amount = null
   addForm.date = new Date().toISOString().slice(0, 10)
   addForm.notes = ''
+  addForm.interestRate = null
+  addForm.installmentCount = null
+  addForm.installmentFrequency = 'monthly'
+  addForm.accountId = null
   showAddDialog.value = true
 }
 
@@ -555,6 +744,75 @@ async function saveLoan() {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
   }
   saving.value = false
+}
+
+async function saveLoanEntry() {
+  if (!addForm.personName || !addForm.amount || addForm.amount <= 0) return
+  if (!addForm.installmentCount || addForm.installmentCount <= 0) return
+  if (!addForm.accountId) return
+  saving.value = true
+  try {
+    await loanStore.addLoanWithInstallments({
+      personName: addForm.personName,
+      amount: addForm.amount,
+      interestRate: addForm.interestRate || 0,
+      date: addForm.date,
+      installmentCount: addForm.installmentCount,
+      installmentFrequency: addForm.installmentFrequency,
+      accountId: addForm.accountId,
+      notes: addForm.notes,
+    })
+    $q.notify({ type: 'positive', message: t('loans.loanAdded'), position: 'top' })
+    showAddDialog.value = false
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  saving.value = false
+}
+
+function getFrequencyLabel(freq) {
+  const map = { daily: t('loans.daily'), weekly: t('loans.weekly'), monthly: t('loans.monthly'), yearly: t('loans.yearly') }
+  return map[freq] || freq
+}
+
+function openConfirmInstallment(inst, idx) {
+  confirmingInstallment.value = inst
+  confirmingInstallmentIndex.value = idx
+  confirmInstallmentAmount.value = inst.amount
+  showConfirmInstallmentDialog.value = true
+}
+
+async function doConfirmInstallment() {
+  if (!confirmInstallmentAmount.value || confirmInstallmentAmount.value <= 0) return
+  confirmingInstallmentSaving.value = true
+  try {
+    const loan = detailLoan.value
+    const amount = confirmInstallmentAmount.value
+
+    await loanStore.confirmInstallment(loan.id, confirmingInstallmentIndex.value, amount)
+
+    // Deduct from account
+    await accountStore.updateBalance(loan.accountId, -amount)
+
+    // Create expense transaction
+    const txData = {
+      type: 'expense',
+      amount,
+      category: t('loans.installmentPayment'),
+      accountId: loan.accountId,
+      date: new Date().toISOString().slice(0, 10),
+      time: new Date().toTimeString().slice(0, 5),
+      notes: `${t('loans.installment')} #${confirmingInstallmentIndex.value + 1} - ${loan.personName}`,
+    }
+    await transactionStore.addTransaction(txData)
+
+    detailLoan.value = loanStore.loans.find((l) => l.id === loan.id)
+    $q.notify({ type: 'positive', message: t('loans.installmentConfirmed'), position: 'top' })
+    showConfirmInstallmentDialog.value = false
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  confirmingInstallmentSaving.value = false
 }
 
 function openEditDialog(loan) {

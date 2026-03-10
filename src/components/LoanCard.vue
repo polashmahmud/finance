@@ -20,7 +20,11 @@
 
         <!-- Amount -->
         <div class="text-h5 text-weight-bold q-mb-xs" :style="{ color }">
-          {{ settings.currency }}{{ settings.formatNumber(loan.amount) }}
+          {{ settings.currency }}{{ settings.formatNumber(effectiveTotal) }}
+        </div>
+        <div v-if="loan.type === 'loan'" class="text-caption text-grey-6 q-mb-xs" style="margin-top: -4px;">
+          {{ $t('loans.principal') }}: {{ settings.currency }}{{ settings.formatNumber(loan.amount) }}
+          &middot; {{ loan.interestRate }}%
         </div>
 
         <!-- Progress -->
@@ -40,7 +44,7 @@
         <!-- Action buttons -->
         <div class="row justify-end q-gutter-xs q-mt-xs">
           <q-btn v-if="!settled" flat dense no-caps size="sm" :style="{ color }" icon="payment"
-            :label="loan.type === 'receivable' ? $t('loans.receiveBtn') : $t('loans.payBtn')"
+            :label="loan.type === 'receivable' ? $t('loans.receiveBtn') : loan.type === 'loan' ? $t('loans.installments') : $t('loans.payBtn')"
             @click.stop="$emit('pay')" style="border-radius: 8px;" />
           <q-btn flat dense no-caps size="sm" color="dark" icon="edit"
             @click.stop="$emit('edit')" style="border-radius: 8px;" />
@@ -66,10 +70,15 @@ defineEmits(['click', 'delete', 'pay', 'edit'])
 
 const settings = useSettingsStore()
 
-const remaining = computed(() => (props.loan.amount || 0) - (props.loan.paidAmount || 0))
+const effectiveTotal = computed(() =>
+  props.loan.type === 'loan'
+    ? (props.loan.totalAmount || props.loan.amount || 0)
+    : (props.loan.amount || 0),
+)
+const remaining = computed(() => effectiveTotal.value - (props.loan.paidAmount || 0))
 const progress = computed(() => {
-  if (!props.loan.amount) return 0
-  return (props.loan.paidAmount || 0) / props.loan.amount
+  if (!effectiveTotal.value) return 0
+  return (props.loan.paidAmount || 0) / effectiveTotal.value
 })
 
 function formatDate(dateStr) {

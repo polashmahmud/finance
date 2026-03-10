@@ -30,6 +30,19 @@ export const useLoanStore = defineStore('loans', () => {
     payables.value.reduce((sum, l) => sum + ((l.amount || 0) - (l.paidAmount || 0)), 0),
   )
 
+  const loanEntries = computed(() =>
+    loans.value
+      .filter((l) => l.type === 'loan')
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)),
+  )
+
+  const totalLoanAmount = computed(() =>
+    loanEntries.value.reduce(
+      (sum, l) => sum + ((l.totalAmount || l.amount || 0) - (l.paidAmount || 0)),
+      0,
+    ),
+  )
+
   function getUserLoansRef() {
     const uid = auth.currentUser?.uid
     if (!uid) return null
@@ -179,6 +192,149 @@ export const useLoanStore = defineStore('loans', () => {
     )
   }
 
+  function generateInstallmentDates(startDate, count, frequency) {
+    const dates = []
+    const start = new Date(startDate)
+    for (let i = 1; i <= count; i++) {
+      const d = new Date(start)
+      switch (frequency) {
+        case 'daily':
+          d.setDate(d.getDate() + i)
+          break
+        case 'weekly':
+          d.setDate(d.getDate() + i * 7)
+          break
+        case 'monthly':
+          d.setMonth(d.getMonth() + i)
+          break
+        case 'yearly':
+          d.setFullYear(d.getFullYear() + i)
+          break
+      }
+      dates.push(d.toISOString().slice(0, 10))
+    }
+    return dates
+  }
+
+  async function addLoanWithInstallments(loanData) {
+    const loansRef = getUserLoansRef()
+    if (!loansRef) return
+
+    const principal = loanData.amount || 0
+    const rate = loanData.interestRate || 0
+    const totalInterest = (principal * rate) / 100
+    const totalAmount = principal + totalInterest
+    const count = loanData.installmentCount || 1
+    const frequency = loanData.installmentFrequency || 'monthly'
+
+    const dueDates = generateInstallmentDates(loanData.date, count, frequency)
+    const installmentAmount = Math.floor((totalAmount / count) * 100) / 100
+
+    const installments = dueDates.map((dueDate, idx) => ({
+      number: idx + 1,
+      amount:
+        idx === count - 1
+          ? Math.round((totalAmount - installmentAmount * (count - 1)) * 100) / 100
+          : installmentAmount,
+      dueDate,
+      paid: false,
+      paidAmount: 0,
+      paidDate: null,
+    }))
+
+    const docData = {
+      type: 'loan',
+      personName: loanData.personName,
+      amount: principal,
+      interestRate: rate,
+      totalAmount,
+      installmentCount: count,
+      installmentFrequency: frequency,
+      accountId: loanData.accountId,
+      date: loanData.date || new Date().toISOString().slice(0, 10),
+      notes: loanData.notes || '',
+      installments,
+      paidAmount: 0,
+      payments: [],
+      settled: false,
+      createdAt: Date.now(),
+    }
+
+    const tempId = `temp_${Date.now()}`
+    loans.value.unshift({ id: tempId, ...docData })
+
+    addDoc(loansRef, docData)
+      .then((ref) => {
+        const idx = loans.value.findIndex((l) => l.id === tempId)
+        if (idx >= 0) loans.value[idx].id = ref.id
+      })
+      .catch((err) => console.warn('[Firestore] Loan write queued:', err))
+  }
+
+  function recalculateInstallments(loan) {
+    const principal = loan.amount || 0
+    const rate = loan.interestRate || 0
+    const originalTotal = principal * (1 + rate / 100)
+    const totalPaid = (loan.installments || []).reduce(
+      (sum, inst) => sum + (inst.paid ? inst.paidAmount : 0),
+      0,
+    )
+
+    const paidPrincipalPortion =
+      originalTotal > 0 ? totalPaid * (principal / originalTotal) : totalPaid
+    const remainingPrincipal = Math.max(0, principal - paidPrincipalPortion)
+    const newRemainingInterest = (remainingPrincipal * rate) / 100
+    const newRemainingTotal = remainingPrincipal + newRemainingInterest
+
+    const unpaidInstallments = (loan.installments || []).filter((inst) => !inst.paid)
+    const unpaidCount = unpaidInstallments.length
+
+    if (unpaidCount === 0) {
+      loan.totalAmount = totalPaid
+      return
+    }
+
+    const perInstallment = Math.floor((newRemainingTotal / unpaidCount) * 100) / 100
+    unpaidInstallments.forEach((inst, idx) => {
+      inst.amount =
+        idx === unpaidCount - 1
+          ? Math.round((newRemainingTotal - perInstallment * (unpaidCount - 1)) * 100) / 100
+          : perInstallment
+    })
+
+    loan.totalAmount = totalPaid + newRemainingTotal
+  }
+
+  async function confirmInstallment(loanId, installmentIndex, paidAmount) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const loan = loans.value.find((l) => l.id === loanId)
+    if (!loan || !loan.installments) return
+
+    const inst = loan.installments[installmentIndex]
+    if (!inst || inst.paid) return
+
+    inst.paid = true
+    inst.paidAmount = paidAmount
+    inst.paidDate = new Date().toISOString().slice(0, 10)
+
+    recalculateInstallments(loan)
+
+    const newPaidAmount = loan.installments.reduce((sum, i) => sum + (i.paid ? i.paidAmount : 0), 0)
+    loan.paidAmount = newPaidAmount
+
+    const allPaid = loan.installments.every((i) => i.paid)
+    loan.settled = allPaid || newPaidAmount >= loan.totalAmount
+
+    const loanRef = doc(firestore, `users/${uid}/loans/${loanId}`)
+    updateDoc(loanRef, {
+      installments: loan.installments,
+      totalAmount: loan.totalAmount,
+      paidAmount: loan.paidAmount,
+      settled: loan.settled,
+    }).catch((err) => console.warn('[Firestore] Installment confirm queued:', err))
+  }
+
   function stopListening() {
     if (unsubscribe) {
       unsubscribe()
@@ -219,14 +375,18 @@ export const useLoanStore = defineStore('loans', () => {
     loading,
     receivables,
     payables,
+    loanEntries,
     totalReceivable,
     totalPayable,
+    totalLoanAmount,
     listenLoans,
     fetchLoans,
     addLoan,
+    addLoanWithInstallments,
     addPayment,
     updatePayment,
     deletePayment,
+    confirmInstallment,
     updateLoan,
     deleteLoan,
     stopListening,
