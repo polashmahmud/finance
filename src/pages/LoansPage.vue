@@ -51,12 +51,14 @@
 
     <template v-else>
       <!-- Tabs -->
-      <q-tabs v-model="activeTab" dense active-color="dark" indicator-color="dark" class="text-grey-6 q-mb-md"
-        narrow-indicator>
-        <q-tab name="receivable" :label="$t('loans.receivable')" />
-        <q-tab name="payable" :label="$t('loans.payable')" />
-        <q-tab name="loan" :label="$t('loans.loan')" />
-      </q-tabs>
+      <q-card class="finance-card tab-card q-mb-md">
+        <q-tabs v-model="activeTab" dense active-color="dark" indicator-color="dark" class="text-grey-6"
+          align="justify" no-caps>
+          <q-tab name="receivable" :label="$t('loans.receivable')" />
+          <q-tab name="payable" :label="$t('loans.payable')" />
+          <q-tab name="loan" :label="$t('loans.loan')" />
+        </q-tabs>
+      </q-card>
 
       <!-- Receivable Tab -->
       <q-tab-panels v-model="activeTab" animated style="background: transparent;">
