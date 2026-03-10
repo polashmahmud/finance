@@ -793,6 +793,11 @@ export default {
     actualPaidAmount: 'পরিশোধের পরিমাণ',
     markAsPaid: 'পরিশোধ হিসেবে চিহ্নিত করুন',
     installmentPaidSoFar: 'এ পর্যন্ত পরিশোধ',
+    alreadyPaid: 'অলরেডি পরিশোধ',
+    alreadyPaidTitle: 'অলরেডি পরিশোধ',
+    alreadyPaidNote:
+      'এই কিস্তিটি পরিশোধিত হিসেবে চিহ্নিত হবে কিন্তু কোনো একাউন্ট থেকে টাকা কাটা যাবে না।',
+    alreadyPaidConfirm: 'হ্যাঁ, চিহ্নিত করুন',
     resetInstallmentTitle: 'কিস্তি রিসেট করুন',
     resetInstallmentConfirm: 'এই কিস্তির সব পেমেন্ট মুছে যাবে। নিশ্চিত করতে চান?',
     installmentReset: 'কিস্তি রিসেট হয়েছে',

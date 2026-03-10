@@ -795,6 +795,11 @@ export default {
     actualPaidAmount: 'Amount Paid',
     markAsPaid: 'Mark as Paid',
     installmentPaidSoFar: 'Paid so far',
+    alreadyPaid: 'Already Paid',
+    alreadyPaidTitle: 'Already Paid',
+    alreadyPaidNote:
+      'This installment will be marked as paid without affecting any account balance.',
+    alreadyPaidConfirm: 'Yes, Mark as Paid',
     resetInstallmentTitle: 'Reset Installment',
     resetInstallmentConfirm: 'All payments for this installment will be removed. Are you sure?',
     installmentReset: 'Installment reset',

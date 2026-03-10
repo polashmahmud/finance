@@ -481,9 +481,14 @@
                           <div class="text-weight-bold q-mb-xs" :style="{ color: inst.paid ? '#22c55e' : '#333' }">
                             {{ settings.currency }}{{ settings.formatNumber(inst.paid ? inst.paidAmount : inst.amount) }}
                           </div>
-                          <q-btn v-if="!inst.paid && !detailLoan?.settled" flat dense size="sm" color="positive"
-                            icon="payment" :label="$t('loans.confirmPay')"
-                            @click.stop="openConfirmInstallment(inst, idx)" style="border-radius: 8px;" />
+                          <div v-if="!inst.paid && !detailLoan?.settled" class="column q-gutter-xs items-end">
+                            <q-btn flat dense size="sm" color="positive"
+                              icon="payment" :label="$t('loans.confirmPay')"
+                              @click.stop="openConfirmInstallment(inst, idx)" style="border-radius: 8px;" />
+                            <q-btn flat dense size="sm" color="grey-7"
+                              icon="check_circle_outline" :label="$t('loans.alreadyPaid')"
+                              @click.stop="openAlreadyPaidDialog(inst, idx)" style="border-radius: 8px;" />
+                          </div>
                         </q-item-section>
                       </div>
                       <!-- Sub-payment history -->
@@ -627,6 +632,43 @@
       </q-card>
     </q-dialog>
 
+    <!-- Already Paid Dialog (no transaction) -->
+    <q-dialog v-model="showAlreadyPaidDialog">
+      <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
+        <q-card-section class="row items-center justify-between no-wrap q-pb-none">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
+            {{ $t('loans.alreadyPaidTitle') }}
+          </div>
+          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+        </q-card-section>
+        <q-card-section>
+          <div class="q-mb-md" style="background: #f8fafc; border-radius: 12px; padding: 12px;">
+            <div class="text-subtitle2 text-weight-bold">
+              {{ $t('loans.installment') }} #{{ alreadyPaidInstallment?.number }}
+            </div>
+            <div class="text-caption text-grey-7">
+              {{ $t('loans.scheduledAmount') }}: {{ settings.currency }}{{ settings.formatNumber(alreadyPaidInstallment?.amount || 0) }}
+            </div>
+            <div class="text-caption text-grey-7">
+              {{ $t('loans.dueDate') }}: {{ formatDate(alreadyPaidInstallment?.dueDate) }}
+            </div>
+          </div>
+          <div class="q-mb-md text-body2 text-grey-8">{{ $t('loans.alreadyPaidNote') }}</div>
+          <q-form @submit.prevent="doMarkAlreadyPaid">
+            <q-input v-model.number="alreadyPaidAmount" :label="$t('loans.actualPaidAmount')" type="number"
+              outlined dense color="dark" :prefix="settings.currency"
+              :rules="[val => val > 0 || $t('common.validAmount')]" style="margin-bottom: 16px;" />
+            <div class="row q-gutter-sm">
+              <q-btn type="submit" class="col bg-primary-gradient" text-color="white" rounded unelevated
+                :label="$t('loans.alreadyPaidConfirm')" :loading="alreadyPaidSaving" />
+              <q-btn class="col" flat rounded color="grey-7" :label="$t('common.cancel')"
+                @click="showAlreadyPaidDialog = false" />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
     <!-- Confirm Installment Dialog -->
     <q-dialog v-model="showConfirmInstallmentDialog">
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
@@ -706,6 +748,11 @@ const confirmingInstallmentIndex = ref(null)
 const confirmInstallmentAmount = ref(null)
 const confirmMarkAsPaid = ref(true)
 const confirmingInstallmentSaving = ref(false)
+const showAlreadyPaidDialog = ref(false)
+const alreadyPaidInstallment = ref(null)
+const alreadyPaidInstallmentIndex = ref(null)
+const alreadyPaidAmount = ref(null)
+const alreadyPaidSaving = ref(false)
 
 const now = new Date()
 
@@ -863,6 +910,40 @@ async function saveLoanEntry() {
 function getFrequencyLabel(freq) {
   const map = { daily: t('loans.daily'), weekly: t('loans.weekly'), monthly: t('loans.monthly'), yearly: t('loans.yearly') }
   return map[freq] || freq
+}
+
+function openAlreadyPaidDialog(inst, idx) {
+  alreadyPaidInstallment.value = inst
+  alreadyPaidInstallmentIndex.value = idx
+  alreadyPaidAmount.value = inst.amount
+  showAlreadyPaidDialog.value = true
+}
+
+async function doMarkAlreadyPaid() {
+  if (!alreadyPaidAmount.value || alreadyPaidAmount.value <= 0) return
+  alreadyPaidSaving.value = true
+  try {
+    const loan = detailLoan.value
+    const idx = alreadyPaidInstallmentIndex.value
+    // Mark paid without touching any account or creating any transaction
+    await loanStore.addInstallmentPayment(
+      loan.id,
+      idx,
+      {
+        amount: alreadyPaidAmount.value,
+        accountId: null,
+        date: new Date().toISOString().slice(0, 10),
+        notes: t('loans.alreadyPaidNote'),
+      },
+      true, // always mark as paid
+    )
+    detailLoan.value = loanStore.loans.find((l) => l.id === loan.id)
+    $q.notify({ type: 'positive', message: t('loans.installmentConfirmed'), position: 'top' })
+    showAlreadyPaidDialog.value = false
+  } catch (err) {
+    $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
+  }
+  alreadyPaidSaving.value = false
 }
 
 function openConfirmInstallment(inst, idx) {
