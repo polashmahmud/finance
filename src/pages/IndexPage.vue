@@ -38,13 +38,13 @@
                     <q-icon name="arrow_upward" size="14px" style="color: #4ade80;" />
                     <span class="ie-label">{{ $t('common.income') }}</span>
                     <span class="ie-value income-value">{{ settings.currency }}{{
-                      settings.formatNumber(transactions.totalIncome) }}</span>
+                      formatShort(transactions.totalIncome) }}</span>
                   </div>
                   <div class="expense-chip">
                     <q-icon name="arrow_downward" size="14px" style="color: #f87171;" />
                     <span class="ie-label">{{ $t('common.expense') }}</span>
                     <span class="ie-value expense-value">{{ settings.currency }}{{
-                      settings.formatNumber(transactions.totalExpense) }}</span>
+                      formatShort(transactions.totalExpense) }}</span>
                   </div>
                 </div>
               </div>
@@ -143,28 +143,58 @@
           <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right"
             @click="$router.push('/dashboard/loans')" size="sm" />
         </div>
-        <q-card class="finance-card q-mb-md cursor-pointer" @click="$router.push('/dashboard/loans')" v-ripple>
-          <q-card-section class="q-pa-md">
-            <div class="row q-col-gutter-sm">
-              <div class="col-6">
-                <div class="loan-summary-item" style="border-left: 3px solid #22c55e;">
-                  <div class="text-caption text-grey-7">{{ $t('loans.totalReceivable') }}</div>
-                  <div class="text-subtitle1 text-weight-bold" style="color: #22c55e;">
-                    {{ settings.currency }}{{ settings.formatNumber(loans.totalReceivable) }}
+        <div class="loan-cards-row q-mb-md">
+          <!-- পাওনা -->
+          <q-card class="finance-card loan-dash-card cursor-pointer" @click="$router.push('/dashboard/loans')" v-ripple>
+            <q-card-section class="q-pa-sm">
+              <div class="row items-center no-wrap q-gutter-sm">
+                <q-avatar style="background:#e8f5e9;" size="36px">
+                  <q-icon name="arrow_downward" style="color:#22c55e;" size="18px" />
+                </q-avatar>
+                <div>
+                  <div style="font-size:0.7rem; color:#8e8ea0; font-weight:500;">{{ $t('loans.receivable') }}</div>
+                  <div style="font-size:0.8rem; font-weight:700; color:#22c55e;">
+                    {{ settings.currency }}{{ formatShort(loans.totalReceivable) }}
                   </div>
                 </div>
               </div>
-              <div class="col-6">
-                <div class="loan-summary-item" style="border-left: 3px solid #ef4444;">
-                  <div class="text-caption text-grey-7">{{ $t('loans.totalPayable') }}</div>
-                  <div class="text-subtitle1 text-weight-bold" style="color: #ef4444;">
-                    {{ settings.currency }}{{ settings.formatNumber(loans.totalPayable) }}
+            </q-card-section>
+          </q-card>
+
+          <!-- দেনা -->
+          <q-card class="finance-card loan-dash-card cursor-pointer" @click="$router.push('/dashboard/loans')" v-ripple>
+            <q-card-section class="q-pa-sm">
+              <div class="row items-center no-wrap q-gutter-sm">
+                <q-avatar style="background:#fef2f2;" size="36px">
+                  <q-icon name="arrow_upward" style="color:#ef4444;" size="18px" />
+                </q-avatar>
+                <div>
+                  <div style="font-size:0.7rem; color:#8e8ea0; font-weight:500;">{{ $t('loans.payable') }}</div>
+                  <div style="font-size:0.8rem; font-weight:700; color:#ef4444;">
+                    {{ settings.currency }}{{ formatShort(loans.totalPayable) }}
                   </div>
                 </div>
               </div>
-            </div>
-          </q-card-section>
-        </q-card>
+            </q-card-section>
+          </q-card>
+
+          <!-- মোট লোন -->
+          <q-card class="finance-card loan-dash-card cursor-pointer" @click="$router.push('/dashboard/loans')" v-ripple>
+            <q-card-section class="q-pa-sm">
+              <div class="row items-center no-wrap q-gutter-sm">
+                <q-avatar style="background:#fff8e1;" size="36px">
+                  <q-icon name="account_balance" style="color:#f59e0b;" size="18px" />
+                </q-avatar>
+                <div>
+                  <div style="font-size:0.7rem; color:#8e8ea0; font-weight:500;">{{ $t('loans.loan') }}</div>
+                  <div style="font-size:0.8rem; font-weight:700; color:#f59e0b;">
+                    {{ settings.currency }}{{ formatShort(loans.totalLoanAmount) }}
+                  </div>
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
 
         <!-- Budget Status -->
         <div class="dash-section-header row items-center justify-between q-mb-sm">
@@ -1102,6 +1132,16 @@ async function confirmDeleteOnly() {
   padding: 8px 12px;
   border-radius: 8px;
   background: #f8fafc;
+}
+
+.loan-cards-row {
+  display: flex;
+  gap: 8px;
+}
+
+.loan-dash-card {
+  flex: 1;
+  min-width: 0;
 }
 
 /* Budget scroll */
