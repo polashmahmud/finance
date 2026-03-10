@@ -196,6 +196,33 @@
           </q-card>
         </div>
 
+        <!-- This month due -->
+        <div v-if="loans.thisMonthDue > 0" class="loan-due-section q-mb-md">
+          <div class="loan-due-header row items-center q-gutter-xs q-mb-xs">
+            <q-icon name="event" size="16px" color="orange" />
+            <span style="font-weight:600; font-size:0.8rem; color:#1a1a2e;">{{ $t('loans.thisMonthDue') }}</span>
+            <span style="font-weight:500; color:#8e8ea0; font-size:0.7rem;"> &middot; {{ settings.currency }}{{ formatShort(loans.thisMonthDue) }}</span>
+          </div>
+          <q-card class="finance-card" style="overflow:hidden;">
+            <q-list dense separator>
+              <q-item v-for="(item, idx) in loans.thisMonthDueList" :key="idx" class="q-py-xs" clickable @click="$router.push('/dashboard/loans')">
+                <q-item-section avatar style="min-width:32px;">
+                  <q-avatar style="background:#fff8e1;" size="28px">
+                    <q-icon name="receipt" style="color:#f59e0b;" size="14px" />
+                  </q-avatar>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label style="font-size:0.76rem; font-weight:600; color:#1a1a2e;">{{ item.personName }}</q-item-label>
+                  <q-item-label caption style="font-size:0.65rem;">{{ $t('loans.installment') }} #{{ item.installmentNumber }} &middot; {{ settings.formatDate(item.dueDate) }}</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <span style="font-size:0.78rem; font-weight:700; color:#f59e0b;">{{ settings.currency }}{{ settings.formatNumber(item.amount) }}</span>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-card>
+        </div>
+
         <!-- Budget Status -->
         <div class="dash-section-header row items-center justify-between q-mb-sm">
           <div class="dash-section-title">{{ $t('dashboard.budgetStatus') }}</div>
@@ -1142,6 +1169,10 @@ async function confirmDeleteOnly() {
 .loan-dash-card {
   flex: 1;
   min-width: 0;
+}
+
+.loan-due-section .loan-due-header {
+  padding: 0 2px;
 }
 
 /* Budget scroll */

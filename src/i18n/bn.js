@@ -731,6 +731,8 @@ export default {
     payable: 'দেনা',
     totalReceivable: 'মোট পাওনা',
     totalPayable: 'মোট দেনা',
+    thisMonthDue: 'এই মাসে পরিশোধযোগ্য',
+    installmentsDue: '{count}টি কিস্তি',
     activeLoans: 'চলমান',
     settledLoans: 'পরিশোধিত',
     active: 'চলমান',

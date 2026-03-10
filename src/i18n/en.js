@@ -733,6 +733,8 @@ export default {
     payable: 'Payable',
     totalReceivable: 'Total Receivable',
     totalPayable: 'Total Payable',
+    thisMonthDue: 'Due this month',
+    installmentsDue: '{count} installment(s)',
     activeLoans: 'Active',
     settledLoans: 'Settled',
     active: 'Active',

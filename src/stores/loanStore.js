@@ -43,6 +43,64 @@ export const useLoanStore = defineStore('loans', () => {
     ),
   )
 
+  const thisMonthDue = computed(() => {
+    const now = new Date()
+    const y = now.getFullYear()
+    const m = now.getMonth()
+    let total = 0
+    for (const loan of loanEntries.value) {
+      if (loan.settled || !loan.installments) continue
+      for (const inst of loan.installments) {
+        if (inst.paid) continue
+        const d = new Date(inst.dueDate)
+        if (d.getFullYear() === y && d.getMonth() === m) {
+          total += (inst.amount || 0) - (inst.paidAmount || 0)
+        }
+      }
+    }
+    return total
+  })
+
+  const thisMonthDueCount = computed(() => {
+    const now = new Date()
+    const y = now.getFullYear()
+    const m = now.getMonth()
+    let count = 0
+    for (const loan of loanEntries.value) {
+      if (loan.settled || !loan.installments) continue
+      for (const inst of loan.installments) {
+        if (inst.paid) continue
+        const d = new Date(inst.dueDate)
+        if (d.getFullYear() === y && d.getMonth() === m) count++
+      }
+    }
+    return count
+  })
+
+  const thisMonthDueList = computed(() => {
+    const now = new Date()
+    const y = now.getFullYear()
+    const m = now.getMonth()
+    const items = []
+    for (const loan of loanEntries.value) {
+      if (loan.settled || !loan.installments) continue
+      for (const inst of loan.installments) {
+        if (inst.paid) continue
+        const d = new Date(inst.dueDate)
+        if (d.getFullYear() === y && d.getMonth() === m) {
+          items.push({
+            personName: loan.personName,
+            installmentNumber: inst.number,
+            dueDate: inst.dueDate,
+            amount: (inst.amount || 0) - (inst.paidAmount || 0),
+          })
+        }
+      }
+    }
+    items.sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+    return items
+  })
+
   function getUserLoansRef() {
     const uid = auth.currentUser?.uid
     if (!uid) return null
@@ -425,6 +483,9 @@ export const useLoanStore = defineStore('loans', () => {
     totalReceivable,
     totalPayable,
     totalLoanAmount,
+    thisMonthDue,
+    thisMonthDueCount,
+    thisMonthDueList,
     listenLoans,
     fetchLoans,
     addLoan,
