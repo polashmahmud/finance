@@ -36,6 +36,7 @@
     "globals": "^16.4.0",
     "postcss": "^8.4.14",
     "prettier": "^3.3.3",
+    "sharp": "^0.34.5",
     "vite-plugin-checker": "^0.11.0",
     "vue-eslint-parser": "^10.2.0",
     "workbox-build": "^7.4.0",
