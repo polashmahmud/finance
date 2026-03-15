@@ -40,6 +40,26 @@ export default {
     refreshFailed: 'Failed to refresh data',
   },
 
+  appUpdate: {
+    flexibleTitle: 'Update available',
+    flexibleMessage:
+      'Version {version} is available. Download it in the background and install it when ready?',
+    immediateTitle: 'Update required',
+    immediateMessage:
+      'Version {version} is available and must be installed before you continue using the app.',
+    updateNow: 'Update now',
+    downloadNow: 'Download',
+    later: 'Later',
+    completeTitle: 'Update ready',
+    completeMessage: 'The update has finished downloading. Restart now to install it.',
+    completeAction: 'Complete update',
+    openStore: 'Open Play Store',
+    retry: 'Retry',
+    failed: 'Unable to start the app update.',
+    canceled: 'The update was canceled.',
+    unavailable: 'An update is available, but this update flow is not allowed on this device.',
+  },
+
   // ========== Greetings ==========
   greetings: {
     morning: 'Good Morning',
