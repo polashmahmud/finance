@@ -16,6 +16,22 @@ export const useMarketListStore = defineStore('marketLists', () => {
   const loading = ref(false)
   let unsubscribe = null
 
+  function toMillis(value) {
+    if (!value) return 0
+    if (typeof value === 'number') return Number.isFinite(value) ? value : 0
+    if (typeof value === 'string') {
+      const parsed = Date.parse(value)
+      return Number.isFinite(parsed) ? parsed : 0
+    }
+    if (typeof value?.toMillis === 'function') return value.toMillis()
+    if (typeof value?.seconds === 'number') return value.seconds * 1000
+    return 0
+  }
+
+  function getItemCreatedAt(itemId, itemVal) {
+    return toMillis(itemVal?.createdAt) || toMillis(itemId)
+  }
+
   function getUserListsRef() {
     const uid = auth.currentUser?.uid
     if (!uid) return null
@@ -36,18 +52,21 @@ export const useMarketListStore = defineStore('marketLists', () => {
           .map((docSnap) => {
             const val = docSnap.data()
             const items = val.items
-              ? Object.entries(val.items).map(([itemId, itemVal]) => ({ id: itemId, ...itemVal }))
+              ? Object.entries(val.items)
+                  .map(([itemId, itemVal]) => ({ id: itemId, ...itemVal }))
+                  .sort((a, b) => getItemCreatedAt(b.id, b) - getItemCreatedAt(a.id, a))
               : []
+            const createdAt = toMillis(val.createdAt)
             return {
               id: docSnap.id,
               name: val.name,
               date: val.date,
-              createdAt: val.createdAt || 0,
+              createdAt,
               convertedAt: val.convertedAt || null,
               items,
             }
           })
-          .sort((a, b) => b.createdAt - a.createdAt)
+          .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt))
         loading.value = false
       },
       (error) => {
@@ -132,18 +151,20 @@ export const useMarketListStore = defineStore('marketLists', () => {
     const uid = auth.currentUser?.uid
     if (!uid) return
 
-    const itemId = Date.now().toString()
+    const createdAt = Date.now()
+    const itemId = createdAt.toString()
     const itemData = {
       name: item.name,
       quantity: item.quantity || '',
       price: item.price || 0,
       bought: false,
+      createdAt,
     }
 
     // Optimistic update
     const list = lists.value.find((l) => l.id === listId)
     if (list) {
-      list.items.push({ id: itemId, ...itemData })
+      list.items.unshift({ id: itemId, ...itemData })
     }
 
     const updates = { [`items.${itemId}`]: itemData }
