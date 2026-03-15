@@ -291,6 +291,7 @@ export default {
 
   // ========== Search ==========
   search: {
+    title: 'অনুসন্ধান',
     placeholder: 'লেনদেন খুঁজুন...',
     noResults: 'কোনো ফলাফল পাওয়া যায়নি',
     tryOther: 'অন্য কিছু দিয়ে খুঁজুন',

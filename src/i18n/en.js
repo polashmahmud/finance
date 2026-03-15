@@ -289,6 +289,7 @@ export default {
 
   // ========== Search ==========
   search: {
+    title: 'Search',
     placeholder: 'Search transactions...',
     noResults: 'No results found',
     tryOther: 'Try searching for something else',
