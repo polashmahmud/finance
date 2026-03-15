@@ -79,7 +79,7 @@
               </div>
 
               <!-- Items -->
-              <q-list>
+              <q-list :key="swipeResetKey">
                 <q-slide-item v-for="item in list.items" :key="item.id" @left="onLeftSwipe(list, item, $event)"
                   @right="onRightSwipe(list, item, $event)" left-color="primary" right-color="negative">
                   <template v-slot:left><q-icon name="edit" /></template>
@@ -432,7 +432,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { useMarketListStore } from 'stores/marketListStore'
@@ -464,6 +464,9 @@ const listToRename = ref(null)
 const activeListId = ref(null)
 const activeItemId = ref(null)
 const saving = ref(false)
+let editItemResetFn = null
+let deleteItemResetFn = null
+const swipeResetKey = ref(0)
 const newItem = reactive({ name: '', quantity: 1, price: 0 })
 const editItemData = reactive({ name: '', quantity: 1, price: 0 })
 const convertForm = reactive({ amount: 0, category: '', accountId: null, date: '', time: '', notes: '' })
@@ -745,17 +748,31 @@ onUnmounted(() => {
   transactions.stopListening()
 })
 
+// Watch for edit dialog close to reset swipe state
+watch(showEditItem, async (val) => {
+  if (!val && editItemResetFn) {
+    await nextTick()
+    if (editItemResetFn) {
+      editItemResetFn()
+      editItemResetFn = null
+    }
+    // Force re-render to ensure swipe state is reset
+    swipeResetKey.value++
+  }
+})
+
 function onLeftSwipe(list, item, { reset }) {
   activeListId.value = list.id
   activeItemId.value = item.id
   editItemData.name = item.name
   editItemData.quantity = item.quantity
   editItemData.price = item.price || 0
+  editItemResetFn = reset
   showEditItem.value = true
-  reset()
 }
 
 function onRightSwipe(list, item, { reset }) {
+  deleteItemResetFn = reset
   $q.dialog({
     title: t('common.delete'),
     message: t('common.areYouSure'),
@@ -763,8 +780,14 @@ function onRightSwipe(list, item, { reset }) {
     cancel: { label: t('common.cancel'), flat: true },
   }).onOk(() => {
     marketLists.removeItem(list.id, item.id)
-  }).onCancel(() => {
-    reset()
+    deleteItemResetFn = null
+  }).onCancel(async () => {
+    await nextTick()
+    if (deleteItemResetFn) {
+      deleteItemResetFn()
+      deleteItemResetFn = null
+    }
+    swipeResetKey.value++
   })
 }
 
@@ -777,7 +800,16 @@ async function submitEditItem() {
       quantity: editItemData.quantity,
       price: editItemData.price
     })
+    // Close dialog first
     showEditItem.value = false
+    // Then reset the swipe item with nextTick to ensure DOM is updated
+    await nextTick()
+    if (editItemResetFn) {
+      editItemResetFn()
+      editItemResetFn = null
+    }
+    // Force re-render of the list to ensure swipe state is reset
+    swipeResetKey.value++
     $q.notify({ type: 'positive', message: t('marketLists.itemUpdateSuccess'), position: 'top' })
   } catch (err) {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
