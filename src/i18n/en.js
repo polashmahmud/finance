@@ -422,6 +422,7 @@ export default {
   // ========== All Transactions ==========
   allTransactions: {
     title: 'All Transactions',
+    subtitle: 'View and manage all your transactions',
     viewAll: 'View All',
     allTime: 'All Time',
     all: 'All',

@@ -425,6 +425,7 @@ export default {
   // ========== All Transactions ==========
   allTransactions: {
     title: 'সকল লেনদেন',
+    subtitle: 'আপনার সকল লেনদেন দেখুন এবং পরিচালনা করুন',
     viewAll: 'সব দেখুন',
     allTime: 'সবসময়',
     all: 'সব',
