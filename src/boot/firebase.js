@@ -1,12 +1,7 @@
 import { boot } from 'quasar/wrappers'
 import { initializeApp } from 'firebase/app'
-import { getAnalytics } from 'firebase/analytics'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import {
-  initializeFirestore,
-  persistentLocalCache,
-  persistentMultipleTabManager,
-} from 'firebase/firestore'
+import { initializeFirestore, persistentLocalCache } from 'firebase/firestore'
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -22,18 +17,27 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
-// eslint-disable-next-line no-unused-vars
-const analytics = getAnalytics(app)
 const auth = getAuth(app)
 
-// Initialize Firestore with specific database ID and offline persistence
+// Initialize Firestore with offline persistence (single-tab — avoids slow IndexedDB lock acquisition)
 const firestore = initializeFirestore(
   app,
   {
-    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+    localCache: persistentLocalCache(),
   },
   'finance',
 )
+
+// Defer analytics initialization so it never blocks app boot
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', () => {
+    import('firebase/analytics').then(({ getAnalytics, isSupported }) => {
+      isSupported().then((supported) => {
+        if (supported) getAnalytics(app)
+      })
+    })
+  })
+}
 
 // We export a promise to delay the Vue app boot process until Firebase Auth has initialized.
 export default boot(() => {

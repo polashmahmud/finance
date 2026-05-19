@@ -62,19 +62,20 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   // Wait for initial auth state before allowing navigation
-  onAuthStateChanged(auth, async (currentUser) => {
+  onAuthStateChanged(auth, (currentUser) => {
     user.value = currentUser
     isAuthenticated.value = !!currentUser
     isAuthReady.value = true
 
-    // Fetch user profile when auth state changes
+    // Resolve auth-ready immediately — don't block navigation on profile fetch
+    _authReadyResolve()
+
+    // Fetch user profile in background after auth state is known
     if (currentUser) {
-      await fetchUserProfile(currentUser.uid)
+      fetchUserProfile(currentUser.uid)
     } else {
       userProfile.value = null
     }
-
-    _authReadyResolve()
   })
 
   function waitForAuth() {
