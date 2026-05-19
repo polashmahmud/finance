@@ -6,16 +6,16 @@
       <div class="col-12 col-md-7">
 
         <!-- Greeting -->
-        <div class="greeting-header q-mb-md q-mt-xs">
+        <div class="greeting-header q-mb-lg q-mt-xs">
           <div class="col">
-            <div class="text-h5 text-weight-bold" style="color: #1a1a2e; letter-spacing: -0.02em;">
+            <div class="greeting-name">
               {{ $t('dashboard.hello') }}, {{ userName }}!
             </div>
-            <div class="text-body2" style="color: #8e8ea0; margin-top: 2px;">{{ greeting }}</div>
+            <div class="greeting-sub">{{ greeting }}</div>
           </div>
           <div class="greeting-icon-wrap">
             <img :src="greetingIcon.src" :alt="greetingIcon.alt"
-              style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover;" />
+              style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" />
           </div>
         </div>
 
@@ -118,20 +118,18 @@
           <q-card v-for="account in accounts.accounts" :key="account.id"
             class="finance-card account-card cursor-pointer"
             @click="$router.push('/dashboard/account/' + account.id + '/transactions')" v-ripple>
-            <q-card-section class="q-pa-md">
-              <div class="row items-center no-wrap q-gutter-sm">
-                <q-avatar :style="{ background: (account.color || '#757575') + '15' }" size="42px">
-                  <q-icon :name="account.icon" :style="{ color: account.color || '#757575' }" size="22px" />
+            <q-card-section class="account-card-inner">
+              <div class="row items-center justify-between no-wrap q-mb-sm">
+                <q-avatar :style="{ background: (account.color || '#757575') + '18' }" size="38px">
+                  <q-icon :name="account.icon" :style="{ color: account.color || '#757575' }" size="19px" />
                 </q-avatar>
-                <div>
-                  <div style="font-size: 0.78rem; color: #8e8ea0; font-weight: 500;">
-                    {{ account.type === 'Cash' ? $t('dashboard.cash') : account.type === 'Bank' ? $t('dashboard.bank') :
-                      $t('dashboard.mobile') }}
-                  </div>
-                  <div class="text-subtitle2 text-weight-bold" style="color: #1a1a2e;">
-                    {{ settings.currency }}{{ settings.formatNumber(account.balance) }}
-                  </div>
+                <div class="account-type-chip" :style="{ color: account.color || '#757575', background: (account.color || '#757575') + '14' }">
+                  {{ account.type === 'Cash' ? $t('dashboard.cash') : account.type === 'Bank' ? $t('dashboard.bank') : $t('dashboard.mobile') }}
                 </div>
+              </div>
+              <div class="account-card-name">{{ account.name }}</div>
+              <div class="account-card-balance" :style="{ color: account.color || '#0f172a' }">
+                {{ settings.currency }}{{ settings.formatNumber(account.balance) }}
               </div>
             </q-card-section>
           </q-card>
@@ -146,51 +144,39 @@
         <div class="loan-cards-row q-mb-md">
           <!-- পাওনা -->
           <q-card class="finance-card loan-dash-card cursor-pointer" @click="$router.push('/dashboard/loans')" v-ripple>
-            <q-card-section class="q-pa-sm">
-              <div class="row items-center no-wrap q-gutter-sm">
-                <q-avatar style="background:#e8f5e9;" size="36px">
-                  <q-icon name="arrow_downward" style="color:#22c55e;" size="18px" />
-                </q-avatar>
-                <div>
-                  <div style="font-size:0.7rem; color:#8e8ea0; font-weight:500;">{{ $t('loans.receivable') }}</div>
-                  <div style="font-size:0.8rem; font-weight:700; color:#22c55e;">
-                    {{ settings.currency }}{{ formatShort(loans.totalReceivable) }}
-                  </div>
-                </div>
+            <q-card-section class="loan-card-inner">
+              <q-avatar style="background: rgba(22,163,74,0.12);" size="34px" class="q-mb-sm">
+                <q-icon name="arrow_downward" style="color:#16a34a;" size="16px" />
+              </q-avatar>
+              <div class="loan-card-label">{{ $t('loans.receivable') }}</div>
+              <div class="loan-card-amount" style="color:#16a34a;">
+                {{ settings.currency }}{{ formatShort(loans.totalReceivable) }}
               </div>
             </q-card-section>
           </q-card>
 
           <!-- দেনা -->
           <q-card class="finance-card loan-dash-card cursor-pointer" @click="$router.push('/dashboard/loans')" v-ripple>
-            <q-card-section class="q-pa-sm">
-              <div class="row items-center no-wrap q-gutter-sm">
-                <q-avatar style="background:#fef2f2;" size="36px">
-                  <q-icon name="arrow_upward" style="color:#ef4444;" size="18px" />
-                </q-avatar>
-                <div>
-                  <div style="font-size:0.7rem; color:#8e8ea0; font-weight:500;">{{ $t('loans.payable') }}</div>
-                  <div style="font-size:0.8rem; font-weight:700; color:#ef4444;">
-                    {{ settings.currency }}{{ formatShort(loans.totalPayable) }}
-                  </div>
-                </div>
+            <q-card-section class="loan-card-inner">
+              <q-avatar style="background: rgba(220,38,38,0.1);" size="34px" class="q-mb-sm">
+                <q-icon name="arrow_upward" style="color:#dc2626;" size="16px" />
+              </q-avatar>
+              <div class="loan-card-label">{{ $t('loans.payable') }}</div>
+              <div class="loan-card-amount" style="color:#dc2626;">
+                {{ settings.currency }}{{ formatShort(loans.totalPayable) }}
               </div>
             </q-card-section>
           </q-card>
 
           <!-- মোট লোন -->
           <q-card class="finance-card loan-dash-card cursor-pointer" @click="$router.push('/dashboard/loans')" v-ripple>
-            <q-card-section class="q-pa-sm">
-              <div class="row items-center no-wrap q-gutter-sm">
-                <q-avatar style="background:#fff8e1;" size="36px">
-                  <q-icon name="account_balance" style="color:#f59e0b;" size="18px" />
-                </q-avatar>
-                <div>
-                  <div style="font-size:0.7rem; color:#8e8ea0; font-weight:500;">{{ $t('loans.loan') }}</div>
-                  <div style="font-size:0.8rem; font-weight:700; color:#f59e0b;">
-                    {{ settings.currency }}{{ formatShort(loans.totalLoanAmount) }}
-                  </div>
-                </div>
+            <q-card-section class="loan-card-inner">
+              <q-avatar style="background: rgba(245,158,11,0.12);" size="34px" class="q-mb-sm">
+                <q-icon name="account_balance" style="color:#d97706;" size="16px" />
+              </q-avatar>
+              <div class="loan-card-label">{{ $t('loans.loan') }}</div>
+              <div class="loan-card-amount" style="color:#d97706;">
+                {{ settings.currency }}{{ formatShort(loans.totalLoanAmount) }}
               </div>
             </q-card-section>
           </q-card>
@@ -899,7 +885,7 @@ async function confirmDeleteOnly() {
 
 <style scoped>
 .dashboard-page {
-  padding: 12px 16px 80px;
+  padding: 16px 16px 80px;
 }
 
 /* Greeting header */
@@ -914,16 +900,33 @@ async function confirmDeleteOnly() {
   margin-left: 12px;
 }
 
+/* Greeting typography */
+.greeting-name {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.greeting-sub {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
 /* Section headers */
 .dash-section-header {
-  padding: 8px 4px 0;
+  padding: 10px 2px 0;
 }
 
 .dash-section-title {
-  font-size: 0.95rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: rgba(0, 0, 0, 0.75);
-  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
 }
 
 /* Balance Card */
@@ -935,10 +938,10 @@ async function confirmDeleteOnly() {
 }
 
 .balance-card-gradient {
-  background: linear-gradient(145deg, #2d2d3a 0%, #1a1a2a 50%, #111118 100%) !important;
+  background: linear-gradient(160deg, #07071e 0%, #0f0a2a 30%, #1a0635 60%, #07071e 100%) !important;
   background-size: 200% 200% !important;
-  animation: gradientShift 8s ease infinite;
-  padding: 22px 24px !important;
+  animation: gradientShift 10s ease infinite;
+  padding: 24px 24px !important;
   position: relative;
   overflow: hidden;
 }
@@ -946,11 +949,11 @@ async function confirmDeleteOnly() {
 .balance-card-gradient::before {
   content: '';
   position: absolute;
-  top: -60%;
-  right: -15%;
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
+  top: -50%;
+  right: -10%;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.07) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -960,35 +963,36 @@ async function confirmDeleteOnly() {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(40px);
-  opacity: 0.35;
+  filter: blur(45px);
+  opacity: 0.55;
 }
 
 .balance-orb-1 {
-  width: 120px;
-  height: 120px;
-  background: radial-gradient(circle, #6366f1 0%, transparent 70%);
-  top: -30px;
-  right: -20px;
+  width: 130px;
+  height: 130px;
+  background: radial-gradient(circle, #f97316 0%, transparent 70%);
+  top: -35px;
+  right: -25px;
   animation: orbFloat1 6s ease-in-out infinite;
 }
 
 .balance-orb-2 {
-  width: 90px;
-  height: 90px;
+  width: 100px;
+  height: 100px;
   background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
-  bottom: -20px;
-  left: 20%;
+  bottom: -25px;
+  left: 15%;
   animation: orbFloat2 8s ease-in-out infinite;
 }
 
 .balance-orb-3 {
-  width: 70px;
-  height: 70px;
+  width: 75px;
+  height: 75px;
   background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
-  top: 50%;
-  right: 30%;
+  top: 45%;
+  right: 28%;
   animation: orbFloat3 7s ease-in-out infinite;
+  opacity: 0.35;
 }
 
 /* Shimmer sweep */
@@ -1082,12 +1086,12 @@ async function confirmDeleteOnly() {
 }
 
 .balance-amount {
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   font-weight: 800;
   color: #ffffff;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  margin-top: 4px;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin-top: 6px;
 }
 
 .income-chip,
@@ -1151,14 +1155,38 @@ async function confirmDeleteOnly() {
 }
 
 .account-card {
-  min-width: 155px;
+  min-width: 160px;
   flex-shrink: 0;
 }
 
-.loan-summary-item {
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: #f8fafc;
+.account-card-inner {
+  padding: 16px 14px !important;
+}
+
+.account-type-chip {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.01em;
+}
+
+.account-card-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-card-balance {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-top: 3px;
 }
 
 .loan-cards-row {
@@ -1169,6 +1197,27 @@ async function confirmDeleteOnly() {
 .loan-dash-card {
   flex: 1;
   min-width: 0;
+}
+
+.loan-card-inner {
+  padding: 14px 12px !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.loan-card-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.loan-card-amount {
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .loan-due-section .loan-due-header {
@@ -1219,6 +1268,17 @@ async function confirmDeleteOnly() {
 /* Transaction card */
 .tx-card {
   border-radius: 18px !important;
+  overflow: hidden;
+}
+
+/* Transaction item left colored border */
+.tx-card :deep(.q-item) {
+  border-left: 3px solid transparent;
+  transition: background 0.15s ease;
+}
+
+.tx-card :deep(.q-item:hover) {
+  background: #fafbfc;
 }
 
 /* Desktop refinements */
@@ -1242,6 +1302,18 @@ async function confirmDeleteOnly() {
 
   .budget-scroll-item {
     width: calc(33.33% - 6px);
+  }
+}
+
+/* Balance overview card */
+.balance-overview-card {
+  position: relative;
+}
+
+/* Greeting spacing for desktop */
+@media (min-width: 1024px) {
+  .greeting-name {
+    font-size: 1.6rem;
   }
 }
 </style>

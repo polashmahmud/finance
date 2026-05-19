@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout *)",
+      "Bash(Get-ChildItem -Path \"d:\\\\Sites\\\\Me\\\\finance\" -Recurse -Depth 2)",
+      "Bash(Select-Object FullName)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:9100/)",
+      "Bash(curl -s http://localhost:9100/ -o /dev/null -w \"%{http_code}\")",
+      "Bash(npx vue-tsc *)",
+      "Bash(Get-ChildItem -Path \"d:\\\\Sites\\\\Me\\\\finance\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(Get-ChildItem -Path \"d:\\\\Sites\\\\Me\\\\finance\" -Force)",
+      "Bash(Select-Object Name, Mode)",
+      "Bash(npx quasar *)"
+    ]
+  }
+}

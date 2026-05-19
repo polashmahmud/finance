@@ -20,13 +20,9 @@ const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
 
 // Initialize Firestore with offline persistence (single-tab — avoids slow IndexedDB lock acquisition)
-const firestore = initializeFirestore(
-  app,
-  {
-    localCache: persistentLocalCache(),
-  },
-  'finance',
-)
+const firestore = initializeFirestore(app, {
+  localCache: persistentLocalCache(),
+})
 
 // Defer analytics initialization so it never blocks app boot
 if (typeof window !== 'undefined') {

@@ -165,17 +165,26 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = userCredential.user
       isAuthenticated.value = true
 
-      // Create initial user profile
-      await setDoc(doc(firestore, 'users', userCredential.user.uid), {
-        uid: userCredential.user.uid,
+      // Run Firestore setup in background — do not block registration redirect
+      _setupNewUserData(userCredential.user.uid, email)
+
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: sanitizeAuthError(error) }
+    }
+  }
+
+  async function _setupNewUserData(uid, email) {
+    try {
+      await setDoc(doc(firestore, 'users', uid), {
+        uid,
         name: '',
         avatar: null,
-        email: email,
+        email,
         createdAt: new Date().toISOString(),
       })
 
-      // Create default accounts
-      const accountsRef = collection(firestore, `users/${userCredential.user.uid}/accounts`)
+      const accountsRef = collection(firestore, `users/${uid}/accounts`)
       await Promise.all([
         addDoc(accountsRef, {
           name: 'Cash',
@@ -195,9 +204,7 @@ export const useAuthStore = defineStore('auth', () => {
         }),
       ])
 
-      // Create default categories
-      const categoriesRef = collection(firestore, `users/${userCredential.user.uid}/categories`)
-
+      const categoriesRef = collection(firestore, `users/${uid}/categories`)
       const defaultCategories = [
         { type: 'expense', name: 'Groceries', icon: 'shopping_cart', color: '#f44336' },
         { type: 'expense', name: 'Restaurant', icon: 'restaurant', color: '#ff9800' },
@@ -208,7 +215,6 @@ export const useAuthStore = defineStore('auth', () => {
         { type: 'expense', name: 'Shopping', icon: 'shopping_bag', color: '#3f51b5' },
         { type: 'income', name: 'Salary', icon: 'attach_money', color: '#4caf50' },
       ]
-
       await Promise.all(
         defaultCategories.map((cat) =>
           addDoc(categoriesRef, {
@@ -221,10 +227,9 @@ export const useAuthStore = defineStore('auth', () => {
         ),
       )
 
-      await fetchUserProfile(userCredential.user.uid)
-      return { success: true }
+      await fetchUserProfile(uid)
     } catch (error) {
-      return { success: false, error: sanitizeAuthError(error) }
+      console.error('Error setting up new user data:', error)
     }
   }
 

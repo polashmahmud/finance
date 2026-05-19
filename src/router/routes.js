@@ -2,14 +2,13 @@ const routes = [
   // Landing page (public)
   {
     path: '/',
-    component: () => import('layouts/LandingLayout.vue'),
-    children: [{ path: '', component: () => import('pages/LandingPage.vue') }],
+    component: () => import('pages/LandingPage.vue'),
   },
 
   // Privacy Policy page (public)
   {
     path: '/privacy-policy',
-    component: () => import('layouts/LandingLayout.vue'),
+    component: () => import('layouts/AuthLayout.vue'),
     children: [{ path: '', component: () => import('pages/PrivacyPolicyPage.vue') }],
   },
 
