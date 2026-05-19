@@ -22,34 +22,39 @@
         <!-- Total Balance Card -->
         <q-card class="balance-overview-card q-mb-lg cursor-pointer" @click="$router.push('/dashboard/accounts')"
           v-ripple>
-          <q-card-section class="balance-card-gradient">
-            <!-- Animated orbs -->
-            <div class="balance-orb balance-orb-1"></div>
-            <div class="balance-orb balance-orb-2"></div>
-            <div class="balance-orb balance-orb-3"></div>
-            <div class="balance-shimmer"></div>
-            <div class="row items-center no-wrap" style="position: relative; z-index: 1;">
+          <q-card-section class="balance-card-inner">
+            <div class="balance-texture"></div>
+            <div class="row items-start justify-between no-wrap" style="position: relative; z-index: 1;">
               <div class="col">
                 <div class="balance-label">{{ $t('dashboard.totalBalance') }}</div>
                 <div class="balance-amount">{{ settings.currency }}{{ settings.formatNumber(accounts.totalBalance) }}
                 </div>
-                <div class="row q-gutter-sm q-mt-sm">
-                  <div class="income-chip">
-                    <q-icon name="arrow_upward" size="14px" style="color: #4ade80;" />
-                    <span class="ie-label">{{ $t('common.income') }}</span>
-                    <span class="ie-value income-value">{{ settings.currency }}{{
-                      formatShort(transactions.totalIncome) }}</span>
-                  </div>
-                  <div class="expense-chip">
-                    <q-icon name="arrow_downward" size="14px" style="color: #f87171;" />
-                    <span class="ie-label">{{ $t('common.expense') }}</span>
-                    <span class="ie-value expense-value">{{ settings.currency }}{{
-                      formatShort(transactions.totalExpense) }}</span>
-                  </div>
+                <div class="balance-meta">
+                  {{ $t('dashboard.accounts') }} · {{ new Date().toLocaleDateString('en-GB', { month: 'long' }) }}
                 </div>
               </div>
-              <div class="balance-emoji">
-                {{ balanceEmoji }}
+              <div class="balance-eye-btn">
+                <q-icon name="visibility" size="16px" color="white" style="opacity: 0.7;" />
+              </div>
+            </div>
+            <div class="balance-stats" style="position: relative; z-index: 1;">
+              <div class="balance-stat-item">
+                <div class="balance-stat-label">
+                  <q-icon name="arrow_upward" size="11px" style="color: rgba(120,220,170,0.95);" />
+                  {{ $t('common.income') }}
+                </div>
+                <div class="balance-stat-value" style="color: rgba(120,220,170,0.95);">
+                  {{ settings.currency }}{{ formatShort(transactions.totalIncome) }}
+                </div>
+              </div>
+              <div class="balance-stat-item">
+                <div class="balance-stat-label">
+                  <q-icon name="arrow_downward" size="11px" style="color: rgba(255,160,140,0.95);" />
+                  {{ $t('common.expense') }}
+                </div>
+                <div class="balance-stat-value" style="color: rgba(255,160,140,0.95);">
+                  {{ settings.currency }}{{ formatShort(transactions.totalExpense) }}
+                </div>
               </div>
             </div>
           </q-card-section>
@@ -128,7 +133,7 @@
                 </div>
               </div>
               <div class="account-card-name">{{ account.name }}</div>
-              <div class="account-card-balance" :style="{ color: account.color || '#0f172a' }">
+              <div class="account-card-balance" :style="{ color: account.color || 'var(--text-primary)' }">
                 {{ settings.currency }}{{ settings.formatNumber(account.balance) }}
               </div>
             </q-card-section>
@@ -145,11 +150,11 @@
           <!-- পাওনা -->
           <q-card class="finance-card loan-dash-card cursor-pointer" @click="$router.push('/dashboard/loans')" v-ripple>
             <q-card-section class="loan-card-inner">
-              <q-avatar style="background: rgba(22,163,74,0.12);" size="34px" class="q-mb-sm">
-                <q-icon name="arrow_downward" style="color:#16a34a;" size="16px" />
+              <q-avatar style="background: rgba(47,125,92,0.12);" size="34px" class="q-mb-sm">
+                <q-icon name="arrow_downward" style="color:#2f7d5c;" size="16px" />
               </q-avatar>
               <div class="loan-card-label">{{ $t('loans.receivable') }}</div>
-              <div class="loan-card-amount" style="color:#16a34a;">
+              <div class="loan-card-amount" style="color:#2f7d5c;">
                 {{ settings.currency }}{{ formatShort(loans.totalReceivable) }}
               </div>
             </q-card-section>
@@ -158,11 +163,11 @@
           <!-- দেনা -->
           <q-card class="finance-card loan-dash-card cursor-pointer" @click="$router.push('/dashboard/loans')" v-ripple>
             <q-card-section class="loan-card-inner">
-              <q-avatar style="background: rgba(220,38,38,0.1);" size="34px" class="q-mb-sm">
-                <q-icon name="arrow_upward" style="color:#dc2626;" size="16px" />
+              <q-avatar style="background: rgba(177,68,55,0.1);" size="34px" class="q-mb-sm">
+                <q-icon name="arrow_upward" style="color:#b14437;" size="16px" />
               </q-avatar>
               <div class="loan-card-label">{{ $t('loans.payable') }}</div>
-              <div class="loan-card-amount" style="color:#dc2626;">
+              <div class="loan-card-amount" style="color:#b14437;">
                 {{ settings.currency }}{{ formatShort(loans.totalPayable) }}
               </div>
             </q-card-section>
@@ -171,11 +176,11 @@
           <!-- মোট লোন -->
           <q-card class="finance-card loan-dash-card cursor-pointer" @click="$router.push('/dashboard/loans')" v-ripple>
             <q-card-section class="loan-card-inner">
-              <q-avatar style="background: rgba(245,158,11,0.12);" size="34px" class="q-mb-sm">
-                <q-icon name="account_balance" style="color:#d97706;" size="16px" />
+              <q-avatar style="background: rgba(177,106,38,0.12);" size="34px" class="q-mb-sm">
+                <q-icon name="account_balance" style="color:#b16a26;" size="16px" />
               </q-avatar>
               <div class="loan-card-label">{{ $t('loans.loan') }}</div>
-              <div class="loan-card-amount" style="color:#d97706;">
+              <div class="loan-card-amount" style="color:#b16a26;">
                 {{ settings.currency }}{{ formatShort(loans.totalLoanAmount) }}
               </div>
             </q-card-section>
@@ -186,8 +191,8 @@
         <div v-if="loans.thisMonthDue > 0" class="loan-due-section q-mb-md">
           <div class="loan-due-header row items-center q-gutter-xs q-mb-xs">
             <q-icon name="event" size="16px" color="orange" />
-            <span style="font-weight:600; font-size:0.8rem; color:#1a1a2e;">{{ $t('loans.thisMonthDue') }}</span>
-            <span style="font-weight:500; color:#8e8ea0; font-size:0.7rem;"> &middot; {{ settings.currency }}{{ formatShort(loans.thisMonthDue) }}</span>
+            <span style="font-weight:600; font-size:0.8rem; color:#16161a;">{{ $t('loans.thisMonthDue') }}</span>
+            <span style="font-weight:500; color:#7c7a73; font-size:0.7rem;"> &middot; {{ settings.currency }}{{ formatShort(loans.thisMonthDue) }}</span>
           </div>
           <q-card class="finance-card" style="overflow:hidden;">
             <q-list dense separator>
@@ -198,7 +203,7 @@
                   </q-avatar>
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label style="font-size:0.76rem; font-weight:600; color:#1a1a2e;">{{ item.personName }}</q-item-label>
+                  <q-item-label style="font-size:0.76rem; font-weight:600; color:#16161a;">{{ item.personName }}</q-item-label>
                   <q-item-label caption style="font-size:0.65rem;">{{ $t('loans.installment') }} #{{ item.installmentNumber }} &middot; {{ settings.formatDate(item.dueDate) }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
@@ -213,7 +218,7 @@
         <div class="dash-section-header row items-center justify-between q-mb-sm">
           <div class="dash-section-title">{{ $t('dashboard.budgetStatus') }}</div>
           <div class="row items-center q-gutter-xs">
-            <span class="text-caption" style="color: #8e8ea0;">{{ $t('dashboard.quickEntry') }}</span>
+            <span class="text-caption" style="color: #7c7a73;">{{ $t('dashboard.quickEntry') }}</span>
             <q-toggle v-model="quickEntry" color="dark" dense @update:model-value="onQuickEntryChange" />
           </div>
         </div>
@@ -229,15 +234,15 @@
                 <q-avatar :style="{ background: cat.color + '18' }" size="40px" class="q-mb-xs">
                   <q-icon :name="cat.icon" :style="{ color: cat.color }" size="20px" />
                 </q-avatar>
-                <div class="text-center ellipsis full-width" style="font-size: 11px; font-weight: 600; color: #1a1a2e;">
+                <div class="text-center ellipsis full-width" style="font-size: 11px; font-weight: 600; color: #16161a;">
                   {{ cat.name }}
                 </div>
                 <div v-if="getCurrentMonthBudget(cat)" class="text-caption q-mt-xs"
-                  style="font-size: 9px; color: #8e8ea0;">
+                  style="font-size: 9px; color: #7c7a73;">
                   {{ settings.currency }}{{ formatShort(getCurrentMonthBudget(cat)) }}
                 </div>
                 <div v-else class="text-caption q-mt-xs text-center"
-                  style="font-size: 9px; color: #b0b0c0; line-height: 1.2;">
+                  style="font-size: 9px; color: #b8b5ac; line-height: 1.2;">
                   {{ $t('dashboard.tapToSetBudget') }}
                 </div>
               </q-card-section>
@@ -302,10 +307,10 @@
     <q-dialog v-model="budgetModalOpen">
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: var(--text-primary);">
             {{ budgetModalCategory?.name }}
           </div>
-          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+          <q-btn icon="close" flat round dense v-close-popup style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
 
         <q-card-section>
@@ -342,10 +347,10 @@
     <q-dialog v-model="quickEntryModalOpen">
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: var(--text-primary);">
             {{ quickEntryCategory?.name }}
           </div>
-          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+          <q-btn icon="close" flat round dense v-close-popup style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
 
         <q-card-section class="q-px-lg">
@@ -394,15 +399,15 @@
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="row items-center q-gutter-sm">
             <q-avatar color="negative" text-color="white" icon="delete" size="36px" />
-            <div class="text-h6 text-weight-bold" style="color: #222;">{{ $t('dashboard.deleteTransactionTitle') }}
+            <div class="text-h6 text-weight-bold" style="color: var(--text-primary);">{{ $t('dashboard.deleteTransactionTitle') }}
             </div>
           </div>
-          <q-btn icon="close" flat round dense @click="cancelDeleteTx" style="background: #f1f5f9; color: #64748b;" />
+          <q-btn icon="close" flat round dense @click="cancelDeleteTx" style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
 
         <q-card-section class="q-pt-sm">
           <!-- Transaction summary -->
-          <div class="q-pa-sm q-mb-md" style="background: #f8fafc; border-radius: 12px;">
+          <div class="q-pa-sm q-mb-md" style="background: var(--card-cream); border-radius: 12px;">
             <div class="row items-center q-gutter-sm">
               <q-avatar :style="{ background: getCategoryColor(deleteTxData?.category) + '20' }" size="36px">
                 <q-icon :name="getCategoryIcon(deleteTxData?.category)"
@@ -752,6 +757,7 @@ function getCategoryIcon(categoryName) {
   return all.find((c) => c.name === categoryName)?.icon || 'receipt'
 }
 
+// eslint-disable-next-line no-unused-vars
 const balanceEmoji = computed(() => {
   const bal = accounts.totalBalance || 0
   const emojis = settings.balanceEmojis || {
@@ -903,17 +909,19 @@ async function confirmDeleteOnly() {
 /* Greeting typography */
 .greeting-name {
   font-size: 1.45rem;
-  font-weight: 800;
-  color: #0f172a;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
 .greeting-sub {
-  font-size: 0.85rem;
-  color: #94a3b8;
-  margin-top: 3px;
-  font-weight: 500;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 /* Section headers */
@@ -922,222 +930,98 @@ async function confirmDeleteOnly() {
 }
 
 .dash-section-title {
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: 0.69rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #94a3b8;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
 }
 
 /* Balance Card */
 .balance-overview-card {
-  border-radius: 20px !important;
+  border-radius: 18px !important;
   border: none !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18) !important;
+  box-shadow: 0 12px 30px -16px rgba(22, 22, 26, 0.6), 0 2px 0 rgba(22, 22, 26, 0.04) !important;
   overflow: hidden;
 }
 
-.balance-card-gradient {
-  background: linear-gradient(160deg, #07071e 0%, #0f0a2a 30%, #1a0635 60%, #07071e 100%) !important;
-  background-size: 200% 200% !important;
-  animation: gradientShift 10s ease infinite;
-  padding: 24px 24px !important;
+.balance-card-inner {
+  background: #16161a !important;
+  color: #fff;
+  padding: 20px 20px !important;
   position: relative;
   overflow: hidden;
 }
 
-.balance-card-gradient::before {
-  content: '';
+.balance-texture {
   position: absolute;
-  top: -50%;
-  right: -10%;
-  width: 260px;
-  height: 260px;
-  background: radial-gradient(circle, rgba(249, 115, 22, 0.07) 0%, transparent 70%);
-  border-radius: 50%;
+  inset: 0;
+  opacity: 0.06;
+  background-image: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.5) 0, transparent 40%);
   pointer-events: none;
-}
-
-/* Floating orbs */
-.balance-orb {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  filter: blur(45px);
-  opacity: 0.55;
-}
-
-.balance-orb-1 {
-  width: 130px;
-  height: 130px;
-  background: radial-gradient(circle, #f97316 0%, transparent 70%);
-  top: -35px;
-  right: -25px;
-  animation: orbFloat1 6s ease-in-out infinite;
-}
-
-.balance-orb-2 {
-  width: 100px;
-  height: 100px;
-  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
-  bottom: -25px;
-  left: 15%;
-  animation: orbFloat2 8s ease-in-out infinite;
-}
-
-.balance-orb-3 {
-  width: 75px;
-  height: 75px;
-  background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
-  top: 45%;
-  right: 28%;
-  animation: orbFloat3 7s ease-in-out infinite;
-  opacity: 0.35;
-}
-
-/* Shimmer sweep */
-.balance-shimmer {
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 60%;
-  height: 100%;
-  background: linear-gradient(105deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.03) 40%,
-      rgba(255, 255, 255, 0.07) 50%,
-      rgba(255, 255, 255, 0.03) 60%,
-      transparent 100%);
-  animation: shimmerSweep 4s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes gradientShift {
-
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-@keyframes orbFloat1 {
-
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-
-  33% {
-    transform: translate(-15px, 10px) scale(1.1);
-  }
-
-  66% {
-    transform: translate(10px, -8px) scale(0.95);
-  }
-}
-
-@keyframes orbFloat2 {
-
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-
-  40% {
-    transform: translate(20px, -12px) scale(1.15);
-  }
-
-  70% {
-    transform: translate(-10px, 8px) scale(0.9);
-  }
-}
-
-@keyframes orbFloat3 {
-
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-
-  50% {
-    transform: translate(-12px, -15px) scale(1.1);
-  }
-}
-
-@keyframes shimmerSweep {
-  0% {
-    left: -100%;
-  }
-
-  100% {
-    left: 200%;
-  }
 }
 
 .balance-label {
-  font-size: 0.82rem;
+  font-size: 0.69rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   color: rgba(255, 255, 255, 0.55);
-  font-weight: 500;
-  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .balance-amount {
-  font-size: 2.4rem;
-  font-weight: 800;
+  font-size: 2.1rem;
+  font-weight: 700;
   color: #ffffff;
   line-height: 1.1;
-  letter-spacing: -0.04em;
-  margin-top: 6px;
+  letter-spacing: -0.02em;
+  margin-top: 8px;
 }
 
-.income-chip,
-.expense-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 5px 10px;
-  border-radius: 20px;
+.balance-meta {
+  margin-top: 4px;
   font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
 }
 
-.income-chip {
-  background: rgba(74, 222, 128, 0.12);
-}
-
-.expense-chip {
-  background: rgba(248, 113, 113, 0.12);
-}
-
-.ie-label {
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.7rem;
-  font-weight: 500;
-}
-
-.ie-value {
-  font-weight: 700;
-  font-size: 0.8rem;
-}
-
-.income-value {
-  color: #4ade80;
-}
-
-.expense-value {
-  color: #f87171;
-}
-
-.balance-emoji {
-  font-size: 4.5rem;
-  user-select: none;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
-  line-height: 1;
+.balance-eye-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  margin-left: 12px;
+}
+
+.balance-stats {
+  margin-top: 18px;
+  display: flex;
+  gap: 22px;
+}
+
+.balance-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.balance-stat-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.69rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.balance-stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 /* Account cards */
@@ -1155,38 +1039,40 @@ async function confirmDeleteOnly() {
 }
 
 .account-card {
-  min-width: 160px;
+  min-width: 158px;
   flex-shrink: 0;
+  border-radius: 18px !important;
 }
 
 .account-card-inner {
-  padding: 16px 14px !important;
+  padding: 14px 14px !important;
 }
 
 .account-type-chip {
-  font-size: 0.68rem;
+  font-size: 0.625rem;
   font-weight: 600;
-  padding: 3px 8px;
+  padding: 2px 6px;
   border-radius: 20px;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .account-card-name {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #0f172a;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
   letter-spacing: -0.01em;
-  margin-top: 2px;
+  margin-top: 14px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .account-card-balance {
-  font-size: 1.05rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-top: 3px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-top: 2px;
 }
 
 .loan-cards-row {
@@ -1197,27 +1083,29 @@ async function confirmDeleteOnly() {
 .loan-dash-card {
   flex: 1;
   min-width: 0;
+  border-radius: 16px !important;
 }
 
 .loan-card-inner {
-  padding: 14px 12px !important;
+  padding: 12px 12px !important;
   display: flex;
   flex-direction: column;
 }
 
 .loan-card-label {
-  font-size: 0.68rem;
+  font-size: 0.625rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   margin-bottom: 2px;
+  margin-top: 8px;
 }
 
 .loan-card-amount {
-  font-size: 0.9rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: 1.06rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .loan-due-section .loan-due-header {
@@ -1248,6 +1136,7 @@ async function confirmDeleteOnly() {
   position: relative;
   overflow: hidden;
   min-height: 108px;
+  border-radius: 16px !important;
 }
 
 .budget-fill-bg {
@@ -1271,14 +1160,17 @@ async function confirmDeleteOnly() {
   overflow: hidden;
 }
 
-/* Transaction item left colored border */
+/* Transaction item */
 .tx-card :deep(.q-item) {
-  border-left: 3px solid transparent;
-  transition: background 0.15s ease;
+  transition: background 0.12s ease;
 }
 
 .tx-card :deep(.q-item:hover) {
-  background: #fafbfc;
+  background: var(--card-cream);
+}
+
+.tx-card :deep(.q-item-label--caption) {
+  color: var(--text-muted) !important;
 }
 
 /* Desktop refinements */
@@ -1305,11 +1197,6 @@ async function confirmDeleteOnly() {
   }
 }
 
-/* Balance overview card */
-.balance-overview-card {
-  position: relative;
-}
-
 /* Greeting spacing for desktop */
 @media (min-width: 1024px) {
   .greeting-name {
@@ -1317,3 +1204,4 @@ async function confirmDeleteOnly() {
   }
 }
 </style>
+

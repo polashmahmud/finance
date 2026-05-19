@@ -33,7 +33,7 @@ import CTASection from 'src/components/landing/CTASection.vue'
 import LandingFooter from 'src/components/landing/LandingFooter.vue'
 
 onMounted(() => {
-  document.body.style.background = '#07101e'
+  document.body.style.background = '#fafaf7'
 })
 
 onUnmounted(() => {
@@ -44,12 +44,12 @@ onUnmounted(() => {
 <style lang="scss">
 // Global landing page styles — not scoped so children inherit
 .lp-page {
-  background: #07101e;
+  background: #fafaf7;
   min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Hind Siliguri', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #f1f5f9;
+  color: #16161a;
 
   // Override .q-page padding added by Quasar
   .q-page {

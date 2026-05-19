@@ -78,6 +78,7 @@ const steps = [
   position: relative;
   padding: 100px 24px;
   overflow: hidden;
+  background: #f5f1e8;
 
   &__bg {
     position: absolute;
@@ -90,7 +91,7 @@ const steps = [
     width: 700px;
     height: 700px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(47, 125, 92, 0.06) 0%, transparent 70%);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -111,7 +112,7 @@ const steps = [
   &__title {
     font-size: clamp(1.8rem, 3.5vw, 2.8rem);
     font-weight: 900;
-    color: #f1f5f9;
+    color: #16161a;
     letter-spacing: -0.04em;
     margin: 12px 0 16px;
     line-height: 1.15;
@@ -119,7 +120,7 @@ const steps = [
 
   &__subtitle {
     font-size: 1.05rem;
-    color: #64748b;
+    color: #7c7a73;
     max-width: 480px;
     margin: 0 auto;
     line-height: 1.65;
@@ -159,7 +160,7 @@ const steps = [
     right: 0;
     width: 50%;
     height: 1px;
-    background: linear-gradient(90deg, rgba(249, 115, 22, 0.4), transparent);
+    background: linear-gradient(90deg, rgba(47, 125, 92, 0.35), transparent);
     z-index: 0;
 
     @media (max-width: 1023px) {
@@ -170,7 +171,7 @@ const steps = [
   &__step-number {
     font-size: 0.7rem;
     font-weight: 800;
-    color: rgba(249, 115, 22, 0.5);
+    color: rgba(47, 125, 92, 0.5);
     letter-spacing: 0.1em;
     margin-bottom: 16px;
   }
@@ -179,8 +180,8 @@ const steps = [
     width: 72px;
     height: 72px;
     border-radius: 20px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #ffffff;
+    border: 1px solid #e9e5dc;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -192,22 +193,22 @@ const steps = [
 
     .hiw__step:hover & {
       transform: translateY(-4px);
-      border-color: rgba(249, 115, 22, 0.3);
-      box-shadow: 0 12px 32px rgba(249, 115, 22, 0.15);
+      border-color: rgba(47, 125, 92, 0.3);
+      box-shadow: 0 12px 32px rgba(22, 22, 26, 0.1);
     }
   }
 
   &__step-title {
     font-size: 1rem;
     font-weight: 800;
-    color: #e2e8f0;
+    color: #16161a;
     margin: 0 0 10px;
     letter-spacing: -0.02em;
   }
 
   &__step-desc {
     font-size: 0.85rem;
-    color: #64748b;
+    color: #7c7a73;
     line-height: 1.6;
     margin: 0 0 12px;
   }
@@ -215,12 +216,12 @@ const steps = [
   &__step-detail {
     display: inline-block;
     padding: 4px 12px;
-    background: rgba(249, 115, 22, 0.08);
-    border: 1px solid rgba(249, 115, 22, 0.15);
+    background: rgba(47, 125, 92, 0.08);
+    border: 1px solid rgba(47, 125, 92, 0.18);
     border-radius: 100px;
     font-size: 0.72rem;
     font-weight: 600;
-    color: #f97316;
+    color: #2f7d5c;
   }
 
   &__cta {
@@ -232,25 +233,26 @@ const steps = [
     align-items: center;
     gap: 8px;
     padding: 14px 32px;
-    background: linear-gradient(135deg, #f97316, #ef4444);
+    background: #16161a;
     color: #fff;
     font-size: 1rem;
     font-weight: 700;
     border-radius: 12px;
     text-decoration: none;
-    box-shadow: 0 4px 24px rgba(249, 115, 22, 0.4);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 4px 20px rgba(22, 22, 26, 0.25);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
     margin-bottom: 14px;
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(249, 115, 22, 0.55);
+      box-shadow: 0 8px 28px rgba(22, 22, 26, 0.35);
+      opacity: 0.88;
     }
   }
 
   &__cta-note {
     font-size: 0.82rem;
-    color: #475569;
+    color: #b8b5ac;
     margin: 0;
   }
 }
@@ -258,12 +260,12 @@ const steps = [
 .section-badge {
   display: inline-block;
   padding: 5px 14px;
-  background: rgba(249, 115, 22, 0.1);
-  border: 1px solid rgba(249, 115, 22, 0.2);
+  background: rgba(47, 125, 92, 0.08);
+  border: 1px solid rgba(47, 125, 92, 0.2);
   border-radius: 100px;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #f97316;
+  color: #2f7d5c;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 8px;

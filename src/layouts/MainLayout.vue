@@ -10,7 +10,7 @@
         <!-- Left: Logo + Name -->
         <div class="row items-center q-gutter-sm cursor-pointer" @click="$router.push('/dashboard')">
           <div class="header-logo-wrap">
-            <q-icon name="account_balance_wallet" size="18px" style="color: #f97316;" />
+            <q-icon name="account_balance_wallet" size="18px" style="color: #16161a;" />
           </div>
           <span class="header-brand-text">{{ $t('layout.financeManager') }}</span>
         </div>
@@ -126,23 +126,23 @@
               <div class="panel-group-label">{{ $t('nav.home') === 'Home' ? 'Navigation' : 'নেভিগেশন' }}</div>
               <div class="panel-nav-grid">
                 <div class="panel-nav-item" v-ripple @click="profileMenuNav('/dashboard')">
-                  <div class="panel-nav-icon" style="background: #fff7ed;"><q-icon name="home" size="22px" style="color:#f97316" /></div>
+                  <div class="panel-nav-icon" style="background: rgba(22,22,26,0.06);"><q-icon name="home" size="22px" style="color:#16161a" /></div>
                   <span>{{ $t('nav.home') }}</span>
                 </div>
                 <div class="panel-nav-item" v-ripple @click="profileMenuNav('/dashboard/accounts')">
-                  <div class="panel-nav-icon" style="background: #f0fdf4;"><q-icon name="account_balance_wallet" size="22px" style="color:#22c55e" /></div>
+                  <div class="panel-nav-icon" style="background: #e8f1ec;"><q-icon name="account_balance_wallet" size="22px" style="color:#2f7d5c" /></div>
                   <span>{{ $t('nav.accounts') }}</span>
                 </div>
                 <div class="panel-nav-item" v-ripple @click="profileMenuNav('/dashboard/reports')">
-                  <div class="panel-nav-icon" style="background: #fdf4ff;"><q-icon name="bar_chart" size="22px" style="color:#a855f7" /></div>
+                  <div class="panel-nav-icon" style="background: #eef0f9;"><q-icon name="bar_chart" size="22px" style="color:#3f4a7a" /></div>
                   <span>{{ $t('nav.reports') }}</span>
                 </div>
                 <div class="panel-nav-item" v-ripple @click="profileMenuNav('/dashboard/all-transactions')">
-                  <div class="panel-nav-icon" style="background: #fffbeb;"><q-icon name="receipt_long" size="22px" style="color:#f59e0b" /></div>
+                  <div class="panel-nav-icon" style="background: rgba(22,22,26,0.06);"><q-icon name="receipt_long" size="22px" style="color:#3a3a40" /></div>
                   <span>{{ $t('nav.allTransactions') }}</span>
                 </div>
                 <div class="panel-nav-item" v-ripple @click="profileMenuNav('/dashboard/search')">
-                  <div class="panel-nav-icon" style="background: #f8fafc;"><q-icon name="search" size="22px" color="grey-7" /></div>
+                  <div class="panel-nav-icon" style="background: rgba(22,22,26,0.04);"><q-icon name="search" size="22px" style="color:#7c7a73" /></div>
                   <span>{{ $t('nav.search') }}</span>
                 </div>
               </div>
@@ -150,37 +150,37 @@
               <div class="panel-group-label q-mt-md">Tools</div>
               <div class="panel-nav-grid">
                 <div class="panel-nav-item" v-ripple @click="profileMenuNav('/dashboard/market-lists')">
-                  <div class="panel-nav-icon" style="background: #eff6ff;"><q-icon name="shopping_cart" size="22px" style="color:#3b82f6" /></div>
+                  <div class="panel-nav-icon" style="background: #eef0f9;"><q-icon name="shopping_cart" size="22px" style="color:#3f4a7a" /></div>
                   <span>{{ $t('nav.lists') }}</span>
                 </div>
                 <div class="panel-nav-item" v-ripple @click="profileMenuNav('/dashboard/notes')">
-                  <div class="panel-nav-icon" style="background: #fdf2f8;"><q-icon name="description" size="22px" style="color:#ec4899" /></div>
+                  <div class="panel-nav-icon" style="background: #f5eef8;"><q-icon name="description" size="22px" style="color:#7a3c8a" /></div>
                   <span>{{ $t('nav.note') }}</span>
                 </div>
                 <div class="panel-nav-item" v-ripple @click="profileMenuNav('/dashboard/loans')">
-                  <div class="panel-nav-icon" style="background: #f5f3ff;"><q-icon name="account_balance" size="22px" style="color:#8b5cf6" /></div>
+                  <div class="panel-nav-icon" style="background: rgba(22,22,26,0.06);"><q-icon name="account_balance" size="22px" style="color:#5e5b54" /></div>
                   <span>{{ $t('nav.loans') }}</span>
                 </div>
               </div>
 
               <div class="panel-group-label q-mt-md">Preferences</div>
-              <q-list style="border-radius: 14px; overflow: hidden; background: #f8fafc; border: 1px solid #e2e8f0;">
+              <q-list style="border-radius: 14px; overflow: hidden; background: white; border: 1px solid #e9e5dc;">
                 <q-item clickable v-ripple @click="profileMenuNav('/dashboard/categories')" style="min-height: 52px;">
-                  <q-item-section avatar><div class="panel-list-icon" style="background:#fff7ed"><q-icon name="category" size="18px" style="color:#ea580c" /></div></q-item-section>
+                  <q-item-section avatar><div class="panel-list-icon" style="background:rgba(22,22,26,0.06)"><q-icon name="category" size="18px" style="color:#16161a" /></div></q-item-section>
                   <q-item-section class="text-weight-medium" style="font-size: 0.9rem;">{{ $t('nav.categories') }}</q-item-section>
-                  <q-item-section side><q-icon name="chevron_right" color="grey-5" /></q-item-section>
+                  <q-item-section side><q-icon name="chevron_right" style="color:#b8b5ac" /></q-item-section>
                 </q-item>
                 <q-separator inset />
                 <q-item clickable v-ripple @click="profileMenuNav('/dashboard/settings')" style="min-height: 52px;">
-                  <q-item-section avatar><div class="panel-list-icon" style="background:#f1f5f9"><q-icon name="settings" size="18px" color="grey-8" /></div></q-item-section>
+                  <q-item-section avatar><div class="panel-list-icon" style="background:rgba(22,22,26,0.06)"><q-icon name="settings" size="18px" style="color:#3a3a40" /></div></q-item-section>
                   <q-item-section class="text-weight-medium" style="font-size: 0.9rem;">{{ $t('nav.settings') }}</q-item-section>
-                  <q-item-section side><q-icon name="chevron_right" color="grey-5" /></q-item-section>
+                  <q-item-section side><q-icon name="chevron_right" style="color:#b8b5ac" /></q-item-section>
                 </q-item>
                 <q-separator inset />
                 <q-item clickable v-ripple @click="profileMenuNav('/dashboard/help')" style="min-height: 52px;">
-                  <q-item-section avatar><div class="panel-list-icon" style="background:#fff7ed"><q-icon name="help_outline" size="18px" style="color:#f97316" /></div></q-item-section>
+                  <q-item-section avatar><div class="panel-list-icon" style="background:rgba(22,22,26,0.06)"><q-icon name="help_outline" size="18px" style="color:#3a3a40" /></div></q-item-section>
                   <q-item-section class="text-weight-medium" style="font-size: 0.9rem;">{{ $t('help.title') }}</q-item-section>
-                  <q-item-section side><q-icon name="chevron_right" color="grey-5" /></q-item-section>
+                  <q-item-section side><q-icon name="chevron_right" style="color:#b8b5ac" /></q-item-section>
                 </q-item>
               </q-list>
 
@@ -200,7 +200,7 @@
       <!-- Brand section -->
       <div class="sidebar-brand">
         <div class="sidebar-brand-logo">
-          <q-icon name="account_balance_wallet" size="18px" style="color: #f97316;" />
+          <q-icon name="account_balance_wallet" size="18px" style="color: rgba(255,255,255,0.75);" />
         </div>
         <span class="sidebar-brand-text">{{ $t('layout.financeManager') }}</span>
       </div>
@@ -212,8 +212,8 @@
           <!-- Group 1: Main -->
           <q-item clickable v-ripple to="/dashboard" exact active-class="sidebar-item-active" class="sidebar-nav-item">
             <q-item-section avatar style="min-width: 40px;">
-              <div class="sidebar-icon-wrap" style="color: #f97316; background: rgba(249,115,22,0.12);">
-                <q-icon name="home" size="17px" />
+              <div class="sidebar-icon-wrap">
+                <q-icon name="home" size="17px" style="color: rgba(255,255,255,0.55);" />
               </div>
             </q-item-section>
             <q-item-section class="sidebar-nav-label">{{ $t('nav.home') }}</q-item-section>
@@ -221,8 +221,8 @@
 
           <q-item clickable v-ripple to="/dashboard/accounts" active-class="sidebar-item-active" class="sidebar-nav-item">
             <q-item-section avatar style="min-width: 40px;">
-              <div class="sidebar-icon-wrap" style="color: #22c55e; background: rgba(34,197,94,0.12);">
-                <q-icon name="account_balance_wallet" size="17px" />
+              <div class="sidebar-icon-wrap">
+                <q-icon name="account_balance_wallet" size="17px" style="color: rgba(255,255,255,0.55);" />
               </div>
             </q-item-section>
             <q-item-section class="sidebar-nav-label">{{ $t('nav.accounts') }}</q-item-section>
@@ -230,8 +230,8 @@
 
           <q-item clickable v-ripple to="/dashboard/reports" active-class="sidebar-item-active" class="sidebar-nav-item">
             <q-item-section avatar style="min-width: 40px;">
-              <div class="sidebar-icon-wrap" style="color: #8b5cf6; background: rgba(139,92,246,0.12);">
-                <q-icon name="bar_chart" size="17px" />
+              <div class="sidebar-icon-wrap">
+                <q-icon name="bar_chart" size="17px" style="color: rgba(255,255,255,0.55);" />
               </div>
             </q-item-section>
             <q-item-section class="sidebar-nav-label">{{ $t('nav.reports') }}</q-item-section>
@@ -239,8 +239,8 @@
 
           <q-item clickable v-ripple to="/dashboard/market-lists" active-class="sidebar-item-active" class="sidebar-nav-item">
             <q-item-section avatar style="min-width: 40px;">
-              <div class="sidebar-icon-wrap" style="color: #3b82f6; background: rgba(59,130,246,0.12);">
-                <q-icon name="shopping_cart" size="17px" />
+              <div class="sidebar-icon-wrap">
+                <q-icon name="shopping_cart" size="17px" style="color: rgba(255,255,255,0.55);" />
               </div>
             </q-item-section>
             <q-item-section class="sidebar-nav-label">{{ $t('nav.lists') }}</q-item-section>
@@ -251,8 +251,8 @@
           <!-- Group 2: Finance -->
           <q-item clickable v-ripple to="/dashboard/all-transactions" active-class="sidebar-item-active" class="sidebar-nav-item">
             <q-item-section avatar style="min-width: 40px;">
-              <div class="sidebar-icon-wrap" style="color: #f59e0b; background: rgba(245,158,11,0.12);">
-                <q-icon name="receipt_long" size="17px" />
+              <div class="sidebar-icon-wrap">
+                <q-icon name="receipt_long" size="17px" style="color: rgba(255,255,255,0.55);" />
               </div>
             </q-item-section>
             <q-item-section class="sidebar-nav-label">{{ $t('nav.allTransactions') }}</q-item-section>
@@ -260,8 +260,8 @@
 
           <q-item clickable v-ripple to="/dashboard/search" active-class="sidebar-item-active" class="sidebar-nav-item">
             <q-item-section avatar style="min-width: 40px;">
-              <div class="sidebar-icon-wrap" style="color: #94a3b8; background: rgba(148,163,184,0.12);">
-                <q-icon name="search" size="17px" />
+              <div class="sidebar-icon-wrap">
+                <q-icon name="search" size="17px" style="color: rgba(255,255,255,0.55);" />
               </div>
             </q-item-section>
             <q-item-section class="sidebar-nav-label">{{ $t('nav.search') }}</q-item-section>
@@ -269,8 +269,8 @@
 
           <q-item clickable v-ripple to="/dashboard/notes" active-class="sidebar-item-active" class="sidebar-nav-item">
             <q-item-section avatar style="min-width: 40px;">
-              <div class="sidebar-icon-wrap" style="color: #ec4899; background: rgba(236,72,153,0.12);">
-                <q-icon name="description" size="17px" />
+              <div class="sidebar-icon-wrap">
+                <q-icon name="description" size="17px" style="color: rgba(255,255,255,0.55);" />
               </div>
             </q-item-section>
             <q-item-section class="sidebar-nav-label">{{ $t('nav.note') }}</q-item-section>
@@ -278,8 +278,8 @@
 
           <q-item clickable v-ripple to="/dashboard/loans" active-class="sidebar-item-active" class="sidebar-nav-item">
             <q-item-section avatar style="min-width: 40px;">
-              <div class="sidebar-icon-wrap" style="color: #a855f7; background: rgba(168,85,247,0.12);">
-                <q-icon name="account_balance" size="17px" />
+              <div class="sidebar-icon-wrap">
+                <q-icon name="account_balance" size="17px" style="color: rgba(255,255,255,0.55);" />
               </div>
             </q-item-section>
             <q-item-section class="sidebar-nav-label">{{ $t('nav.loans') }}</q-item-section>
@@ -290,8 +290,8 @@
           <!-- Group 3: Settings -->
           <q-item clickable v-ripple to="/dashboard/categories" active-class="sidebar-item-active" class="sidebar-nav-item">
             <q-item-section avatar style="min-width: 40px;">
-              <div class="sidebar-icon-wrap" style="color: #ea580c; background: rgba(234,88,12,0.12);">
-                <q-icon name="category" size="17px" />
+              <div class="sidebar-icon-wrap">
+                <q-icon name="category" size="17px" style="color: rgba(255,255,255,0.55);" />
               </div>
             </q-item-section>
             <q-item-section class="sidebar-nav-label">{{ $t('nav.categories') }}</q-item-section>
@@ -299,8 +299,8 @@
 
           <q-item clickable v-ripple to="/dashboard/settings" active-class="sidebar-item-active" class="sidebar-nav-item">
             <q-item-section avatar style="min-width: 40px;">
-              <div class="sidebar-icon-wrap" style="color: #94a3b8; background: rgba(148,163,184,0.1);">
-                <q-icon name="settings" size="17px" />
+              <div class="sidebar-icon-wrap">
+                <q-icon name="settings" size="17px" style="color: rgba(255,255,255,0.55);" />
               </div>
             </q-item-section>
             <q-item-section class="sidebar-nav-label">{{ $t('nav.settings') }}</q-item-section>
@@ -308,8 +308,8 @@
 
           <q-item clickable v-ripple to="/dashboard/help" active-class="sidebar-item-active" class="sidebar-nav-item">
             <q-item-section avatar style="min-width: 40px;">
-              <div class="sidebar-icon-wrap" style="color: #0ea5e9; background: rgba(14,165,233,0.12);">
-                <q-icon name="help_outline" size="17px" />
+              <div class="sidebar-icon-wrap">
+                <q-icon name="help_outline" size="17px" style="color: rgba(255,255,255,0.55);" />
               </div>
             </q-item-section>
             <q-item-section class="sidebar-nav-label">{{ $t('help.title') }}</q-item-section>
@@ -319,11 +319,11 @@
 
           <q-item clickable v-ripple @click="onLogout" class="sidebar-nav-item sidebar-logout-item">
             <q-item-section avatar style="min-width: 40px;">
-              <div class="sidebar-icon-wrap" style="color: #f87171; background: rgba(248,113,113,0.12);">
-                <q-icon name="logout" size="17px" />
+              <div class="sidebar-icon-wrap">
+                <q-icon name="logout" size="17px" style="color: #b14437;" />
               </div>
             </q-item-section>
-            <q-item-section class="sidebar-nav-label" style="color: #f87171 !important;">{{ $t('common.logout') }}</q-item-section>
+            <q-item-section class="sidebar-nav-label" style="color: #b14437 !important;">{{ $t('common.logout') }}</q-item-section>
           </q-item>
 
         </q-list>
@@ -478,12 +478,12 @@ const showFab = computed(() => !noFabPages.includes(route.path) && !route.path.s
 const showBottomNav = computed(() => !noBottomNavPages.includes(route.path))
 
 const quickAddActions = computed(() => [
-  { label: t('common.income'), icon: 'trending_up', color: '#16a34a', bgColor: '#f0fdf4', iconBg: 'rgba(22,163,74,0.15)', route: '/dashboard/add-income' },
-  { label: t('common.expense'), icon: 'trending_down', color: '#dc2626', bgColor: '#fef2f2', iconBg: 'rgba(220,38,38,0.15)', route: '/dashboard/add-expense' },
-  { label: t('common.transfer'), icon: 'sync_alt', color: '#2563eb', bgColor: '#eff6ff', iconBg: 'rgba(37,99,235,0.15)', route: '/dashboard/transfer' },
-  { label: t('nav.marketList'), icon: 'shopping_cart', color: '#16a34a', bgColor: '#f0fdf4', iconBg: 'rgba(22,163,74,0.15)', route: '/dashboard/market-lists' },
-  { label: t('nav.note'), icon: 'description', color: '#ec4899', bgColor: '#fdf2f8', iconBg: 'rgba(236,72,153,0.15)', route: '/dashboard/notes' },
-  { label: t('nav.loans'), icon: 'account_balance', color: '#8b5cf6', bgColor: '#f5f3ff', iconBg: 'rgba(139,92,246,0.15)', route: '/dashboard/loans' }
+  { label: t('common.income'), icon: 'trending_up', color: '#2f7d5c', bgColor: '#e8f1ec', iconBg: 'rgba(47,125,92,0.15)', route: '/dashboard/add-income' },
+  { label: t('common.expense'), icon: 'trending_down', color: '#b14437', bgColor: '#fbeae6', iconBg: 'rgba(177,68,55,0.15)', route: '/dashboard/add-expense' },
+  { label: t('common.transfer'), icon: 'sync_alt', color: '#2a6695', bgColor: '#e8f2f9', iconBg: 'rgba(42,102,149,0.15)', route: '/dashboard/transfer' },
+  { label: t('nav.marketList'), icon: 'shopping_cart', color: '#3f4a7a', bgColor: '#eef0f9', iconBg: 'rgba(63,74,122,0.15)', route: '/dashboard/market-lists' },
+  { label: t('nav.note'), icon: 'description', color: '#7a3c8a', bgColor: '#f5eef8', iconBg: 'rgba(122,60,138,0.15)', route: '/dashboard/notes' },
+  { label: t('nav.loans'), icon: 'account_balance', color: '#5e5b54', bgColor: '#f5f3ef', iconBg: 'rgba(94,91,84,0.15)', route: '/dashboard/loans' }
 ])
 
 function navigateTo(path) {
@@ -512,8 +512,8 @@ async function onLogout() {
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: linear-gradient(135deg, rgba(249,115,22,0.15), rgba(239,68,68,0.15));
-  border: 1px solid rgba(249,115,22,0.25);
+  background: rgba(22, 22, 26, 0.06);
+  border: 1px solid rgba(22, 22, 26, 0.10);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -572,17 +572,17 @@ async function onLogout() {
 
 /* ===== Desktop Dropdown Menu ===== */
 .profile-menu-header {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: #16161a;
   padding: 18px 16px 16px;
 }
 
 .menu-section-label {
   padding: 6px 16px 2px;
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.09em;
-  color: #94a3b8;
+  letter-spacing: 0.12em;
+  color: #7c7a73;
 }
 
 .profile-menu-item {
@@ -593,10 +593,10 @@ async function onLogout() {
   transition: background 0.15s;
 }
 .profile-menu-item:hover {
-  background: #f1f5f9;
+  background: #fafaf7;
 }
 .profile-menu-logout:hover {
-  background: #fff1f2 !important;
+  background: #fbeae6 !important;
 }
 
 /* ===== Mobile Profile Panel ===== */
@@ -606,13 +606,13 @@ async function onLogout() {
   max-width: 100%;
   border-radius: 0;
   overflow-y: auto;
-  background: #f8fafc;
+  background: #fafaf7;
   display: flex;
   flex-direction: column;
 }
 
 .profile-panel-header {
-  background: linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #334155 100%);
+  background: #16161a;
   padding: 16px 20px 28px;
   position: relative;
   flex-shrink: 0;
@@ -652,12 +652,12 @@ async function onLogout() {
   gap: 8px;
   padding: 14px 8px;
   background: white;
-  border-radius: 14px;
-  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  border: 1px solid #e9e5dc;
   cursor: pointer;
   font-size: 0.78rem;
-  font-weight: 500;
-  color: #334155;
+  font-weight: 600;
+  color: #16161a;
   text-align: center;
   line-height: 1.2;
   transition: background 0.15s, transform 0.1s;
@@ -667,7 +667,7 @@ async function onLogout() {
 
 .panel-nav-item:active {
   transform: scale(0.97);
-  background: #f1f5f9;
+  background: #f5f1e8;
 }
 
 .panel-nav-icon {
@@ -689,17 +689,17 @@ async function onLogout() {
 }
 
 .profile-logout-btn {
-  background: #fff1f2;
-  color: #e11d48;
+  background: transparent;
+  color: #b14437;
   border-radius: 14px;
   font-weight: 600;
   font-size: 0.9rem;
   padding: 14px;
-  border: 1.5px solid #fecdd3;
+  border: 1px solid #e9e5dc;
   transition: background 0.15s;
 }
 .profile-logout-btn:hover {
-  background: #ffe4e6;
+  background: #fbeae6;
 }
 
 /* ===== Sidebar nav item overrides ===== */
@@ -707,7 +707,7 @@ async function onLogout() {
   border-radius: 10px !important;
   margin: 1px 8px !important;
   min-height: 42px !important;
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: rgba(255, 255, 255, 0.48) !important;
   font-size: 0.875rem;
   transition: background 0.15s ease, color 0.15s ease !important;
 }
@@ -718,7 +718,7 @@ async function onLogout() {
 }
 
 .sidebar-logout-item:hover {
-  background: rgba(248, 113, 113, 0.08) !important;
+  background: rgba(177, 68, 55, 0.10) !important;
 }
 
 /* ===== Quick Add Dialog ===== */
@@ -727,21 +727,21 @@ async function onLogout() {
   width: 100%;
   max-width: 480px;
   padding: 8px 12px 24px;
-  background: white;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15) !important;
+  background: #fafaf7;
+  box-shadow: 0 24px 64px rgba(22, 22, 26, 0.18) !important;
 }
 
 .quick-add-title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #16161a;
   letter-spacing: -0.02em;
   padding-left: 4px;
 }
 
 .quick-add-close-btn {
-  background: #f1f5f9;
-  color: #64748b;
+  background: #f5f1e8;
+  color: #7c7a73;
   border-radius: 50%;
 }
 
@@ -754,6 +754,8 @@ async function onLogout() {
   border-radius: 16px;
   padding: 18px 8px 16px;
   height: 106px;
+  border: 1px solid #e9e5dc;
+  background: white;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   position: relative;
   overflow: hidden;
@@ -761,7 +763,7 @@ async function onLogout() {
 
 .quick-add-action-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(22, 22, 26, 0.08);
 }
 
 .quick-add-action-item:active {
@@ -780,7 +782,7 @@ async function onLogout() {
 .quick-add-action-label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #334155;
+  color: #16161a;
   text-align: center;
   line-height: 1.2;
 }

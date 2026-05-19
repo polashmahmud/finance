@@ -9,7 +9,7 @@
     <q-input v-model="searchQuery" :placeholder="$t('search.placeholder')" outlined dense rounded class="q-mb-md"
       bg-color="white" clearable style="border-radius: 16px;">
       <template v-slot:prepend>
-        <q-icon name="search" style="color: #8e8ea0" />
+        <q-icon name="search" style="color: #7c7a73" />
       </template>
     </q-input>
 
@@ -18,7 +18,7 @@
       <div v-for="filter in filterOptions" :key="filter.value"
         class="summary-chip cursor-pointer"
         :class="activeFilter === filter.value ? 'summary-chip-neutral' : ''"
-        :style="activeFilter !== filter.value ? 'background: rgba(26,26,46,0.04); color: #8e8ea0' : ''"
+        :style="activeFilter !== filter.value ? 'background: rgba(26,26,46,0.04); color: #7c7a73' : ''"
         @click="activeFilter = filter.value">
         {{ filter.label }}
       </div>

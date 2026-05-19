@@ -55,7 +55,8 @@ const integrations = [
 <style scoped lang="scss">
 .integrations {
   padding: 100px 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: #fafaf7;
+  border-top: 1px solid #e9e5dc;
 
   &__inner {
     max-width: 1000px;
@@ -70,7 +71,7 @@ const integrations = [
   &__title {
     font-size: clamp(1.8rem, 3.5vw, 2.6rem);
     font-weight: 900;
-    color: #f1f5f9;
+    color: #16161a;
     letter-spacing: -0.04em;
     margin: 12px 0 16px;
     line-height: 1.15;
@@ -78,7 +79,7 @@ const integrations = [
 
   &__subtitle {
     font-size: 1.05rem;
-    color: #64748b;
+    color: #7c7a73;
     max-width: 440px;
     margin: 0 auto;
     line-height: 1.65;
@@ -109,11 +110,11 @@ const integrations = [
     align-items: flex-start;
     gap: 10px;
     padding: 14px 20px;
-    background: rgba(59, 130, 246, 0.06);
-    border: 1px solid rgba(59, 130, 246, 0.15);
+    background: rgba(42, 102, 149, 0.05);
+    border: 1px solid rgba(42, 102, 149, 0.15);
     border-radius: 12px;
     font-size: 0.85rem;
-    color: #64748b;
+    color: #7c7a73;
     line-height: 1.5;
     max-width: 600px;
     text-align: left;
@@ -128,16 +129,16 @@ const integrations = [
 
 .integration-card {
   padding: 20px 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #ffffff;
+  border: 1px solid #e9e5dc;
   border-radius: 16px;
   text-align: center;
-  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 
   &:hover {
     transform: translateY(-3px);
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: #d4d0c8;
+    box-shadow: 0 8px 24px rgba(22, 22, 26, 0.08);
   }
 
   &__icon {
@@ -154,25 +155,25 @@ const integrations = [
   &__name {
     font-size: 0.8rem;
     font-weight: 700;
-    color: #e2e8f0;
+    color: #16161a;
     margin-bottom: 4px;
   }
 
   &__type {
     font-size: 0.7rem;
-    color: #475569;
+    color: #7c7a73;
   }
 }
 
 .section-badge {
   display: inline-block;
   padding: 5px 14px;
-  background: rgba(249, 115, 22, 0.1);
-  border: 1px solid rgba(249, 115, 22, 0.2);
+  background: rgba(47, 125, 92, 0.08);
+  border: 1px solid rgba(47, 125, 92, 0.2);
   border-radius: 100px;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #f97316;
+  color: #2f7d5c;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 8px;

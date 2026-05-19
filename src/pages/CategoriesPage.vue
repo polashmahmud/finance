@@ -3,10 +3,10 @@
     <!-- Header -->
     <div class="back-header" style="justify-content: space-between;">
       <div style="display: flex; align-items: center; gap: 8px;">
-        <q-btn flat round dense icon="arrow_back" size="sm" style="color: #1a1a2e" @click="$router.back()" />
+        <q-btn flat round dense icon="arrow_back" size="sm" style="color: #16161a" @click="$router.back()" />
         <span class="back-header-title">{{ $t('categories.title') }}</span>
       </div>
-      <q-btn round flat dense icon="add" size="sm" style="color: #1a1a2e; background: rgba(26,26,46,0.06); border-radius: 12px;" @click="openAddDialog" />
+      <q-btn round flat dense icon="add" size="sm" style="color: #16161a; background: rgba(22,22,26,0.06); border-radius: 12px;" @click="openAddDialog" />
     </div>
 
     <!-- Tabs -->
@@ -118,17 +118,17 @@
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <!-- Dialog Header -->
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: var(--text-primary);">
             {{ isEditing ? $t('categories.editCategory') : $t('categories.newCategory') }}
           </div>
-          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+          <q-btn icon="close" flat round dense v-close-popup style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
 
         <q-card-section>
           <q-form @submit.prevent="saveCategory" class="q-gutter-md">
             <!-- Type Tabs -->
             <q-tabs v-model="form.type" dense active-color="dark" indicator-color="dark" class="text-grey-6"
-              align="justify" style="border-radius: 8px; background: #f8fafc;">
+              align="justify" style="border-radius: 8px; background: var(--card-cream);">
               <q-tab name="expense" :label="$t('common.expense')" />
               <q-tab name="income" :label="$t('common.income')" />
             </q-tabs>
@@ -343,3 +343,4 @@ onUnmounted(() => {
   transactionStore.stopListening()
 })
 </script>
+

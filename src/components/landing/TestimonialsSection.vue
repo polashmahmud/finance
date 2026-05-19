@@ -59,7 +59,7 @@ const testimonials = [
     name: 'Rahim Uddin',
     role: 'Software Engineer, Dhaka',
     initials: 'RU',
-    color: 'linear-gradient(135deg, #f97316, #ef4444)',
+    color: 'linear-gradient(135deg, #2f7d5c, #2a6695)',
   },
   {
     quote:
@@ -67,7 +67,7 @@ const testimonials = [
     name: 'Nusrat Jahan',
     role: 'Freelance Designer, Chittagong',
     initials: 'NJ',
-    color: 'linear-gradient(135deg, #8b5cf6, #3b82f6)',
+    color: 'linear-gradient(135deg, #2a6695, #16161a)',
   },
   {
     quote:
@@ -75,7 +75,7 @@ const testimonials = [
     name: 'Arif Hassan',
     role: 'Business Owner, Sylhet',
     initials: 'AH',
-    color: 'linear-gradient(135deg, #22c55e, #14b8a6)',
+    color: 'linear-gradient(135deg, #2f7d5c, #3a3a40)',
   },
   {
     quote:
@@ -83,7 +83,7 @@ const testimonials = [
     name: 'Sharmin Akter',
     role: 'Teacher, Rajshahi',
     initials: 'SA',
-    color: 'linear-gradient(135deg, #ec4899, #f97316)',
+    color: 'linear-gradient(135deg, #b14437, #b16a26)',
   },
   {
     quote:
@@ -91,7 +91,7 @@ const testimonials = [
     name: 'Kamal Hossain',
     role: 'Medical Professional, Comilla',
     initials: 'KH',
-    color: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+    color: 'linear-gradient(135deg, #2a6695, #2f7d5c)',
   },
   {
     quote:
@@ -99,7 +99,7 @@ const testimonials = [
     name: 'Fatema Begum',
     role: 'Homemaker, Khulna',
     initials: 'FB',
-    color: 'linear-gradient(135deg, #f97316, #eab308)',
+    color: 'linear-gradient(135deg, #b16a26, #16161a)',
   },
 ]
 </script>
@@ -109,6 +109,7 @@ const testimonials = [
   position: relative;
   padding: 100px 24px;
   overflow: hidden;
+  background: #f5f1e8;
 
   &__bg {
     position: absolute;
@@ -121,7 +122,7 @@ const testimonials = [
     width: 600px;
     height: 600px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(47, 125, 92, 0.06) 0%, transparent 70%);
     bottom: -200px;
     right: -100px;
     filter: blur(60px);
@@ -141,7 +142,7 @@ const testimonials = [
   &__title {
     font-size: clamp(1.8rem, 3.5vw, 2.8rem);
     font-weight: 900;
-    color: #f1f5f9;
+    color: #16161a;
     letter-spacing: -0.04em;
     margin: 12px 0 16px;
     line-height: 1.15;
@@ -149,7 +150,7 @@ const testimonials = [
 
   &__subtitle {
     font-size: 1.05rem;
-    color: #64748b;
+    color: #7c7a73;
     max-width: 400px;
     margin: 0 auto;
     line-height: 1.65;
@@ -178,15 +179,15 @@ const testimonials = [
 
 .testimonial-card {
   padding: 28px 24px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: #ffffff;
+  border: 1px solid #e9e5dc;
   border-radius: 20px;
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 
   &:hover {
     transform: translateY(-4px);
-    border-color: rgba(249, 115, 22, 0.18);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    border-color: #d4d0c8;
+    box-shadow: 0 12px 32px rgba(22, 22, 26, 0.08);
   }
 
   &__stars {
@@ -197,7 +198,7 @@ const testimonials = [
 
   &__quote {
     font-size: 0.9rem;
-    color: #94a3b8;
+    color: #7c7a73;
     line-height: 1.7;
     margin: 0 0 20px;
     font-style: normal;
@@ -226,12 +227,12 @@ const testimonials = [
   &__name {
     font-size: 0.88rem;
     font-weight: 700;
-    color: #e2e8f0;
+    color: #16161a;
   }
 
   &__role {
     font-size: 0.75rem;
-    color: #475569;
+    color: #7c7a73;
     margin-top: 2px;
   }
 }
@@ -239,8 +240,8 @@ const testimonials = [
 .rating-card {
   text-align: center;
   padding: 28px 48px;
-  background: rgba(249, 115, 22, 0.06);
-  border: 1px solid rgba(249, 115, 22, 0.15);
+  background: rgba(47, 125, 92, 0.06);
+  border: 1px solid rgba(47, 125, 92, 0.15);
   border-radius: 20px;
 
   &__stars {
@@ -252,17 +253,14 @@ const testimonials = [
   &__score {
     font-size: 2.4rem;
     font-weight: 900;
-    background: linear-gradient(135deg, #f97316, #ef4444);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #16161a;
     letter-spacing: -0.04em;
     margin-bottom: 6px;
   }
 
   &__desc {
     font-size: 0.82rem;
-    color: #64748b;
+    color: #7c7a73;
     font-weight: 500;
   }
 }
@@ -270,12 +268,12 @@ const testimonials = [
 .section-badge {
   display: inline-block;
   padding: 5px 14px;
-  background: rgba(249, 115, 22, 0.1);
-  border: 1px solid rgba(249, 115, 22, 0.2);
+  background: rgba(47, 125, 92, 0.08);
+  border: 1px solid rgba(47, 125, 92, 0.2);
   border-radius: 100px;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #f97316;
+  color: #2f7d5c;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 8px;

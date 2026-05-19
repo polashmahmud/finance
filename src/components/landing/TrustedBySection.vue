@@ -56,8 +56,9 @@ const stats = [
 <style scoped lang="scss">
 .trusted {
   padding: 60px 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: #fafaf7;
+  border-top: 1px solid #e9e5dc;
+  border-bottom: 1px solid #e9e5dc;
 
   &__inner {
     max-width: 1200px;
@@ -67,7 +68,7 @@ const stats = [
 
   &__label {
     font-size: 0.85rem;
-    color: #475569;
+    color: #b8b5ac;
     font-weight: 500;
     margin: 0 0 40px;
     text-transform: uppercase;
@@ -87,30 +88,27 @@ const stats = [
 
   &__stat {
     padding: 28px 20px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: #ffffff;
+    border: 1px solid #e9e5dc;
     border-radius: 16px;
-    transition: background 0.25s, border-color 0.25s;
+    transition: box-shadow 0.25s, border-color 0.25s;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(249, 115, 22, 0.2);
+      box-shadow: 0 4px 20px rgba(22, 22, 26, 0.08);
+      border-color: #d4d0c8;
     }
 
     &-value {
       font-size: 2.2rem;
       font-weight: 900;
-      background: linear-gradient(135deg, #f97316, #ef4444);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #16161a;
       letter-spacing: -0.04em;
       margin-bottom: 6px;
     }
 
     &-label {
       font-size: 0.82rem;
-      color: #64748b;
+      color: #7c7a73;
       font-weight: 500;
     }
   }
@@ -128,18 +126,18 @@ const stats = [
     align-items: center;
     gap: 7px;
     padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #ffffff;
+    border: 1px solid #e9e5dc;
     border-radius: 100px;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #64748b;
-    transition: color 0.2s, border-color 0.2s, background 0.2s;
+    color: #7c7a73;
+    transition: color 0.2s, border-color 0.2s, box-shadow 0.2s;
 
     &:hover {
-      color: #94a3b8;
-      border-color: rgba(255, 255, 255, 0.15);
-      background: rgba(255, 255, 255, 0.06);
+      color: #16161a;
+      border-color: #d4d0c8;
+      box-shadow: 0 2px 8px rgba(22, 22, 26, 0.06);
     }
   }
 }

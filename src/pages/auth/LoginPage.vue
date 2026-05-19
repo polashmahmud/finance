@@ -29,7 +29,7 @@
         <div class="auth-brand__features">
           <div v-for="f in features" :key="f" class="auth-brand__feature">
             <div class="auth-brand__feature-check">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2f7d5c" stroke-width="3">
                 <path d="M20 6L9 17l-5-5"/>
               </svg>
             </div>
@@ -122,7 +122,7 @@
 
             <!-- Server error -->
             <div v-if="serverError" class="auth-server-error">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b14437" stroke-width="2">
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
               {{ serverError }}
@@ -175,10 +175,10 @@ const features = [
 ]
 
 const avatarColors = [
-  'linear-gradient(135deg,#f97316,#ef4444)',
-  'linear-gradient(135deg,#8b5cf6,#3b82f6)',
-  'linear-gradient(135deg,#22c55e,#14b8a6)',
-  'linear-gradient(135deg,#ec4899,#f97316)',
+  'linear-gradient(135deg,#2f7d5c,#2a6695)',
+  'linear-gradient(135deg,#2a6695,#16161a)',
+  'linear-gradient(135deg,#b16a26,#b14437)',
+  'linear-gradient(135deg,#16161a,#3a3a40)',
 ]
 const avatarLetters = ['R', 'N', 'A', 'K']
 
@@ -226,12 +226,12 @@ async function onLogin() {
 <style scoped lang="scss">
 .auth-page {
   min-height: 100vh;
-  background: #07101e;
+  background: #fafaf7;
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: stretch;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Hind Siliguri', system-ui, sans-serif;
 }
 
 // ── Background ──
@@ -248,17 +248,17 @@ async function onLogin() {
   filter: blur(80px);
 
   &--1 {
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(249, 115, 22, 0.18) 0%, transparent 70%);
-    top: -150px;
-    left: -100px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(47, 125, 92, 0.08) 0%, transparent 70%);
+    top: -200px;
+    left: -150px;
   }
 
   &--2 {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.14) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(177, 68, 55, 0.06) 0%, transparent 70%);
     bottom: -100px;
     right: -100px;
   }
@@ -268,8 +268,8 @@ async function onLogin() {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(rgba(22, 22, 26, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(22, 22, 26, 0.025) 1px, transparent 1px);
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse at 30% 50%, black 20%, transparent 75%);
 }
@@ -287,15 +287,28 @@ async function onLogin() {
   }
 }
 
-// ── Left brand panel ──
+// ── Left brand panel (dark ink, like sidebar) ──
 .auth-brand {
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 60px 56px;
-  background: linear-gradient(145deg, rgba(249, 115, 22, 0.08) 0%, rgba(139, 92, 246, 0.06) 100%);
+  background: #16161a;
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   gap: 36px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
 
   @media (max-width: 1023px) {
     display: none;
@@ -308,24 +321,25 @@ async function onLogin() {
     text-decoration: none;
     font-size: 1.15rem;
     font-weight: 800;
-    color: #f1f5f9;
+    color: #ffffff;
     letter-spacing: -0.03em;
+    position: relative;
 
     span:first-child { font-size: 1.5rem; }
   }
 
-  &__hero { }
+  &__hero { position: relative; }
 
   &__title {
     font-size: 2.6rem;
     font-weight: 900;
-    color: #f1f5f9;
+    color: rgba(255, 255, 255, 0.95);
     letter-spacing: -0.04em;
     line-height: 1.15;
     margin: 0 0 14px;
 
     &-gradient {
-      background: linear-gradient(135deg, #f97316, #ef4444);
+      background: linear-gradient(135deg, rgba(47, 125, 92, 0.9), rgba(42, 102, 149, 0.9));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -334,7 +348,7 @@ async function onLogin() {
 
   &__subtitle {
     font-size: 0.95rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.42);
     line-height: 1.65;
     margin: 0;
   }
@@ -343,6 +357,7 @@ async function onLogin() {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    position: relative;
   }
 
   &__feature {
@@ -350,7 +365,7 @@ async function onLogin() {
     align-items: center;
     gap: 10px;
     font-size: 0.875rem;
-    color: #94a3b8;
+    color: rgba(255, 255, 255, 0.55);
     font-weight: 500;
   }
 
@@ -358,8 +373,8 @@ async function onLogin() {
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.2);
+    background: rgba(47, 125, 92, 0.15);
+    border: 1px solid rgba(47, 125, 92, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -371,10 +386,11 @@ async function onLogin() {
     align-items: center;
     gap: 12px;
     padding: 14px 18px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.09);
     border-radius: 14px;
     max-width: fit-content;
+    position: relative;
   }
 
   &__stat-avatars {
@@ -391,7 +407,7 @@ async function onLogin() {
     font-size: 0.65rem;
     font-weight: 800;
     color: #fff;
-    border: 2px solid #07101e;
+    border: 2px solid #16161a;
     margin-left: -8px;
 
     &:first-child { margin-left: 0; }
@@ -399,11 +415,11 @@ async function onLogin() {
 
   &__stat-text {
     font-size: 0.8rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.42);
     font-weight: 500;
 
     strong {
-      color: #e2e8f0;
+      color: rgba(255, 255, 255, 0.88);
       font-weight: 700;
     }
   }
@@ -430,7 +446,7 @@ async function onLogin() {
   text-decoration: none;
   font-size: 1.1rem;
   font-weight: 800;
-  color: #f1f5f9;
+  color: #16161a;
   letter-spacing: -0.03em;
   margin-bottom: 32px;
 
@@ -444,12 +460,11 @@ async function onLogin() {
 .auth-card {
   width: 100%;
   max-width: 420px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #e9e5dc;
   border-radius: 24px;
   padding: 40px 36px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 24px rgba(22, 22, 26, 0.07), 0 1px 0 rgba(22, 22, 26, 0.03);
 
   @media (max-width: 599px) {
     padding: 32px 24px;
@@ -463,14 +478,14 @@ async function onLogin() {
   &__title {
     font-size: 1.65rem;
     font-weight: 900;
-    color: #f1f5f9;
+    color: #16161a;
     letter-spacing: -0.04em;
     margin: 0 0 6px;
   }
 
   &__subtitle {
     font-size: 0.875rem;
-    color: #64748b;
+    color: #7c7a73;
     margin: 0;
   }
 
@@ -478,16 +493,16 @@ async function onLogin() {
     margin-top: 24px;
     text-align: center;
     font-size: 0.85rem;
-    color: #475569;
+    color: #7c7a73;
 
     &-link {
-      color: #f97316;
+      color: #2f7d5c;
       font-weight: 700;
       text-decoration: none;
       transition: color 0.2s;
       margin-left: 4px;
 
-      &:hover { color: #fb923c; }
+      &:hover { color: #16161a; }
     }
   }
 }
@@ -514,48 +529,48 @@ async function onLogin() {
 .auth-label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: #3a3a40;
   letter-spacing: 0.02em;
 }
 
 .auth-forgot {
   font-size: 0.78rem;
-  color: #475569;
+  color: #7c7a73;
   text-decoration: none;
   transition: color 0.2s;
 
-  &:hover { color: #f97316; }
+  &:hover { color: #2f7d5c; }
 }
 
 .auth-input-wrap {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #fafaf7;
+  border: 1px solid #e9e5dc;
   border-radius: 12px;
   transition: border-color 0.2s, box-shadow 0.2s;
 
   &:focus-within {
-    border-color: rgba(249, 115, 22, 0.5);
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.08);
-    background: rgba(249, 115, 22, 0.03);
+    border-color: rgba(22, 22, 26, 0.4);
+    box-shadow: 0 0 0 3px rgba(22, 22, 26, 0.05);
+    background: #ffffff;
   }
 
   &--error {
-    border-color: rgba(239, 68, 68, 0.5) !important;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.06) !important;
+    border-color: rgba(177, 68, 55, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(177, 68, 55, 0.06) !important;
   }
 }
 
 .auth-input-icon {
   padding: 0 14px;
-  color: #334155;
+  color: #b8b5ac;
   display: flex;
   align-items: center;
   flex-shrink: 0;
 
   .auth-input-wrap:focus-within & {
-    color: #f97316;
+    color: #7c7a73;
   }
 }
 
@@ -566,14 +581,14 @@ async function onLogin() {
   outline: none;
   padding: 13px 0;
   font-size: 0.9rem;
-  color: #f1f5f9;
+  color: #16161a;
   font-family: inherit;
 
-  &::placeholder { color: #334155; }
+  &::placeholder { color: #b8b5ac; }
 
   &:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 30px #0d1525 inset !important;
-    -webkit-text-fill-color: #f1f5f9 !important;
+    -webkit-box-shadow: 0 0 0 30px #fafaf7 inset !important;
+    -webkit-text-fill-color: #16161a !important;
   }
 }
 
@@ -581,19 +596,19 @@ async function onLogin() {
   padding: 0 14px;
   background: none;
   border: none;
-  color: #334155;
+  color: #b8b5ac;
   cursor: pointer;
   display: flex;
   align-items: center;
   transition: color 0.2s;
   flex-shrink: 0;
 
-  &:hover { color: #94a3b8; }
+  &:hover { color: #7c7a73; }
 }
 
 .auth-error {
   font-size: 0.75rem;
-  color: #ef4444;
+  color: #b14437;
   font-weight: 500;
 }
 
@@ -602,18 +617,18 @@ async function onLogin() {
   align-items: center;
   gap: 8px;
   padding: 12px 14px;
-  background: rgba(239, 68, 68, 0.06);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgba(177, 68, 55, 0.05);
+  border: 1px solid rgba(177, 68, 55, 0.18);
   border-radius: 10px;
   font-size: 0.82rem;
-  color: #fca5a5;
+  color: #b14437;
   font-weight: 500;
 }
 
 .auth-submit {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #f97316, #ef4444);
+  background: #16161a;
   color: #fff;
   font-size: 0.95rem;
   font-weight: 700;
@@ -621,7 +636,7 @@ async function onLogin() {
   border-radius: 12px;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.35);
+  box-shadow: 0 4px 20px rgba(22, 22, 26, 0.3);
   font-family: inherit;
   display: flex;
   align-items: center;
@@ -630,9 +645,9 @@ async function onLogin() {
   margin-top: 4px;
 
   &:hover:not(:disabled) {
-    opacity: 0.92;
+    opacity: 0.88;
     transform: translateY(-1px);
-    box-shadow: 0 8px 28px rgba(249, 115, 22, 0.5);
+    box-shadow: 0 8px 28px rgba(22, 22, 26, 0.4);
   }
 
   &:active:not(:disabled) {
@@ -640,7 +655,7 @@ async function onLogin() {
   }
 
   &:disabled {
-    opacity: 0.7;
+    opacity: 0.6;
     cursor: not-allowed;
   }
 }

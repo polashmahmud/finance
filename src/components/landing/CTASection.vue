@@ -33,7 +33,7 @@
 
         <div class="cta__perks">
           <div v-for="perk in perks" :key="perk" class="cta__perk">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#22c55e">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#2f7d5c">
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             {{ perk }}
@@ -62,6 +62,7 @@ const perks = [
   position: relative;
   padding: 80px 24px 120px;
   overflow: hidden;
+  background: #16161a;
 
   &__bg {
     position: absolute;
@@ -77,7 +78,7 @@ const perks = [
     &--1 {
       width: 500px;
       height: 500px;
-      background: radial-gradient(circle, rgba(249, 115, 22, 0.2) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(47, 125, 92, 0.18) 0%, transparent 70%);
       top: -100px;
       left: -100px;
     }
@@ -85,7 +86,7 @@ const perks = [
     &--2 {
       width: 400px;
       height: 400px;
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(42, 102, 149, 0.12) 0%, transparent 70%);
       bottom: -100px;
       right: -50px;
     }
@@ -101,7 +102,7 @@ const perks = [
     position: relative;
     padding: 64px 48px;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(249, 115, 22, 0.2);
+    border: 1px solid rgba(47, 125, 92, 0.2);
     border-radius: 28px;
     text-align: center;
     overflow: hidden;
@@ -118,32 +119,32 @@ const perks = [
     transform: translateX(-50%);
     width: 400px;
     height: 300px;
-    background: radial-gradient(ellipse, rgba(249, 115, 22, 0.2) 0%, transparent 70%);
+    background: radial-gradient(ellipse, rgba(47, 125, 92, 0.18) 0%, transparent 70%);
     pointer-events: none;
   }
 
   &__badge {
     display: inline-block;
     padding: 6px 16px;
-    background: rgba(249, 115, 22, 0.1);
-    border: 1px solid rgba(249, 115, 22, 0.25);
+    background: rgba(47, 125, 92, 0.12);
+    border: 1px solid rgba(47, 125, 92, 0.3);
     border-radius: 100px;
     font-size: 0.82rem;
     font-weight: 700;
-    color: #f97316;
+    color: #2f7d5c;
     margin-bottom: 24px;
   }
 
   &__title {
     font-size: clamp(2rem, 4vw, 3.2rem);
     font-weight: 900;
-    color: #f1f5f9;
+    color: rgba(255, 255, 255, 0.95);
     letter-spacing: -0.04em;
     line-height: 1.15;
     margin: 0 0 20px;
 
     &-gradient {
-      background: linear-gradient(135deg, #f97316 0%, #ef4444 50%, #ec4899 100%);
+      background: linear-gradient(135deg, #2f7d5c 0%, #2a6695 60%, rgba(255,255,255,0.7) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -152,7 +153,7 @@ const perks = [
 
   &__subtitle {
     font-size: 1.05rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.42);
     line-height: 1.7;
     max-width: 520px;
     margin: 0 auto 40px;
@@ -172,18 +173,19 @@ const perks = [
     align-items: center;
     gap: 8px;
     padding: 16px 36px;
-    background: linear-gradient(135deg, #f97316, #ef4444);
+    background: #2f7d5c;
     color: #fff;
     font-size: 1.05rem;
     font-weight: 700;
     border-radius: 14px;
     text-decoration: none;
-    box-shadow: 0 4px 32px rgba(249, 115, 22, 0.45);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 4px 28px rgba(47, 125, 92, 0.45);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 40px rgba(249, 115, 22, 0.6);
+      box-shadow: 0 8px 36px rgba(47, 125, 92, 0.6);
+      opacity: 0.92;
     }
 
     svg {
@@ -200,18 +202,18 @@ const perks = [
     align-items: center;
     gap: 6px;
     padding: 16px 24px;
-    color: #94a3b8;
+    color: rgba(255, 255, 255, 0.45);
     font-size: 1rem;
     font-weight: 600;
     border-radius: 14px;
     text-decoration: none;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     transition: color 0.2s, border-color 0.2s, background 0.2s;
 
     &:hover {
-      color: #f1f5f9;
-      border-color: rgba(255, 255, 255, 0.15);
-      background: rgba(255, 255, 255, 0.04);
+      color: rgba(255, 255, 255, 0.88);
+      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.05);
     }
   }
 
@@ -233,7 +235,7 @@ const perks = [
     align-items: center;
     gap: 7px;
     font-size: 0.82rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.35);
     font-weight: 500;
   }
 }

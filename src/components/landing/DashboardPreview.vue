@@ -67,14 +67,14 @@
                 <div class="sc-budget" v-for="b in budgets" :key="b.name">
                   <div class="sc-budget-row">
                     <span class="sc-budget-name">{{ b.name }}</span>
-                    <span class="sc-budget-pct" :style="{ color: b.pct > 80 ? '#ef4444' : '#f97316' }">{{ b.pct }}%</span>
+                    <span class="sc-budget-pct" :style="{ color: b.pct > 80 ? '#b14437' : '#b16a26' }">{{ b.pct }}%</span>
                   </div>
                   <div class="sc-budget-track">
                     <div
                       class="sc-budget-fill"
                       :style="{
                         width: b.pct + '%',
-                        background: b.pct > 80 ? '#ef4444' : 'linear-gradient(90deg, #f97316, #ef4444)'
+                        background: b.pct > 80 ? '#b14437' : '#2f7d5c'
                       }"
                     ></div>
                   </div>
@@ -177,15 +177,16 @@ const budgets = [
 ]
 
 const transactions = [
-  { name: 'Food & Dining', emoji: '🍜', date: 'Today 1:30 PM', type: 'expense', amount: '৳ 380', iconBg: 'rgba(239,68,68,0.15)' },
-  { name: 'Monthly Salary', emoji: '💼', date: 'Yesterday', type: 'income', amount: '৳ 45,000', iconBg: 'rgba(34,197,94,0.15)' },
-  { name: 'Grocery', emoji: '🛒', date: 'May 18', type: 'expense', amount: '৳ 2,450', iconBg: 'rgba(249,115,22,0.15)' },
+  { name: 'Food & Dining', emoji: '🍜', date: 'Today 1:30 PM', type: 'expense', amount: '৳ 380', iconBg: 'rgba(177,68,55,0.15)' },
+  { name: 'Monthly Salary', emoji: '💼', date: 'Yesterday', type: 'income', amount: '৳ 45,000', iconBg: 'rgba(47,125,92,0.15)' },
+  { name: 'Grocery', emoji: '🛒', date: 'May 18', type: 'expense', amount: '৳ 2,450', iconBg: 'rgba(177,106,38,0.15)' },
 ]
 </script>
 
 <style scoped lang="scss">
 .preview {
   padding: 100px 24px;
+  background: #fafaf7;
 
   &__inner {
     max-width: 1300px;
@@ -200,7 +201,7 @@ const transactions = [
   &__title {
     font-size: clamp(1.8rem, 3.5vw, 2.8rem);
     font-weight: 900;
-    color: #f1f5f9;
+    color: #16161a;
     letter-spacing: -0.04em;
     margin: 12px 0 16px;
     line-height: 1.15;
@@ -208,7 +209,7 @@ const transactions = [
 
   &__subtitle {
     font-size: 1.05rem;
-    color: #64748b;
+    color: #7c7a73;
     max-width: 480px;
     margin: 0 auto;
     line-height: 1.65;
@@ -264,9 +265,10 @@ const transactions = [
   gap: 12px;
   padding: 16px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid #e9e5dc;
+  background: #ffffff;
   cursor: default;
-  transition: background 0.25s, border-color 0.25s;
+  transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
 
   &--right {
     flex-direction: row-reverse;
@@ -279,11 +281,12 @@ const transactions = [
   }
 
   &--active, &:hover {
-    background: rgba(249, 115, 22, 0.05);
-    border-color: rgba(249, 115, 22, 0.2);
+    background: #f0f7f4;
+    border-color: rgba(47, 125, 92, 0.25);
+    box-shadow: 0 4px 16px rgba(22, 22, 26, 0.06);
 
     .callout__icon {
-      background: rgba(249, 115, 22, 0.15);
+      background: rgba(47, 125, 92, 0.1);
     }
   }
 
@@ -291,7 +294,7 @@ const transactions = [
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.04);
+    background: #f5f1e8;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -303,13 +306,13 @@ const transactions = [
   &__title {
     font-size: 0.88rem;
     font-weight: 700;
-    color: #e2e8f0;
+    color: #16161a;
     margin-bottom: 4px;
   }
 
   &__desc {
     font-size: 0.78rem;
-    color: #64748b;
+    color: #7c7a73;
     line-height: 1.5;
   }
 }
@@ -319,12 +322,11 @@ const transactions = [
   width: 280px;
   min-height: 560px;
   border-radius: 40px;
-  background: #0a0f1a;
-  border: 8px solid rgba(255, 255, 255, 0.08);
+  background: #111110;
+  border: 8px solid rgba(22, 22, 26, 0.15);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 40px 80px rgba(0, 0, 0, 0.7),
-    inset 0 0 60px rgba(249, 115, 22, 0.04);
+    0 0 0 1px rgba(22, 22, 26, 0.08),
+    0 40px 80px rgba(22, 22, 26, 0.3);
   overflow: hidden;
   position: relative;
 
@@ -337,7 +339,7 @@ const transactions = [
 .screen-notch {
   width: 90px;
   height: 22px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 0 0 14px 14px;
   margin: 0 auto 4px;
 }
@@ -360,8 +362,9 @@ const transactions = [
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f97316, #ef4444);
-  color: #fff;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.7);
   font-weight: 800;
   font-size: 0.75rem;
   display: flex;
@@ -373,12 +376,12 @@ const transactions = [
 .sc-hello {
   font-size: 0.62rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .sc-date {
   font-size: 0.55rem;
-  color: #475569;
+  color: rgba(255, 255, 255, 0.3);
   margin-top: 1px;
 }
 
@@ -391,7 +394,8 @@ const transactions = [
   position: relative;
   border-radius: 12px;
   padding: 12px;
-  background: linear-gradient(145deg, #1e2d42 0%, #0f1e35 100%);
+  background: #16161a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   margin-bottom: 10px;
   overflow: hidden;
 }
@@ -404,7 +408,7 @@ const transactions = [
   &--1 {
     width: 100px;
     height: 100px;
-    background: radial-gradient(circle, rgba(249, 115, 22, 0.25), transparent 70%);
+    background: radial-gradient(circle, rgba(47, 125, 92, 0.22), transparent 70%);
     top: -30px;
     right: -20px;
   }
@@ -412,7 +416,7 @@ const transactions = [
   &--2 {
     width: 60px;
     height: 60px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent 70%);
+    background: radial-gradient(circle, rgba(42, 102, 149, 0.18), transparent 70%);
     bottom: -15px;
     left: 10px;
   }
@@ -429,7 +433,7 @@ const transactions = [
 .sc-balance-amt {
   font-size: 1.4rem;
   font-weight: 900;
-  color: #f1f5f9;
+  color: rgba(255, 255, 255, 0.9);
   letter-spacing: -0.04em;
   margin: 3px 0 8px;
 }
@@ -448,8 +452,8 @@ const transactions = [
   font-size: 0.58rem;
   font-weight: 700;
 
-  &--green { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
-  &--red { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+  &--green { background: rgba(47, 125, 92, 0.18); color: #2f7d5c; }
+  &--red { background: rgba(177, 68, 55, 0.18); color: #b14437; }
 }
 
 .sc-accounts {
@@ -460,8 +464,8 @@ const transactions = [
 
 .sc-account {
   flex: 1;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 8px;
   padding: 7px 5px;
   text-align: center;
@@ -480,7 +484,7 @@ const transactions = [
 
 .sc-acc-name {
   font-size: 0.52rem;
-  color: #475569;
+  color: rgba(255, 255, 255, 0.3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -489,14 +493,14 @@ const transactions = [
 .sc-acc-bal {
   font-size: 0.6rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: rgba(255, 255, 255, 0.75);
   margin-top: 2px;
 }
 
 .sc-section-lbl {
   font-size: 0.55rem;
   font-weight: 700;
-  color: #334155;
+  color: rgba(255, 255, 255, 0.2);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 6px;
@@ -517,7 +521,7 @@ const transactions = [
 
 .sc-budget-name {
   font-size: 0.6rem;
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.4);
   font-weight: 500;
 }
 
@@ -528,7 +532,7 @@ const transactions = [
 
 .sc-budget-track {
   height: 4px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.07);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -550,7 +554,7 @@ const transactions = [
   align-items: center;
   gap: 7px;
   padding: 6px 8px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 7px;
 }
 
@@ -568,12 +572,12 @@ const transactions = [
 .sc-tx-name {
   font-size: 0.62rem;
   font-weight: 600;
-  color: #e2e8f0;
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .sc-tx-date {
   font-size: 0.52rem;
-  color: #334155;
+  color: rgba(255, 255, 255, 0.22);
 }
 
 .sc-tx-amt {
@@ -582,8 +586,8 @@ const transactions = [
   font-weight: 700;
   flex-shrink: 0;
 
-  &--in { color: #22c55e; }
-  &--out { color: #ef4444; }
+  &--in { color: #2f7d5c; }
+  &--out { color: #b14437; }
 }
 
 .sc-greeting { flex: 1; min-width: 0; }
@@ -591,12 +595,12 @@ const transactions = [
 .section-badge {
   display: inline-block;
   padding: 5px 14px;
-  background: rgba(249, 115, 22, 0.1);
-  border: 1px solid rgba(249, 115, 22, 0.2);
+  background: rgba(47, 125, 92, 0.08);
+  border: 1px solid rgba(47, 125, 92, 0.2);
   border-radius: 100px;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #f97316;
+  color: #2f7d5c;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 8px;

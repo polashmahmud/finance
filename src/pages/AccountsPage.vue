@@ -7,7 +7,7 @@
         <div class="page-subtitle">{{ accountStore.accounts.length }}{{ $t('accounts.countSuffix') }}</div>
       </div>
       <q-btn round flat dense icon="add_circle" size="md"
-        style="color: #1a1a2e; background: rgba(26,26,46,0.06); border-radius: 14px;" @click="openAddDialog" />
+        style="color: #16161a; background: rgba(22,22,26,0.06); border-radius: 14px;" @click="openAddDialog" />
     </div>
 
     <!-- Total Balance Banner -->
@@ -104,10 +104,10 @@
     <q-dialog v-model="showDialog">
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: var(--text-primary);">
             {{ isEditing ? $t('accounts.editAccount') : $t('accounts.newAccount') }}
           </div>
-          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+          <q-btn icon="close" flat round dense v-close-popup style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="saveAccount">
@@ -311,3 +311,4 @@ onUnmounted(() => {
   transactionStore.stopListening()
 })
 </script>
+

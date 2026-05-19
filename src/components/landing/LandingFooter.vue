@@ -90,6 +90,7 @@ const linkCols = [
 
 <style scoped lang="scss">
 .footer {
+  background: #16161a;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding: 64px 24px 32px;
 
@@ -123,7 +124,7 @@ const linkCols = [
     text-decoration: none;
     font-size: 1.15rem;
     font-weight: 800;
-    color: #f1f5f9;
+    color: rgba(255, 255, 255, 0.95);
     letter-spacing: -0.03em;
     margin-bottom: 14px;
 
@@ -134,7 +135,7 @@ const linkCols = [
 
   &__tagline {
     font-size: 0.85rem;
-    color: #475569;
+    color: rgba(255, 255, 255, 0.42);
     line-height: 1.65;
     margin: 0 0 20px;
   }
@@ -148,19 +149,19 @@ const linkCols = [
     width: 36px;
     height: 36px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #475569;
+    color: rgba(255, 255, 255, 0.4);
     text-decoration: none;
     transition: color 0.2s, background 0.2s, border-color 0.2s;
 
     &:hover {
-      color: #94a3b8;
-      background: rgba(255, 255, 255, 0.07);
-      border-color: rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.14);
     }
   }
 
@@ -178,7 +179,7 @@ const linkCols = [
     &-title {
       font-size: 0.78rem;
       font-weight: 700;
-      color: #f1f5f9;
+      color: rgba(255, 255, 255, 0.88);
       text-transform: uppercase;
       letter-spacing: 0.08em;
       margin: 0 0 16px;
@@ -196,12 +197,12 @@ const linkCols = [
 
   &__link {
     font-size: 0.85rem;
-    color: #475569;
+    color: rgba(255, 255, 255, 0.4);
     text-decoration: none;
     transition: color 0.2s;
 
     &:hover {
-      color: #94a3b8;
+      color: rgba(255, 255, 255, 0.75);
     }
   }
 
@@ -211,7 +212,7 @@ const linkCols = [
     justify-content: space-between;
     gap: 16px;
     padding-top: 32px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
     flex-wrap: wrap;
 
     @media (max-width: 599px) {
@@ -222,7 +223,7 @@ const linkCols = [
 
   &__copy {
     font-size: 0.8rem;
-    color: #334155;
+    color: rgba(255, 255, 255, 0.22);
     margin: 0;
   }
 
@@ -233,7 +234,7 @@ const linkCols = [
   }
 
   &__sep {
-    color: #1e293b;
+    color: rgba(255, 255, 255, 0.15);
     font-size: 0.8rem;
   }
 }

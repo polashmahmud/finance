@@ -6,7 +6,7 @@
         <div class="page-title">{{ $t('marketLists.title') }}</div>
         <div class="page-subtitle">{{ marketLists.lists.length }}{{ $t('marketLists.countSuffix') }}</div>
       </div>
-      <q-btn round flat dense icon="add_circle" size="md" style="color: #1a1a2e; background: rgba(26,26,46,0.06); border-radius: 14px;" @click="openNewListDialog" />
+      <q-btn round flat dense icon="add_circle" size="md" style="color: #16161a; background: rgba(22,22,26,0.06); border-radius: 14px;" @click="openNewListDialog" />
     </div>
 
     <!-- Loading -->
@@ -30,10 +30,10 @@
                 <div class="text-weight-bold"
                   style="font-size: 15px; color: #111; word-break: break-word; line-height: 1.3;">{{ list.name }}</div>
                 <div class="row items-center q-gutter-xs q-mt-xs">
-                  <div style="font-size: 11px; color: #94a3b8;">{{ getCompletedCount(list) }}/{{ list.items.length }} {{
+                  <div style="font-size: 11px; color: #7c7a73;">{{ getCompletedCount(list) }}/{{ list.items.length }} {{
                     $t('marketLists.items') }}</div>
                   <div v-if="list.convertedAt" class="row items-center q-gutter-xs"
-                    style="font-size: 11px; color: #22c55e;">
+                    style="font-size: 11px; color: var(--income-color);">
                     <q-icon name="check_circle" size="11px" />
                     <span>{{ $t('marketLists.expenseConverted') }}</span>
                   </div>
@@ -74,7 +74,7 @@
               <q-separator />
 
               <!-- Swipe hint -->
-              <div v-if="list.items.length" class="text-center q-py-xs" style="font-size: 11px; color: #94a3b8;">
+              <div v-if="list.items.length" class="text-center q-py-xs" style="font-size: 11px; color: #7c7a73;">
                 <q-icon name="swipe" size="13px" class="q-mr-xs" />{{ $t('marketLists.swipeHint') }}
               </div>
 
@@ -126,7 +126,7 @@
                   @click="convertToExpense(list)" :disable="!list.items.length" />
                 <div v-else class="row items-center justify-between q-pa-xs"
                   style="background: #f0fdf4; border-radius: 10px; border: 1px solid #bbf7d0;">
-                  <div class="row items-center q-gutter-xs" style="color: #16a34a; font-size: 12px;">
+                  <div class="row items-center q-gutter-xs" style="color: #2f7d5c; font-size: 12px;">
                     <q-icon name="check_circle" size="14px" />
                     <span>{{ $t('marketLists.expenseConverted') }}</span>
                   </div>
@@ -139,7 +139,7 @@
 
             <!-- Collapsed summary -->
             <div v-show="!isExpanded(list.id)" class="row items-center justify-between q-px-md q-pb-sm"
-              style="font-size: 12px; color: #94a3b8;">
+              style="font-size: 12px; color: #7c7a73;">
               <div class="row items-center q-gutter-xs">
                 <q-icon name="receipt_long" size="13px" />
                 <span>{{ settings.currency }}{{ settings.formatNumber(marketLists.getListTotal(list.id)) }}</span>
@@ -168,8 +168,8 @@
     <q-dialog v-model="showNewList">
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.newMarketList') }}</div>
-          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: var(--text-primary);">{{ $t('marketLists.newMarketList') }}</div>
+          <q-btn icon="close" flat round dense v-close-popup style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="createList">
@@ -186,9 +186,9 @@
     <q-dialog v-model="showCopyList">
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.copyMarketListTitle') }}
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: var(--text-primary);">{{ $t('marketLists.copyMarketListTitle') }}
           </div>
-          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+          <q-btn icon="close" flat round dense v-close-popup style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="submitCopyList">
@@ -205,9 +205,9 @@
     <q-dialog v-model="showRenameList">
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.renameListTitle') }}
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: var(--text-primary);">{{ $t('marketLists.renameListTitle') }}
           </div>
-          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+          <q-btn icon="close" flat round dense v-close-popup style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="submitRenameList">
@@ -224,8 +224,8 @@
     <q-dialog v-model="showAddItem">
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; padding: 0 16px 24px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.addItem') }}</div>
-          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: var(--text-primary);">{{ $t('marketLists.addItem') }}</div>
+          <q-btn icon="close" flat round dense v-close-popup style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="addItem">
@@ -252,10 +252,10 @@
     <q-dialog v-model="showConvertDialog" persistent>
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; padding: 0 16px 24px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.convertToExpenseTitle')
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: var(--text-primary);">{{ $t('marketLists.convertToExpenseTitle')
             }}
           </div>
-          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+          <q-btn icon="close" flat round dense v-close-popup style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="submitConvertExpense">
@@ -337,15 +337,15 @@
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="row items-center q-gutter-sm">
             <q-avatar color="negative" text-color="white" icon="delete_outline" size="36px" />
-            <div class="text-h6 text-weight-bold" style="color: #222;">{{ $t('marketLists.deleteModalTitle') }}</div>
+            <div class="text-h6 text-weight-bold" style="color: var(--text-primary);">{{ $t('marketLists.deleteModalTitle') }}</div>
           </div>
           <q-btn icon="close" flat round dense @click="deleteListModalOpen = false"
-            style="background: #f1f5f9; color: #64748b;" />
+            style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
 
         <q-card-section class="q-pt-sm">
           <!-- List name summary -->
-          <div class="q-pa-sm q-mb-md row items-center q-gutter-sm" style="background: #f8fafc; border-radius: 12px;">
+          <div class="q-pa-sm q-mb-md row items-center q-gutter-sm" style="background: var(--card-cream); border-radius: 12px;">
             <q-icon name="shopping_cart" color="dark" size="22px" />
             <div class="text-weight-bold">{{ deleteListTarget?.name }}</div>
             <q-space />
@@ -403,9 +403,9 @@
     <q-dialog v-model="showEditItem">
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; padding: 0 16px 24px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">{{ $t('marketLists.editItemTitle') }}
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: var(--text-primary);">{{ $t('marketLists.editItemTitle') }}
           </div>
-          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+          <q-btn icon="close" flat round dense v-close-popup style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="submitEditItem">
@@ -818,3 +818,4 @@ async function submitEditItem() {
 }
 
 </script>
+

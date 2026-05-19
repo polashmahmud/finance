@@ -53,13 +53,13 @@
 
     <!-- Month Filter -->
     <div class="month-filter">
-      <q-btn flat round dense icon="chevron_left" size="sm" style="color: #1a1a2e" @click="goToPrevMonth"
+      <q-btn flat round dense icon="chevron_left" size="sm" style="color: #16161a" @click="goToPrevMonth"
         :disable="!canGoPrev" />
       <div class="month-label" @click="monthPickerOpen = true">
         <span>{{ currentMonthLabel }}</span>
         <q-icon name="calendar_month" size="18px" />
       </div>
-      <q-btn flat round dense icon="chevron_right" size="sm" style="color: #1a1a2e" @click="goToNextMonth"
+      <q-btn flat round dense icon="chevron_right" size="sm" style="color: #16161a" @click="goToNextMonth"
         :disable="!canGoNext" />
     </div>
 
@@ -141,10 +141,10 @@
     <q-dialog v-model="budgetModalOpen">
       <q-card style="border-radius: 28px; width: 100%; max-width: 500px; background: white;">
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
-          <div class="text-h6 text-weight-bold q-pl-sm" style="color: #222;">
+          <div class="text-h6 text-weight-bold q-pl-sm" style="color: var(--text-primary);">
             {{ category?.name }}
           </div>
-          <q-btn icon="close" flat round dense v-close-popup style="background: #f1f5f9; color: #64748b;" />
+          <q-btn icon="close" flat round dense v-close-popup style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
 
         <q-card-section>
@@ -503,3 +503,4 @@ onUnmounted(() => {
   transactions.stopListening()
 })
 </script>
+

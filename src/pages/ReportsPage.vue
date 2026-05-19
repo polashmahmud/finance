@@ -8,8 +8,8 @@
 
       <q-btn flat no-caps class="finance-card q-px-md text-weight-medium bg-white" style="border-radius: 12px">
         <div class="row items-center q-gutter-x-sm">
-          <q-icon name="calendar_month" size="18px" style="color: #1a1a2e" />
-          <span style="color: #1a1a2e">{{ displayMonth }}</span>
+          <q-icon name="calendar_month" size="18px" style="color: #16161a" />
+          <span style="color: #16161a">{{ displayMonth }}</span>
           <q-icon name="arrow_drop_down" size="18px" color="grey-7" />
         </div>
         <q-popup-proxy cover transition-show="scale" transition-hide="scale">

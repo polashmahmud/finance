@@ -33,8 +33,8 @@
 
         <!-- Stats row -->
         <div class="row items-center justify-between q-mb-xs">
-          <div class="text-caption" style="color: #64748b;">
-            {{ $t('loans.paid') }}: <span class="text-weight-medium" style="color: #334155;">{{ settings.currency }}{{ settings.formatNumber(loan.paidAmount || 0) }}</span>
+          <div class="text-caption" style="color: var(--text-muted);">
+            {{ $t('loans.paid') }}: <span class="text-weight-medium" style="color: var(--text-primary);">{{ settings.currency }}{{ settings.formatNumber(loan.paidAmount || 0) }}</span>
           </div>
           <div v-if="remaining > 0" class="text-caption text-weight-bold" :style="{ color }">
             {{ $t('loans.remaining') }}: {{ settings.currency }}{{ settings.formatNumber(remaining) }}

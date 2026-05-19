@@ -22,13 +22,13 @@
 
     <!-- Month Filter -->
     <div class="month-filter">
-      <q-btn flat round dense icon="chevron_left" size="sm" style="color: #1a1a2e" @click="goToPrevMonth"
+      <q-btn flat round dense icon="chevron_left" size="sm" style="color: #16161a" @click="goToPrevMonth"
         :disable="!canGoPrev" />
       <div class="month-label" @click="monthPickerOpen = true">
         <span>{{ currentMonthLabel }}</span>
         <q-icon name="calendar_month" size="18px" />
       </div>
-      <q-btn flat round dense icon="chevron_right" size="sm" style="color: #1a1a2e" @click="goToNextMonth"
+      <q-btn flat round dense icon="chevron_right" size="sm" style="color: #16161a" @click="goToNextMonth"
         :disable="!canGoNext" />
     </div>
 

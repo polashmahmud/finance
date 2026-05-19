@@ -8,7 +8,7 @@
 
 <style lang="scss">
 .auth-layout-root {
-  background: #07101e !important;
+  background: #fafaf7 !important;
 
   // q-page inside auth layout should not impose padding or max-width
   .q-page {
@@ -18,12 +18,12 @@
     padding-right: 0 !important;
     margin: 0 !important;
     min-height: 100vh;
-    background: #07101e;
+    background: #fafaf7;
   }
 
   .q-page-container {
     padding-top: 0 !important;
-    background: #07101e;
+    background: #fafaf7;
   }
 }
 </style>

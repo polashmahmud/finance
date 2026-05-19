@@ -8,13 +8,13 @@
 
     <!-- Month Filter -->
     <div class="month-filter">
-      <q-btn flat round dense icon="chevron_left" size="sm" style="color: #1a1a2e" @click="goToPrevMonth"
+      <q-btn flat round dense icon="chevron_left" size="sm" style="color: #16161a" @click="goToPrevMonth"
         :disable="!canGoPrev" />
       <div class="month-label" @click="monthPickerOpen = true">
         <span>{{ currentMonthLabel }}</span>
         <q-icon name="calendar_month" size="18px" />
       </div>
-      <q-btn flat round dense icon="chevron_right" size="sm" style="color: #1a1a2e" @click="goToNextMonth"
+      <q-btn flat round dense icon="chevron_right" size="sm" style="color: #16161a" @click="goToNextMonth"
         :disable="!canGoNext" />
     </div>
 
@@ -117,15 +117,15 @@
         <q-card-section class="row items-center justify-between no-wrap q-pb-none">
           <div class="row items-center q-gutter-sm">
             <q-avatar color="negative" text-color="white" icon="delete" size="36px" />
-            <div class="text-h6 text-weight-bold" style="color: #222;">{{ $t('dashboard.deleteTransactionTitle') }}
+            <div class="text-h6 text-weight-bold" style="color: var(--text-primary);">{{ $t('dashboard.deleteTransactionTitle') }}
             </div>
           </div>
-          <q-btn icon="close" flat round dense @click="cancelDeleteTx" style="background: #f1f5f9; color: #64748b;" />
+          <q-btn icon="close" flat round dense @click="cancelDeleteTx" style="background: var(--card-cream); color: var(--text-muted);" />
         </q-card-section>
 
         <q-card-section class="q-pt-sm">
           <!-- Transaction summary -->
-          <div class="q-pa-sm q-mb-md" style="background: #f8fafc; border-radius: 12px;">
+          <div class="q-pa-sm q-mb-md" style="background: var(--card-cream); border-radius: 12px;">
             <div class="row items-center q-gutter-sm">
               <q-avatar :style="{ background: getCategoryColor(deleteTxData?.category) + '20' }" size="36px">
                 <q-icon :name="getCategoryIcon(deleteTxData?.category)"
@@ -623,3 +623,4 @@ onUnmounted(() => {
   transactions.stopListening()
 })
 </script>
+

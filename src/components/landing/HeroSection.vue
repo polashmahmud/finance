@@ -39,19 +39,19 @@
 
         <div class="hero__trust">
           <span class="hero__trust-item">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#22c55e">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#2f7d5c">
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             No credit card
           </span>
           <span class="hero__trust-item">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#22c55e">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#2f7d5c">
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             Free forever
           </span>
           <span class="hero__trust-item">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#22c55e">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#2f7d5c">
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             Works offline
@@ -172,6 +172,7 @@ const scrollTo = (href) => {
   align-items: center;
   padding-top: 68px;
   overflow: hidden;
+  background: #16161a;
 
   &__bg {
     position: absolute;
@@ -187,7 +188,7 @@ const scrollTo = (href) => {
     &--1 {
       width: 600px;
       height: 600px;
-      background: radial-gradient(circle, rgba(249, 115, 22, 0.18) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(47, 125, 92, 0.16) 0%, transparent 70%);
       top: -200px;
       right: -100px;
       animation: float-blob 12s ease-in-out infinite;
@@ -196,7 +197,7 @@ const scrollTo = (href) => {
     &--2 {
       width: 500px;
       height: 500px;
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.14) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(42, 102, 149, 0.12) 0%, transparent 70%);
       bottom: -150px;
       left: -100px;
       animation: float-blob 16s ease-in-out infinite reverse;
@@ -205,7 +206,7 @@ const scrollTo = (href) => {
     &--3 {
       width: 300px;
       height: 300px;
-      background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(177, 68, 55, 0.08) 0%, transparent 70%);
       top: 40%;
       left: 35%;
       animation: float-blob 20s ease-in-out infinite;
@@ -215,8 +216,9 @@ const scrollTo = (href) => {
   &__grid {
     position: absolute;
     inset: 0;
-    background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
     background-size: 60px 60px;
     mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
   }
@@ -243,20 +245,20 @@ const scrollTo = (href) => {
     align-items: center;
     gap: 8px;
     padding: 6px 14px 6px 8px;
-    background: rgba(249, 115, 22, 0.1);
-    border: 1px solid rgba(249, 115, 22, 0.25);
+    background: rgba(47, 125, 92, 0.12);
+    border: 1px solid rgba(47, 125, 92, 0.3);
     border-radius: 100px;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #f97316;
+    color: #2f7d5c;
     margin-bottom: 24px;
 
     &-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #f97316;
-      box-shadow: 0 0 8px #f97316;
+      background: #2f7d5c;
+      box-shadow: 0 0 8px rgba(47, 125, 92, 0.6);
       animation: pulse-dot 2s ease-in-out infinite;
     }
   }
@@ -266,11 +268,11 @@ const scrollTo = (href) => {
     font-weight: 900;
     line-height: 1.1;
     letter-spacing: -0.04em;
-    color: #f1f5f9;
+    color: rgba(255, 255, 255, 0.95);
     margin: 0 0 20px;
 
     &-gradient {
-      background: linear-gradient(135deg, #f97316 0%, #ef4444 50%, #ec4899 100%);
+      background: linear-gradient(135deg, #2f7d5c 0%, #2a6695 60%, rgba(255,255,255,0.7) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -280,7 +282,7 @@ const scrollTo = (href) => {
   &__subtitle {
     font-size: 1.125rem;
     line-height: 1.7;
-    color: #94a3b8;
+    color: rgba(255, 255, 255, 0.45);
     margin: 0 0 36px;
     max-width: 520px;
   }
@@ -298,19 +300,19 @@ const scrollTo = (href) => {
     align-items: center;
     gap: 8px;
     padding: 14px 28px;
-    background: linear-gradient(135deg, #f97316, #ef4444);
+    background: #2f7d5c;
     color: #fff;
     font-size: 1rem;
     font-weight: 700;
     border-radius: 12px;
     text-decoration: none;
-    box-shadow: 0 4px 24px rgba(249, 115, 22, 0.4);
+    box-shadow: 0 4px 24px rgba(47, 125, 92, 0.4);
     transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(249, 115, 22, 0.55);
-      opacity: 0.95;
+      box-shadow: 0 8px 32px rgba(47, 125, 92, 0.55);
+      opacity: 0.92;
     }
 
     svg {
@@ -327,7 +329,7 @@ const scrollTo = (href) => {
     align-items: center;
     gap: 10px;
     padding: 14px 20px;
-    color: #94a3b8;
+    color: rgba(255, 255, 255, 0.5);
     font-size: 1rem;
     font-weight: 600;
     border-radius: 12px;
@@ -336,8 +338,8 @@ const scrollTo = (href) => {
     text-decoration: none;
 
     &:hover {
-      color: #f1f5f9;
-      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.06);
     }
   }
 
@@ -345,8 +347,8 @@ const scrollTo = (href) => {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -364,7 +366,7 @@ const scrollTo = (href) => {
       align-items: center;
       gap: 6px;
       font-size: 0.8rem;
-      color: #64748b;
+      color: rgba(255, 255, 255, 0.35);
       font-weight: 500;
 
       svg {
@@ -388,12 +390,12 @@ const scrollTo = (href) => {
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    background: rgba(15, 25, 45, 0.9);
+    background: rgba(22, 22, 26, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 100px;
     font-size: 0.78rem;
     font-weight: 600;
-    color: #e2e8f0;
+    color: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(10px);
     z-index: 10;
     white-space: nowrap;
@@ -428,18 +430,18 @@ const scrollTo = (href) => {
   border-radius: 50%;
   flex-shrink: 0;
 
-  &--green { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
-  &--orange { background: #f97316; box-shadow: 0 0 8px #f97316; }
-  &--blue { background: #3b82f6; box-shadow: 0 0 8px #3b82f6; }
+  &--green { background: #2f7d5c; box-shadow: 0 0 8px rgba(47,125,92,0.7); }
+  &--orange { background: #b16a26; box-shadow: 0 0 8px rgba(177,106,38,0.6); }
+  &--blue { background: #2a6695; box-shadow: 0 0 8px rgba(42,102,149,0.6); }
 }
 
 // ---- Mockup ----
 .hero__mockup {
   border-radius: 16px;
   overflow: hidden;
-  background: #0d1525;
+  background: #111110;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .mockup-bar {
@@ -458,17 +460,17 @@ const scrollTo = (href) => {
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.12);
 
-      &:nth-child(1) { background: #ef4444; opacity: 0.7; }
-      &:nth-child(2) { background: #f59e0b; opacity: 0.7; }
-      &:nth-child(3) { background: #22c55e; opacity: 0.7; }
+      &:nth-child(1) { background: #b14437; opacity: 0.7; }
+      &:nth-child(2) { background: #b16a26; opacity: 0.7; }
+      &:nth-child(3) { background: #2f7d5c; opacity: 0.7; }
     }
   }
 
   &__title {
     font-size: 0.72rem;
-    color: #475569;
+    color: rgba(255, 255, 255, 0.25);
     font-weight: 500;
     flex: 1;
     text-align: center;
@@ -490,11 +492,12 @@ const scrollTo = (href) => {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f97316, #ef4444);
+  background: #16161a;
+  border: 1px solid rgba(255,255,255,0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: rgba(255,255,255,0.7);
   font-weight: 800;
   font-size: 0.85rem;
   flex-shrink: 0;
@@ -503,12 +506,12 @@ const scrollTo = (href) => {
 .mockup-greeting {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .mockup-date {
   font-size: 0.68rem;
-  color: #475569;
+  color: rgba(255, 255, 255, 0.3);
   margin-top: 1px;
 }
 
@@ -516,8 +519,8 @@ const scrollTo = (href) => {
   position: relative;
   border-radius: 12px;
   padding: 16px;
-  background: linear-gradient(145deg, #1e2d42 0%, #0f1e35 100%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #16161a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   margin-bottom: 12px;
   overflow: hidden;
 }
@@ -530,7 +533,7 @@ const scrollTo = (href) => {
   &--1 {
     width: 120px;
     height: 120px;
-    background: radial-gradient(circle, rgba(249, 115, 22, 0.2), transparent 70%);
+    background: radial-gradient(circle, rgba(47, 125, 92, 0.2), transparent 70%);
     top: -40px;
     right: -20px;
   }
@@ -538,7 +541,7 @@ const scrollTo = (href) => {
   &--2 {
     width: 80px;
     height: 80px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+    background: radial-gradient(circle, rgba(42, 102, 149, 0.15), transparent 70%);
     bottom: -20px;
     left: 20px;
   }
@@ -546,7 +549,7 @@ const scrollTo = (href) => {
 
 .mockup-balance-label {
   font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -556,7 +559,7 @@ const scrollTo = (href) => {
 .mockup-balance-amount {
   font-size: 1.6rem;
   font-weight: 800;
-  color: #f1f5f9;
+  color: rgba(255, 255, 255, 0.9);
   letter-spacing: -0.03em;
   margin-bottom: 10px;
 }
@@ -576,13 +579,13 @@ const scrollTo = (href) => {
   font-weight: 700;
 
   &--income {
-    background: rgba(34, 197, 94, 0.15);
-    color: #22c55e;
+    background: rgba(47, 125, 92, 0.15);
+    color: #2f7d5c;
   }
 
   &--expense {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
+    background: rgba(177, 68, 55, 0.15);
+    color: #b14437;
   }
 }
 
@@ -613,7 +616,7 @@ const scrollTo = (href) => {
 
   &-name {
     font-size: 0.6rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.3);
     margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
@@ -623,14 +626,14 @@ const scrollTo = (href) => {
   &-bal {
     font-size: 0.7rem;
     font-weight: 700;
-    color: #e2e8f0;
+    color: rgba(255, 255, 255, 0.75);
   }
 }
 
 .mockup-section-label {
   font-size: 0.65rem;
   font-weight: 700;
-  color: #475569;
+  color: rgba(255, 255, 255, 0.22);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 8px;
@@ -670,7 +673,7 @@ const scrollTo = (href) => {
   &-name {
     font-size: 0.72rem;
     font-weight: 600;
-    color: #e2e8f0;
+    color: rgba(255, 255, 255, 0.8);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -678,7 +681,7 @@ const scrollTo = (href) => {
 
   &-date {
     font-size: 0.62rem;
-    color: #475569;
+    color: rgba(255, 255, 255, 0.25);
     margin-top: 1px;
   }
 
@@ -687,8 +690,8 @@ const scrollTo = (href) => {
     font-weight: 700;
     flex-shrink: 0;
 
-    &--income { color: #22c55e; }
-    &--expense { color: #ef4444; }
+    &--income { color: #2f7d5c; }
+    &--expense { color: #b14437; }
   }
 }
 

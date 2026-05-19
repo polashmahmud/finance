@@ -59,7 +59,7 @@
         </div>
 
         <div class="auth-brand__tagline">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#22c55e">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#2f7d5c">
             <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
           Free forever. No credit card required.
@@ -177,7 +177,7 @@
 
             <!-- Server error -->
             <div v-if="serverError" class="auth-server-error">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b14437" stroke-width="2">
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
               {{ serverError }}
@@ -228,9 +228,9 @@ const strength = ref(0)
 const errors = reactive({ email: '', password: '', confirm: '' })
 
 const mockBudgets = [
-  { name: 'Food', pct: 72, color: '#f97316' },
-  { name: 'Transport', pct: 45, color: '#3b82f6' },
-  { name: 'Shopping', pct: 88, color: '#ef4444' },
+  { name: 'Food', pct: 72, color: '#b16a26' },
+  { name: 'Transport', pct: 45, color: '#2a6695' },
+  { name: 'Shopping', pct: 88, color: '#b14437' },
 ]
 
 const strengthLabel = computed(() => {
@@ -315,12 +315,12 @@ async function onRegister() {
 <style scoped lang="scss">
 .auth-page {
   min-height: 100vh;
-  background: #07101e;
+  background: #fafaf7;
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: stretch;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Hind Siliguri', system-ui, sans-serif;
 }
 
 // ── Background ──
@@ -339,7 +339,7 @@ async function onRegister() {
   &--1 {
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(42, 102, 149, 0.07) 0%, transparent 70%);
     top: -150px;
     right: -100px;
   }
@@ -347,7 +347,7 @@ async function onRegister() {
   &--2 {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, rgba(249, 115, 22, 0.14) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(47, 125, 92, 0.08) 0%, transparent 70%);
     bottom: -100px;
     left: -100px;
   }
@@ -357,8 +357,8 @@ async function onRegister() {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(rgba(22, 22, 26, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(22, 22, 26, 0.025) 1px, transparent 1px);
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse at 70% 50%, black 20%, transparent 75%);
 }
@@ -376,15 +376,28 @@ async function onRegister() {
   }
 }
 
-// ── Left brand panel ──
+// ── Left brand panel (dark ink) ──
 .auth-brand {
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 60px 56px;
-  background: linear-gradient(145deg, rgba(139, 92, 246, 0.06) 0%, rgba(249, 115, 22, 0.06) 100%);
+  background: #16161a;
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   gap: 32px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
 
   @media (max-width: 1023px) {
     display: none;
@@ -397,8 +410,9 @@ async function onRegister() {
     text-decoration: none;
     font-size: 1.15rem;
     font-weight: 800;
-    color: #f1f5f9;
+    color: #ffffff;
     letter-spacing: -0.03em;
+    position: relative;
 
     span:first-child { font-size: 1.5rem; }
   }
@@ -406,13 +420,14 @@ async function onRegister() {
   &__title {
     font-size: 2.4rem;
     font-weight: 900;
-    color: #f1f5f9;
+    color: rgba(255, 255, 255, 0.95);
     letter-spacing: -0.04em;
     line-height: 1.15;
     margin: 0 0 12px;
+    position: relative;
 
     &-gradient {
-      background: linear-gradient(135deg, #f97316, #ef4444);
+      background: linear-gradient(135deg, rgba(47, 125, 92, 0.9), rgba(42, 102, 149, 0.9));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -421,7 +436,7 @@ async function onRegister() {
 
   &__subtitle {
     font-size: 0.9rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.42);
     line-height: 1.65;
     margin: 0;
   }
@@ -431,26 +446,28 @@ async function onRegister() {
     align-items: center;
     gap: 8px;
     font-size: 0.82rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.42);
     font-weight: 500;
+    position: relative;
   }
 }
 
 // ── Mini mockup ──
 .auth-brand__mockup {
   padding: 0;
+  position: relative;
 }
 
 .brand-mockup-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 16px;
   padding: 18px 20px;
 }
 
 .brand-mockup-label {
   font-size: 0.68rem;
-  color: #334155;
+  color: rgba(255, 255, 255, 0.3);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -474,14 +491,14 @@ async function onRegister() {
     letter-spacing: -0.03em;
     margin-bottom: 3px;
 
-    &--in { color: #22c55e; }
-    &--out { color: #ef4444; }
-    &--save { color: #3b82f6; }
+    &--in { color: #2f7d5c; }
+    &--out { color: #b14437; }
+    &--save { color: #2a6695; }
   }
 
   &-label {
     font-size: 0.62rem;
-    color: #475569;
+    color: rgba(255, 255, 255, 0.3);
     font-weight: 500;
   }
 }
@@ -489,7 +506,7 @@ async function onRegister() {
 .brand-mockup-divider {
   width: 1px;
   height: 32px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .brand-mockup-bars {
@@ -506,7 +523,7 @@ async function onRegister() {
 
 .brand-mockup-bar-name {
   font-size: 0.68rem;
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.4);
   width: 56px;
   flex-shrink: 0;
 }
@@ -514,7 +531,7 @@ async function onRegister() {
 .brand-mockup-bar-track {
   flex: 1;
   height: 5px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.07);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -527,7 +544,7 @@ async function onRegister() {
 
 .brand-mockup-bar-pct {
   font-size: 0.65rem;
-  color: #475569;
+  color: rgba(255, 255, 255, 0.35);
   font-weight: 600;
   width: 28px;
   text-align: right;
@@ -555,7 +572,7 @@ async function onRegister() {
   text-decoration: none;
   font-size: 1.1rem;
   font-weight: 800;
-  color: #f1f5f9;
+  color: #16161a;
   letter-spacing: -0.03em;
   margin-bottom: 32px;
 
@@ -569,12 +586,11 @@ async function onRegister() {
 .auth-card {
   width: 100%;
   max-width: 420px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #e9e5dc;
   border-radius: 24px;
   padding: 40px 36px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 24px rgba(22, 22, 26, 0.07), 0 1px 0 rgba(22, 22, 26, 0.03);
 
   @media (max-width: 599px) {
     padding: 32px 24px;
@@ -588,14 +604,14 @@ async function onRegister() {
   &__title {
     font-size: 1.65rem;
     font-weight: 900;
-    color: #f1f5f9;
+    color: #16161a;
     letter-spacing: -0.04em;
     margin: 0 0 6px;
   }
 
   &__subtitle {
     font-size: 0.875rem;
-    color: #64748b;
+    color: #7c7a73;
     margin: 0;
   }
 
@@ -603,16 +619,16 @@ async function onRegister() {
     margin-top: 20px;
     text-align: center;
     font-size: 0.85rem;
-    color: #475569;
+    color: #7c7a73;
 
     &-link {
-      color: #f97316;
+      color: #2f7d5c;
       font-weight: 700;
       text-decoration: none;
       transition: color 0.2s;
       margin-left: 4px;
 
-      &:hover { color: #fb923c; }
+      &:hover { color: #16161a; }
     }
   }
 }
@@ -633,39 +649,39 @@ async function onRegister() {
 .auth-label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: #3a3a40;
   letter-spacing: 0.02em;
 }
 
 .auth-input-wrap {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #fafaf7;
+  border: 1px solid #e9e5dc;
   border-radius: 12px;
   transition: border-color 0.2s, box-shadow 0.2s;
 
   &:focus-within {
-    border-color: rgba(249, 115, 22, 0.5);
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.08);
-    background: rgba(249, 115, 22, 0.03);
+    border-color: rgba(22, 22, 26, 0.4);
+    box-shadow: 0 0 0 3px rgba(22, 22, 26, 0.05);
+    background: #ffffff;
   }
 
   &--error {
-    border-color: rgba(239, 68, 68, 0.5) !important;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.06) !important;
+    border-color: rgba(177, 68, 55, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(177, 68, 55, 0.06) !important;
   }
 }
 
 .auth-input-icon {
   padding: 0 14px;
-  color: #334155;
+  color: #b8b5ac;
   display: flex;
   align-items: center;
   flex-shrink: 0;
 
   .auth-input-wrap:focus-within & {
-    color: #f97316;
+    color: #7c7a73;
   }
 }
 
@@ -676,15 +692,15 @@ async function onRegister() {
   outline: none;
   padding: 13px 0;
   font-size: 0.9rem;
-  color: #f1f5f9;
+  color: #16161a;
   font-family: inherit;
   min-width: 0;
 
-  &::placeholder { color: #334155; }
+  &::placeholder { color: #b8b5ac; }
 
   &:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 30px #0d1525 inset !important;
-    -webkit-text-fill-color: #f1f5f9 !important;
+    -webkit-box-shadow: 0 0 0 30px #fafaf7 inset !important;
+    -webkit-text-fill-color: #16161a !important;
   }
 }
 
@@ -692,14 +708,14 @@ async function onRegister() {
   padding: 0 14px;
   background: none;
   border: none;
-  color: #334155;
+  color: #b8b5ac;
   cursor: pointer;
   display: flex;
   align-items: center;
   transition: color 0.2s;
   flex-shrink: 0;
 
-  &:hover { color: #94a3b8; }
+  &:hover { color: #7c7a73; }
 }
 
 // ── Password strength ──
@@ -719,13 +735,13 @@ async function onRegister() {
     height: 3px;
     flex: 1;
     border-radius: 2px;
-    background: rgba(255, 255, 255, 0.08);
+    background: #e9e5dc;
     transition: background 0.3s ease;
 
-    &--weak  { background: #ef4444; }
-    &--fair  { background: #f97316; }
-    &--good  { background: #eab308; }
-    &--strong { background: #22c55e; }
+    &--weak  { background: #b14437; }
+    &--fair  { background: #b16a26; }
+    &--good  { background: #2a6695; }
+    &--strong { background: #2f7d5c; }
   }
 
   &-label {
@@ -733,16 +749,16 @@ async function onRegister() {
     font-weight: 700;
     flex-shrink: 0;
 
-    &--weak   { color: #ef4444; }
-    &--fair   { color: #f97316; }
-    &--good   { color: #eab308; }
-    &--strong { color: #22c55e; }
+    &--weak   { color: #b14437; }
+    &--fair   { color: #b16a26; }
+    &--good   { color: #2a6695; }
+    &--strong { color: #2f7d5c; }
   }
 }
 
 .auth-error {
   font-size: 0.75rem;
-  color: #ef4444;
+  color: #b14437;
   font-weight: 500;
 }
 
@@ -751,22 +767,22 @@ async function onRegister() {
   align-items: center;
   gap: 8px;
   padding: 12px 14px;
-  background: rgba(239, 68, 68, 0.06);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgba(177, 68, 55, 0.05);
+  border: 1px solid rgba(177, 68, 55, 0.18);
   border-radius: 10px;
   font-size: 0.82rem;
-  color: #fca5a5;
+  color: #b14437;
   font-weight: 500;
 }
 
 .auth-terms {
   font-size: 0.78rem;
-  color: #334155;
+  color: #7c7a73;
   margin: 0;
   line-height: 1.5;
 
   &-link {
-    color: #f97316;
+    color: #2f7d5c;
     text-decoration: none;
     font-weight: 600;
 
@@ -777,7 +793,7 @@ async function onRegister() {
 .auth-submit {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #f97316, #ef4444);
+  background: #16161a;
   color: #fff;
   font-size: 0.95rem;
   font-weight: 700;
@@ -785,7 +801,7 @@ async function onRegister() {
   border-radius: 12px;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.35);
+  box-shadow: 0 4px 20px rgba(22, 22, 26, 0.3);
   font-family: inherit;
   display: flex;
   align-items: center;
@@ -794,9 +810,9 @@ async function onRegister() {
   margin-top: 4px;
 
   &:hover:not(:disabled) {
-    opacity: 0.92;
+    opacity: 0.88;
     transform: translateY(-1px);
-    box-shadow: 0 8px 28px rgba(249, 115, 22, 0.5);
+    box-shadow: 0 8px 28px rgba(22, 22, 26, 0.4);
   }
 
   &:active:not(:disabled) {
@@ -804,7 +820,7 @@ async function onRegister() {
   }
 
   &:disabled {
-    opacity: 0.7;
+    opacity: 0.6;
     cursor: not-allowed;
   }
 }

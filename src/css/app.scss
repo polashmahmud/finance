@@ -5,28 +5,36 @@
 
 @import '../../public/fonts/tiro-bangla.css';
 
-// ---------- Design Tokens ----------
+// ---------- Design Tokens (Khaata warm paper system) ----------
 :root {
-  --app-bg: #f1f5f9;
+  --app-bg: #fafaf7;
   --card-bg: #ffffff;
-  --card-border: rgba(148, 163, 184, 0.18);
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(0, 0, 0, 0.06);
-  --card-shadow-hover: 0 4px 14px rgba(0, 0, 0, 0.07), 0 18px 48px rgba(0, 0, 0, 0.09);
-  --sidebar-bg: #0f172a;
-  --header-bg: rgba(255, 255, 255, 0.96);
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --card-cream: #f5f1e8;
+  --card-border: #e9e5dc;
+  --card-divider: #efece4;
+  --card-shadow: 0 1px 0 rgba(22, 22, 26, 0.02), 0 4px 16px -8px rgba(22, 22, 26, 0.05);
+  --card-shadow-hover: 0 4px 20px -6px rgba(22, 22, 26, 0.12), 0 1px 0 rgba(22, 22, 26, 0.03);
+  --sidebar-bg: #16161a;
+  --header-bg: rgba(250, 250, 247, 0.96);
+  --text-primary: #16161a;
+  --text-secondary: #3a3a40;
+  --text-muted: #7c7a73;
+  --text-faint: #b8b5ac;
   --accent-from: #f97316;
   --accent-to: #ef4444;
-  --income-color: #16a34a;
-  --expense-color: #dc2626;
-  --transfer-color: #2563eb;
+  --income-color: #2f7d5c;
+  --income-bg: #e8f1ec;
+  --expense-color: #b14437;
+  --expense-bg: #fbeae6;
+  --transfer-color: #2a6695;
   --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 20px;
-  --radius-xl: 24px;
-  --radius-2xl: 28px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
+  --radius-2xl: 26px;
+  --font-sans: 'Plus Jakarta Sans', 'Hind Siliguri', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-bn: 'Hind Siliguri', 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 // ---------- Body ----------
@@ -34,6 +42,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--app-bg);
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  font-feature-settings: 'ss01', 'cv11';
 }
 
 // ---------- Typography helpers ----------
@@ -43,22 +54,22 @@ body {
 
 // ---------- Gradient utilities ----------
 .bg-primary-gradient {
-  background: linear-gradient(135deg, var(--accent-from) 0%, var(--accent-to) 100%) !important;
+  background: var(--sidebar-bg) !important;
   color: #fff !important;
 }
 
 .bg-accent-gradient {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+  background: var(--sidebar-bg) !important;
   color: #fff !important;
 }
 
 // ---------- Cards ----------
 .finance-card {
-  border-radius: var(--radius-md) !important;
+  border-radius: var(--radius-lg) !important;
   border: 1px solid var(--card-border) !important;
   box-shadow: var(--card-shadow) !important;
   background: var(--card-bg);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
 
   &.cursor-pointer:hover {
     box-shadow: var(--card-shadow-hover) !important;
@@ -66,18 +77,18 @@ body {
   }
 
   &:active {
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06) !important;
+    box-shadow: var(--card-shadow) !important;
     transform: translateY(0);
   }
 }
 
 // ---------- Bottom nav ----------
 .finance-bottom-nav {
-  border-top: 1px solid rgba(148, 163, 184, 0.18) !important;
-  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.06) !important;
-  background: rgba(255, 255, 255, 0.97) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--card-border) !important;
+  box-shadow: 0 -4px 24px rgba(22, 22, 26, 0.06) !important;
+  background: rgba(250, 250, 247, 0.92) !important;
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
 
   .q-tab {
     min-height: 56px;
@@ -93,15 +104,15 @@ body {
 // ---------- FAB ----------
 .finance-fab {
   bottom: 68px !important;
-  background: linear-gradient(135deg, var(--accent-from) 0%, var(--accent-to) 100%) !important;
-  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4) !important;
+  background: var(--sidebar-bg) !important;
+  box-shadow: 0 8px 20px -6px rgba(22, 22, 26, 0.45) !important;
 }
 
 // ---------- Section titles ----------
 .section-title {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: 0.69rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-muted);
   padding: 16px 16px 4px;
@@ -139,14 +150,17 @@ body {
 
 .amount-income {
   color: var(--income-color);
+  font-family: var(--font-mono);
 }
 
 .amount-expense {
   color: var(--expense-color);
+  font-family: var(--font-mono);
 }
 
 .amount-transfer {
   color: var(--transfer-color);
+  font-family: var(--font-mono);
 }
 
 // ---------- Page layout ----------
@@ -165,16 +179,16 @@ body {
 
 .page-title {
   font-size: 1.5rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   line-height: 1.25;
 }
 
 .page-subtitle {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
-  margin-top: 3px;
+  margin-top: 2px;
   font-weight: 500;
 }
 
@@ -196,7 +210,7 @@ body {
 }
 
 .hero-banner-gradient {
-  background: linear-gradient(145deg, #07071e 0%, #0f0f30 35%, #1a0a2e 65%, #07071e 100%) !important;
+  background: #16161a !important;
   padding: 20px 22px !important;
   position: relative;
   overflow: hidden;
@@ -204,12 +218,9 @@ body {
   &::before {
     content: '';
     position: absolute;
-    top: -60%;
-    right: -15%;
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 70%);
-    border-radius: 50%;
+    inset: 0;
+    opacity: 0.06;
+    background-image: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.5) 0, transparent 40%);
     pointer-events: none;
   }
 }
@@ -232,28 +243,32 @@ body {
 
 // ---------- Summary chips ----------
 .summary-chip {
-  padding: 6px 14px;
-  border-radius: 20px;
+  padding: 7px 14px;
+  border-radius: 999px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
+  border: 1px solid transparent;
 }
 
 .summary-chip-income {
-  background: rgba(22, 163, 74, 0.1);
+  background: var(--income-bg);
   color: var(--income-color);
+  border-color: rgba(47, 125, 92, 0.15);
 }
 
 .summary-chip-expense {
-  background: rgba(220, 38, 38, 0.1);
+  background: var(--expense-bg);
   color: var(--expense-color);
+  border-color: rgba(177, 68, 55, 0.15);
 }
 
 .summary-chip-neutral {
-  background: rgba(15, 23, 42, 0.07);
+  background: var(--card-cream);
   color: var(--text-primary);
+  border-color: var(--card-border);
 }
 
 // ---------- Tab card ----------
@@ -337,36 +352,36 @@ body {
 // ---------- Premium header ----------
 .premium-header {
   background: var(--header-bg) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.15) !important;
-  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.06) !important;
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--card-border) !important;
+  box-shadow: 0 1px 0 rgba(22, 22, 26, 0.04) !important;
 }
 
 // ---------- Quick add button (header) ----------
 .quick-add-btn {
-  background: linear-gradient(135deg, var(--accent-from), var(--accent-to)) !important;
+  background: var(--sidebar-bg) !important;
   color: #ffffff !important;
-  box-shadow: 0 2px 12px rgba(249, 115, 22, 0.3) !important;
+  box-shadow: 0 2px 12px rgba(22, 22, 26, 0.25) !important;
   transition: box-shadow 0.2s, transform 0.15s;
 
   &:hover {
-    box-shadow: 0 4px 20px rgba(249, 115, 22, 0.45) !important;
+    box-shadow: 0 4px 20px rgba(22, 22, 26, 0.35) !important;
     transform: translateY(-1px);
   }
 }
 
-// ---------- Sidebar (dark navy) ----------
+// ---------- Sidebar (deep ink) ----------
 .sidebar-drawer {
   border-right: none !important;
-  box-shadow: 4px 0 32px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 4px 0 32px rgba(22, 22, 26, 0.18) !important;
   background: var(--sidebar-bg) !important;
 
   .q-item {
     border-radius: 10px;
     margin: 1px 8px;
     min-height: 42px;
-    color: rgba(255, 255, 255, 0.5) !important;
+    color: rgba(255, 255, 255, 0.48) !important;
     transition: background 0.15s ease, color 0.15s ease;
 
     &:hover {
@@ -374,7 +389,7 @@ body {
       color: rgba(255, 255, 255, 0.88) !important;
 
       .sidebar-icon-wrap {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.10);
       }
     }
 
@@ -390,16 +405,16 @@ body {
   align-items: center;
   gap: 10px;
   padding: 18px 16px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
 }
 
 .sidebar-brand-logo {
   width: 34px;
   height: 34px;
-  border-radius: 9px;
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.22), rgba(239, 68, 68, 0.22));
-  border: 1px solid rgba(249, 115, 22, 0.32);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -413,12 +428,12 @@ body {
   letter-spacing: -0.02em;
 }
 
-// Sidebar icon wrap (colored bg per nav item)
+// Sidebar icon wrap
 .sidebar-icon-wrap {
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -433,27 +448,24 @@ body {
 
 .sidebar-sep {
   height: 1px;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.06);
   margin: 6px 16px;
 }
 
 // Active nav item
 .sidebar-item-active {
-  background: rgba(249, 115, 22, 0.13) !important;
+  background: rgba(255, 255, 255, 0.09) !important;
   color: rgba(255, 255, 255, 0.95) !important;
-  border: 1px solid rgba(249, 115, 22, 0.22) !important;
-
-  .q-icon {
-    color: #f97316 !important;
-  }
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
 
   .sidebar-icon-wrap {
-    background: rgba(249, 115, 22, 0.22) !important;
-    color: #f97316 !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
   }
 
   .sidebar-nav-label {
-    font-weight: 600 !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
   }
 }
 
@@ -485,13 +497,16 @@ body {
 
 // ---------- Dark mode ----------
 .body--dark {
-  --app-bg: #080c12;
-  --card-bg: #141b27;
-  --card-border: rgba(255, 255, 255, 0.06);
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --header-bg: rgba(8, 12, 18, 0.97);
+  --app-bg: #111110;
+  --card-bg: #1c1c1a;
+  --card-cream: #2a2a27;
+  --card-border: rgba(255, 255, 255, 0.07);
+  --card-divider: rgba(255, 255, 255, 0.06);
+  --text-primary: #f0ede6;
+  --text-secondary: #b8b5ac;
+  --text-muted: #7c7a73;
+  --text-faint: #4a4844;
+  --header-bg: rgba(17, 17, 16, 0.97);
 
   .finance-card {
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
@@ -514,13 +529,12 @@ body {
   }
 
   .finance-bottom-nav {
-    background: rgba(8, 12, 18, 0.98) !important;
+    background: rgba(17, 17, 16, 0.96) !important;
     border-top-color: rgba(255, 255, 255, 0.06) !important;
   }
 
   .sidebar-drawer {
-    // Sidebar is already dark navy — fine in dark mode too
-    background: #07091a !important;
+    background: #0d0d0c !important;
   }
 
   .summary-chip-neutral {
