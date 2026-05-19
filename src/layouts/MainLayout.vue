@@ -379,18 +379,6 @@
     </q-footer>
   </q-layout>
 
-  <!-- Backup Reminder Banner -->
-  <transition name="offline-slide">
-    <div v-if="showBackupBanner" class="backup-reminder-banner">
-      <q-icon name="cloud_upload" size="16px" class="q-mr-xs" />
-      <span>{{ $t('settings.backupDueBanner') }}</span>
-      <q-space />
-      <q-btn flat dense size="sm" color="white" :label="$t('settings.backupNow')"
-        :loading="backupBannerBacking" @click="onBannerBackupNow" class="q-mr-xs" />
-      <q-btn flat dense size="sm" color="white" icon="close" @click="showBackupBanner = false" />
-    </div>
-  </transition>
-
   <!-- Offline Banner -->
   <transition name="offline-slide">
     <div v-if="!isOnline" class="offline-banner">
@@ -407,7 +395,6 @@ import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from 'stores/authStore'
 import { useSettingsStore } from 'stores/settingsStore'
-import { isDriveConnected, backupToDrive } from 'src/services/driveBackupService'
 import { useAccountStore } from 'stores/accountStore'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
@@ -426,8 +413,6 @@ const currentTab = ref('home')
 const quickAddOpen = ref(false)
 const drawerOpen = ref(false)
 const profileMenuOpen = ref(false)
-const showBackupBanner = ref(false)
-const backupBannerBacking = ref(false)
 
 function onAvatarClick() {
   if ($q.screen.lt.sm) {
@@ -477,27 +462,9 @@ async function onRefresh(done) {
   }
 }
 
-async function onBannerBackupNow() {
-  backupBannerBacking.value = true
-  try {
-    await backupToDrive()
-    settings.updateLastBackupAt()
-    showBackupBanner.value = false
-    $q.notify({ type: 'positive', message: t('settings.backupComplete'), position: 'top' })
-  } catch {
-    $q.notify({ type: 'negative', message: t('settings.backupFailed'), position: 'top' })
-  } finally {
-    backupBannerBacking.value = false
-  }
-}
-
 onMounted(() => {
   window.addEventListener('online', handleOnline)
   window.addEventListener('offline', handleOffline)
-  // Show backup reminder if due and Drive is still connected
-  if (settings.isBackupDue() && isDriveConnected()) {
-    showBackupBanner.value = true
-  }
 })
 onUnmounted(() => {
   window.removeEventListener('online', handleOnline)
@@ -557,24 +524,6 @@ async function onLogout() {
   font-weight: 700;
   color: #0f172a;
   letter-spacing: -0.02em;
-}
-
-/* ===== Backup Reminder Banner ===== */
-.backup-reminder-banner {
-  position: fixed;
-  top: 56px;
-  left: 0;
-  right: 0;
-  z-index: 9998;
-  display: flex;
-  align-items: center;
-  background: #2563eb;
-  color: #fff;
-  font-size: 0.82rem;
-  font-weight: 600;
-  padding: 7px 12px;
-  letter-spacing: 0.01em;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* ===== Offline Banner ===== */

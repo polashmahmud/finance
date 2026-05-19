@@ -26,11 +26,6 @@ export const useSettingsStore = defineStore('settings', () => {
   const _pinHash = ref('')
   const isAuthenticated = ref(false)
 
-  // Auto Backup Configuration
-  const autoBackupEnabled = ref(false)
-  const autoBackupIntervalDays = ref(7)
-  const lastBackupAt = ref(null)
-
   // Balance Emojis Configuration
   const balanceEmojis = ref({
     negative: { emoji: '😭', threshold: 0 },
@@ -76,9 +71,6 @@ export const useSettingsStore = defineStore('settings', () => {
         if (s.balanceEmojis) {
           balanceEmojis.value = s.balanceEmojis
         }
-        if (s.autoBackupEnabled !== undefined) autoBackupEnabled.value = s.autoBackupEnabled
-        if (s.autoBackupIntervalDays) autoBackupIntervalDays.value = s.autoBackupIntervalDays
-        if (s.lastBackupAt) lastBackupAt.value = s.lastBackupAt
         if (s.language) i18n.global.locale.value = s.language
       } catch {
         /* ignore parse errors */
@@ -116,9 +108,6 @@ export const useSettingsStore = defineStore('settings', () => {
         timezone: timezone.value,
         darkMode: darkMode.value,
         balanceEmojis: balanceEmojis.value,
-        autoBackupEnabled: autoBackupEnabled.value,
-        autoBackupIntervalDays: autoBackupIntervalDays.value,
-        lastBackupAt: lastBackupAt.value,
       }),
     )
   }
@@ -167,23 +156,6 @@ export const useSettingsStore = defineStore('settings', () => {
   function setBalanceEmojis(newEmojis) {
     balanceEmojis.value = newEmojis
     saveSettings()
-  }
-
-  function setAutoBackup(enabled, intervalDays) {
-    autoBackupEnabled.value = enabled
-    if (intervalDays !== undefined) autoBackupIntervalDays.value = Math.max(1, Math.min(365, intervalDays))
-    saveSettings()
-  }
-
-  function updateLastBackupAt() {
-    lastBackupAt.value = Date.now()
-    saveSettings()
-  }
-
-  function isBackupDue() {
-    if (!autoBackupEnabled.value) return false
-    if (!lastBackupAt.value) return true
-    return Date.now() - lastBackupAt.value >= autoBackupIntervalDays.value * 86_400_000
   }
 
   function formatNumber(value) {
@@ -332,12 +304,6 @@ export const useSettingsStore = defineStore('settings', () => {
     setDateFormat,
     setTimezone,
     setBalanceEmojis,
-    autoBackupEnabled,
-    autoBackupIntervalDays,
-    lastBackupAt,
-    setAutoBackup,
-    updateLastBackupAt,
-    isBackupDue,
     formatDate,
     formatNumber,
     toBengaliNumerals,
