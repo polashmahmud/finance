@@ -210,6 +210,84 @@
           </q-list>
         </q-card>
 
+        <!-- Auto Backup Section -->
+        <div class="section-title">{{ $t('settings.autoBackup') }}</div>
+        <q-card class="finance-card q-mb-md">
+          <q-list separator>
+            <!-- Enable toggle -->
+            <q-item class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="cloud_sync" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.autoBackupEnabled') }}</q-item-label>
+                <q-item-label caption>{{ $t('settings.autoBackupDesc') }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-toggle :model-value="settings.autoBackupEnabled" color="dark"
+                  @update:model-value="onAutoBackupToggle" />
+              </q-item-section>
+            </q-item>
+
+            <!-- Interval -->
+            <q-item v-if="settings.autoBackupEnabled" class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="schedule" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.backupInterval') }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <div class="row items-center q-gutter-xs">
+                  <q-input v-model.number="backupIntervalDays" type="number" dense borderless
+                    min="1" max="365" style="width: 60px" @update:model-value="onIntervalChange" />
+                  <span class="text-caption text-grey-7">{{ $t('settings.days') }}</span>
+                </div>
+              </q-item-section>
+            </q-item>
+
+            <!-- Drive connect/disconnect -->
+            <q-item v-if="settings.autoBackupEnabled" class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="cloud" :color="driveConnected ? 'positive' : 'grey-5'" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.googleDrive') }}</q-item-label>
+                <q-item-label caption :class="driveConnected ? 'text-positive' : 'text-grey'">
+                  {{ driveConnected ? $t('settings.driveConnected') : $t('settings.driveNotConnected') }}
+                </q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-btn v-if="!driveConnected" unelevated size="sm" color="dark"
+                  :label="$t('settings.connectDrive')" :loading="connectingDrive"
+                  @click="onConnectDrive" />
+                <q-btn v-else flat size="sm" color="negative"
+                  :label="$t('settings.disconnectDrive')" @click="onDisconnectDrive" />
+              </q-item-section>
+            </q-item>
+
+            <!-- Last backup + Backup Now -->
+            <q-item v-if="settings.autoBackupEnabled && driveConnected" class="touch-target">
+              <q-item-section avatar>
+                <q-icon name="history" color="dark" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ $t('settings.lastBackup') }}</q-item-label>
+                <q-item-label caption>
+                  {{ settings.lastBackupAt
+                    ? settings.formatDate(new Date(settings.lastBackupAt).toISOString().slice(0, 10))
+                    : $t('settings.never') }}
+                </q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-btn unelevated size="sm" color="dark" icon="backup"
+                  :label="$t('settings.backupNow')" :loading="backingUp"
+                  @click="onBackupNow" />
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card>
+
         <!-- Data Section -->
         <div class="section-title">{{ $t('settings.data') }}</div>
         <q-card class="finance-card q-mb-md">
@@ -630,6 +708,7 @@ import { useAuthStore } from 'stores/authStore'
 import { Notify } from 'quasar'
 import { collection, getDocs, deleteDoc, addDoc, setDoc, doc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
+import { isDriveConnected, disconnectDrive, backupToDrive, requestDriveToken } from 'src/services/driveBackupService'
 
 const { t } = useI18n()
 const settings = useSettingsStore()
@@ -655,6 +734,63 @@ const resettingDb = ref(false)
 // Export
 const showExportDialog = ref(false)
 const exporting = ref(false)
+
+// Auto Backup
+const driveConnected = ref(isDriveConnected())
+const connectingDrive = ref(false)
+const backingUp = ref(false)
+const backupIntervalDays = ref(settings.autoBackupIntervalDays)
+
+function onAutoBackupToggle(val) {
+  settings.setAutoBackup(val, backupIntervalDays.value)
+}
+
+function onIntervalChange(val) {
+  const days = Math.max(1, Math.min(365, Number(val) || 7))
+  backupIntervalDays.value = days
+  settings.setAutoBackup(settings.autoBackupEnabled, days)
+}
+
+async function onConnectDrive() {
+  if (!import.meta.env.VITE_GOOGLE_CLIENT_ID) {
+    Notify.create({ type: 'warning', message: t('settings.googleClientIdMissing') })
+    return
+  }
+  connectingDrive.value = true
+  try {
+    await requestDriveToken('select_account')
+    driveConnected.value = true
+    Notify.create({ type: 'positive', message: t('settings.driveConnected') })
+  } catch {
+    Notify.create({ type: 'negative', message: t('settings.driveAuthFailed') })
+  } finally {
+    connectingDrive.value = false
+  }
+}
+
+function onDisconnectDrive() {
+  disconnectDrive()
+  driveConnected.value = false
+  Notify.create({ type: 'info', message: t('settings.driveDisconnected') })
+}
+
+async function onBackupNow() {
+  backingUp.value = true
+  try {
+    await backupToDrive()
+    settings.updateLastBackupAt()
+    driveConnected.value = isDriveConnected()
+    Notify.create({ type: 'positive', message: t('settings.backupComplete') })
+  } catch (err) {
+    if (err.message === 'GOOGLE_CLIENT_ID_MISSING') {
+      Notify.create({ type: 'warning', message: t('settings.googleClientIdMissing') })
+    } else {
+      Notify.create({ type: 'negative', message: t('settings.backupFailed') })
+    }
+  } finally {
+    backingUp.value = false
+  }
+}
 
 // Restore
 const showRestoreDialog = ref(false)
