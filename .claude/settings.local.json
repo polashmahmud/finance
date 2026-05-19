@@ -10,7 +10,10 @@
       "Bash(npx vue-tsc *)",
       "Bash(Get-ChildItem -Path \"d:\\\\Sites\\\\Me\\\\finance\" -Recurse -Directory)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(Sort-Object)"
+      "Bash(Sort-Object)",
+      "Bash(Get-ChildItem -Path \"d:\\\\Sites\\\\Me\\\\finance\" -Force)",
+      "Bash(Select-Object Name, Mode)",
+      "Bash(npx quasar *)"
     ]
   }
 }
