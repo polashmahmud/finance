@@ -13,7 +13,13 @@
       "Bash(Sort-Object)",
       "Bash(Get-ChildItem -Path \"d:\\\\Sites\\\\Me\\\\finance\" -Force)",
       "Bash(Select-Object Name, Mode)",
-      "Bash(npx quasar *)"
+      "Bash(npx quasar *)",
+      "Bash(ls d:/Sites/Me/)",
+      "Read(//d/Sites/Me/**)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh pr create --title 'feat: Khaata warm paper design system redesign' --body ' *)"
     ]
   }
 }
