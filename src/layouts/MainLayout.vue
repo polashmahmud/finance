@@ -10,7 +10,7 @@
         <!-- Left: Logo + Name -->
         <div class="row items-center q-gutter-sm cursor-pointer" @click="$router.push('/dashboard')">
           <div class="header-logo-wrap">
-            <q-icon name="account_balance_wallet" size="18px" style="color: #16161a;" />
+            <q-icon name="account_balance_wallet" size="18px" style="color: var(--text-primary);" />
           </div>
           <span class="header-brand-text">{{ $t('layout.financeManager') }}</span>
         </div>

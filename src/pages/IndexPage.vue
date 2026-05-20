@@ -30,7 +30,7 @@
                 <div class="balance-amount">{{ settings.currency }}{{ settings.formatNumber(accounts.totalBalance) }}
                 </div>
                 <div class="balance-meta">
-                  {{ $t('dashboard.accounts') }} · {{ new Date().toLocaleDateString('en-GB', { month: 'long' }) }}
+                  {{ $t('dashboard.accounts') }} · {{ new Date().toLocaleDateString(undefined, { month: 'long' }) }}
                 </div>
               </div>
               <div class="balance-eye-btn">
