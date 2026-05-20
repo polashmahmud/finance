@@ -214,7 +214,7 @@
         <div class="section-title">{{ $t('settings.data') }}</div>
         <q-card class="finance-card q-mb-md">
           <q-list separator>
-            <q-item clickable class="touch-target">
+            <q-item clickable class="touch-target" @click="openRestoreDialog">
               <q-item-section avatar>
                 <q-icon name="backup" color="dark" />
               </q-item-section>
@@ -222,15 +222,21 @@
                 <q-item-label>{{ $t('settings.backup') }}</q-item-label>
                 <q-item-label caption>{{ $t('settings.localBackup') }}</q-item-label>
               </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" />
+              </q-item-section>
             </q-item>
 
-            <q-item clickable class="touch-target">
+            <q-item clickable class="touch-target" @click="showExportDialog = true">
               <q-item-section avatar>
                 <q-icon name="file_download" color="dark" />
               </q-item-section>
               <q-item-section>
                 <q-item-label>{{ $t('settings.dataExport') }}</q-item-label>
-                <q-item-label caption>CSV / PDF</q-item-label>
+                <q-item-label caption>JSON / CSV</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" />
               </q-item-section>
             </q-item>
 
@@ -450,6 +456,118 @@
       </q-card>
     </q-dialog>
 
+    <!-- Export Dialog -->
+    <q-dialog v-model="showExportDialog" persistent>
+      <q-card style="min-width: 320px; max-width: 90vw; border-radius: 16px">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6 text-weight-bold">{{ $t('settings.exportFormat') }}</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup :disable="exporting" />
+        </q-card-section>
+
+        <q-card-section class="q-gutter-sm q-pt-md">
+          <q-card flat bordered class="cursor-pointer" @click="exportData('json')">
+            <q-card-section class="row items-center q-py-sm">
+              <q-icon name="data_object" size="32px" color="dark" class="q-mr-md" />
+              <div>
+                <div class="text-weight-medium">{{ $t('settings.exportJson') }}</div>
+                <div class="text-caption text-grey">{{ $t('settings.exportJsonDesc') }}</div>
+              </div>
+            </q-card-section>
+          </q-card>
+
+          <q-card flat bordered class="cursor-pointer" @click="exportData('csv')">
+            <q-card-section class="row items-center q-py-sm">
+              <q-icon name="table_chart" size="32px" color="dark" class="q-mr-md" />
+              <div>
+                <div class="text-weight-medium">{{ $t('settings.exportCsv') }}</div>
+                <div class="text-caption text-grey">{{ $t('settings.exportCsvDesc') }}</div>
+              </div>
+            </q-card-section>
+          </q-card>
+        </q-card-section>
+
+        <q-card-section v-if="exporting" class="text-center q-pt-none">
+          <q-spinner color="dark" size="24px" class="q-mr-sm" />
+          <span class="text-caption">{{ $t('settings.exporting') }}</span>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- Restore Dialog: file picker -->
+    <q-dialog v-model="showRestoreDialog" persistent>
+      <q-card style="min-width: 320px; max-width: 90vw; border-radius: 16px">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6 text-weight-bold">{{ $t('settings.restoreTitle') }}</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-card-section>
+          <div class="text-body2 text-grey-8 q-mb-md">{{ $t('settings.restoreDesc') }}</div>
+
+          <div class="q-mb-md">
+            <div class="text-subtitle2 q-mb-xs">{{ $t('settings.restoreMode') }}</div>
+            <q-option-group
+              v-model="restoreMode"
+              :options="[
+                { label: $t('settings.restoreReplace'), value: 'replace' },
+                { label: $t('settings.restoreMerge'), value: 'merge' },
+              ]"
+              color="dark"
+              dense
+            />
+          </div>
+
+          <q-btn
+            unelevated
+            color="dark"
+            icon="upload_file"
+            :label="$t('settings.restoreSelectFile')"
+            class="full-width"
+            @click="restoreFileInput?.click()"
+          />
+          <input ref="restoreFileInput" type="file" accept=".json" style="display: none" @change="onRestoreFileSelected" />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- Restore Confirm Dialog -->
+    <q-dialog v-model="showRestoreConfirmDialog" persistent>
+      <q-card style="min-width: 320px; max-width: 90vw; border-radius: 16px">
+        <q-card-section class="row items-center q-pb-none">
+          <q-icon name="warning" color="warning" size="28px" class="q-mr-sm" />
+          <div class="text-h6 text-weight-bold">{{ $t('settings.restoreConfirmTitle') }}</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup :disable="restoring" />
+        </q-card-section>
+
+        <q-card-section class="q-pt-sm">
+          <p class="text-body2 text-grey-8">
+            {{ restoreMode === 'replace' ? $t('settings.restoreReplaceWarning') : $t('settings.restoreMergeWarning') }}
+          </p>
+          <q-chip v-if="restorePreview" color="grey-2" text-color="dark" icon="info">
+            {{ $t('settings.backupFileInfo', {
+              transactions: restorePreview.transactions,
+              accounts: restorePreview.accounts,
+              categories: restorePreview.categories,
+            }) }}
+          </q-chip>
+        </q-card-section>
+
+        <q-card-actions align="right" class="q-px-md q-pb-md">
+          <q-btn flat :label="$t('common.cancel')" v-close-popup :disable="restoring" />
+          <q-btn
+            unelevated
+            color="dark"
+            :label="restoring ? $t('settings.restoring') : $t('common.yes')"
+            :loading="restoring"
+            @click="performRestore"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
     <!-- Dashboard Emojis Dialog -->
     <q-dialog v-model="showEmojisDialog" persistent>
       <q-card style="min-width: 350px; border-radius: 16px">
@@ -510,8 +628,10 @@ import { useI18n } from 'vue-i18n'
 import { useSettingsStore } from 'stores/settingsStore'
 import { useAuthStore } from 'stores/authStore'
 import { Notify } from 'quasar'
-import { collection, getDocs, deleteDoc, addDoc } from 'firebase/firestore'
+import { collection, getDocs, deleteDoc, addDoc, setDoc, doc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
+
+const ALLOWED_COLLECTIONS = ['transactions', 'accounts', 'categories', 'notes', 'marketLists']
 
 const { t } = useI18n()
 const settings = useSettingsStore()
@@ -533,6 +653,19 @@ const imageElement = ref(null)
 // Reset database
 const showResetDbDialog = ref(false)
 const resettingDb = ref(false)
+
+// Export
+const showExportDialog = ref(false)
+const exporting = ref(false)
+
+// Restore
+const showRestoreDialog = ref(false)
+const showRestoreConfirmDialog = ref(false)
+const restoreFileInput = ref(null)
+const restoreMode = ref('replace')
+const restoreData = ref(null)
+const restorePreview = ref(null)
+const restoring = ref(false)
 
 // Dialog refs
 const showPinDialog = ref(false)
@@ -959,11 +1092,9 @@ async function onResetDatabase() {
     const uid = auth.currentUser?.uid
     if (!uid) throw new Error('Not authenticated')
 
-    const collections = ['transactions', 'accounts', 'categories', 'notes', 'marketLists']
-
     // Delete all documents from every subcollection
     await Promise.all(
-      collections.map(async (col) => {
+      ALLOWED_COLLECTIONS.map(async (col) => {
         const ref = collection(firestore, `users/${uid}/${col}`)
         const snap = await getDocs(ref)
         await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)))
@@ -1061,6 +1192,132 @@ async function removePinConfirm() {
   currentPinInput.value = ''
   showRemovePinDialog.value = false
   Notify.create({ type: 'positive', message: t('settings.pinRemoved') })
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+async function exportData(format) {
+  exporting.value = true
+  try {
+    const uid = auth.currentUser?.uid
+    if (!uid) throw new Error('Not authenticated')
+
+    const allData = {}
+    const snapshots = await Promise.all(
+      ALLOWED_COLLECTIONS.map((col) => getDocs(collection(firestore, `users/${uid}/${col}`))),
+    )
+    snapshots.forEach((snap, i) => {
+      allData[ALLOWED_COLLECTIONS[i]] = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+    })
+
+    const dateStr = new Date().toISOString().split('T')[0]
+
+    if (format === 'json') {
+      const blob = new Blob(
+        [JSON.stringify({ version: 1, exportedAt: Date.now(), data: allData }, null, 2)],
+        { type: 'application/json' },
+      )
+      downloadBlob(blob, `finance-backup-${dateStr}.json`)
+    } else {
+      const txs = allData.transactions
+      if (!txs.length) {
+        Notify.create({ type: 'warning', message: t('settings.noTransactionsToExport') })
+        return
+      }
+      const headers = ['Date', 'Time', 'Type', 'Amount', 'Fee', 'Category', 'Account ID', 'Notes']
+      const rows = txs.map((tx) => [
+        tx.date || '',
+        tx.time || '',
+        tx.type || '',
+        tx.amount || 0,
+        tx.fee || 0,
+        tx.category || '',
+        tx.accountId || tx.fromAccountId || '',
+        (tx.notes || '').replace(/"/g, '""'),
+      ])
+      const csv = [headers, ...rows]
+        .map((r) => r.map((v) => `"${v}"`).join(','))
+        .join('\n')
+      downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), `finance-transactions-${dateStr}.csv`)
+    }
+
+    Notify.create({ type: 'positive', message: t('settings.exportSuccess') })
+    showExportDialog.value = false
+  } catch {
+    Notify.create({ type: 'negative', message: t('settings.exportError') })
+  } finally {
+    exporting.value = false
+  }
+}
+
+function openRestoreDialog() {
+  restoreMode.value = 'replace'
+  restoreData.value = null
+  restorePreview.value = null
+  showRestoreDialog.value = true
+}
+
+function onRestoreFileSelected(event) {
+  const file = event.target.files[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result)
+      if (!parsed.data || !parsed.version) throw new Error('invalid')
+      restoreData.value = parsed
+      restorePreview.value = {
+        transactions: (parsed.data.transactions || []).length,
+        accounts: (parsed.data.accounts || []).length,
+        categories: (parsed.data.categories || []).length,
+      }
+      showRestoreDialog.value = false
+      showRestoreConfirmDialog.value = true
+    } catch {
+      Notify.create({ type: 'negative', message: t('settings.invalidBackupFile') })
+    }
+    event.target.value = ''
+  }
+  reader.readAsText(file)
+}
+
+async function performRestore() {
+  if (!restoreData.value) return
+  restoring.value = true
+  try {
+    const uid = auth.currentUser?.uid
+    if (!uid) throw new Error('Not authenticated')
+    const backup = restoreData.value
+
+    for (const colName of ALLOWED_COLLECTIONS) {
+      const docs = backup.data[colName]
+      if (!Array.isArray(docs)) continue
+      const colRef = collection(firestore, `users/${uid}/${colName}`)
+      if (restoreMode.value === 'replace') {
+        const snap = await getDocs(colRef)
+        await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)))
+      }
+      await Promise.all(
+        docs.map(({ id, ...data }) =>
+          setDoc(doc(firestore, `users/${uid}/${colName}/${id}`), data),
+        ),
+      )
+    }
+
+    Notify.create({ type: 'positive', message: t('settings.restoreSuccess') })
+    showRestoreConfirmDialog.value = false
+  } catch {
+    Notify.create({ type: 'negative', message: t('settings.restoreError') })
+  } finally {
+    restoring.value = false
+  }
 }
 
 async function changePassword() {
