@@ -631,6 +631,8 @@ import { Notify } from 'quasar'
 import { collection, getDocs, deleteDoc, addDoc, setDoc, doc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
 
+const ALLOWED_COLLECTIONS = ['transactions', 'accounts', 'categories', 'notes', 'marketLists']
+
 const { t } = useI18n()
 const settings = useSettingsStore()
 const authStore = useAuthStore()
@@ -1090,11 +1092,9 @@ async function onResetDatabase() {
     const uid = auth.currentUser?.uid
     if (!uid) throw new Error('Not authenticated')
 
-    const collections = ['transactions', 'accounts', 'categories', 'notes', 'marketLists']
-
     // Delete all documents from every subcollection
     await Promise.all(
-      collections.map(async (col) => {
+      ALLOWED_COLLECTIONS.map(async (col) => {
         const ref = collection(firestore, `users/${uid}/${col}`)
         const snap = await getDocs(ref)
         await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)))
@@ -1209,12 +1209,13 @@ async function exportData(format) {
     const uid = auth.currentUser?.uid
     if (!uid) throw new Error('Not authenticated')
 
-    const collectionNames = ['transactions', 'accounts', 'categories', 'notes', 'marketLists']
     const allData = {}
-    for (const col of collectionNames) {
-      const snap = await getDocs(collection(firestore, `users/${uid}/${col}`))
-      allData[col] = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
-    }
+    const snapshots = await Promise.all(
+      ALLOWED_COLLECTIONS.map((col) => getDocs(collection(firestore, `users/${uid}/${col}`))),
+    )
+    snapshots.forEach((snap, i) => {
+      allData[ALLOWED_COLLECTIONS[i]] = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+    })
 
     const dateStr = new Date().toISOString().split('T')[0]
 
@@ -1295,7 +1296,9 @@ async function performRestore() {
     if (!uid) throw new Error('Not authenticated')
     const backup = restoreData.value
 
-    for (const [colName, docs] of Object.entries(backup.data)) {
+    for (const colName of ALLOWED_COLLECTIONS) {
+      const docs = backup.data[colName]
+      if (!Array.isArray(docs)) continue
       const colRef = collection(firestore, `users/${uid}/${colName}`)
       if (restoreMode.value === 'replace') {
         const snap = await getDocs(colRef)
