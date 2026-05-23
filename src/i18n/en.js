@@ -870,5 +870,6 @@ export default {
     upcomingSchedule: 'Upcoming Repayment Schedule',
     thisMonthBadge: 'This Month',
     scheduleTotal: 'Total Remaining',
+    remainingInstallments: '{count} installments left',
   },
 }

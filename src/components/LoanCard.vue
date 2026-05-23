@@ -41,10 +41,19 @@
           </div>
         </div>
 
-        <!-- Action buttons -->
-        <div v-if="!settled" class="row justify-end q-gutter-xs q-mt-xs">
+        <!-- Remaining installments (loan type only) -->
+        <div v-if="loan.type === 'loan' && !settled && remainingInstallments > 0"
+          class="row items-center q-gutter-xs" style="margin-top: 2px;">
+          <q-icon name="pending_actions" size="14px" style="color: #f59e0b;" />
+          <span class="text-caption" style="color: #f59e0b; font-weight: 600;">
+            {{ $t('loans.remainingInstallments', { count: remainingInstallments }) }}
+          </span>
+        </div>
+
+        <!-- Action buttons (receivable/payable only — loan type opens via card click) -->
+        <div v-if="!settled && loan.type !== 'loan'" class="row justify-end q-gutter-xs q-mt-xs">
           <q-btn flat dense no-caps size="sm" :style="{ color }" icon="payment"
-            :label="loan.type === 'receivable' ? $t('loans.receiveBtn') : loan.type === 'loan' ? $t('loans.installments') : $t('loans.payBtn')"
+            :label="loan.type === 'receivable' ? $t('loans.receiveBtn') : $t('loans.payBtn')"
             @click.stop="$emit('pay')" style="border-radius: 8px;" />
         </div>
       </div>
@@ -72,6 +81,9 @@ const effectiveTotal = computed(() =>
     : (props.loan.amount || 0),
 )
 const remaining = computed(() => effectiveTotal.value - (props.loan.paidAmount || 0))
+const remainingInstallments = computed(() =>
+  (props.loan.installments || []).filter((i) => !i.paid).length,
+)
 const progress = computed(() => {
   if (!effectiveTotal.value) return 0
   return (props.loan.paidAmount || 0) / effectiveTotal.value

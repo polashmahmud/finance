@@ -868,5 +868,6 @@ export default {
     upcomingSchedule: 'আগামী কিস্তির সারসংক্ষেপ',
     thisMonthBadge: 'এই মাস',
     scheduleTotal: 'মোট বাকি',
+    remainingInstallments: '{count}টি কিস্তি বাকি',
   },
 }
