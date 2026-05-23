@@ -79,7 +79,8 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   function waitForAuth() {
-    return authReadyPromise
+    const timeoutFallback = new Promise((resolve) => setTimeout(resolve, 10000))
+    return Promise.race([authReadyPromise, timeoutFallback])
   }
 
   async function fetchUserProfile(uid) {
