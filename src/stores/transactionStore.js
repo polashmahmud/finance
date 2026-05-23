@@ -1,6 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  writeBatch,
+  increment,
+} from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
 
 export const useTransactionStore = defineStore('transactions', () => {
@@ -111,6 +120,76 @@ export const useTransactionStore = defineStore('transactions', () => {
     )
   }
 
+  // Atomically writes transaction + updates account balance in a single batch.
+  // Prevents balance/transaction inconsistency on network failure mid-write.
+  async function addTransactionWithBalance(tx) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+
+    const txsRef = collection(firestore, `users/${uid}/transactions`)
+    const newTxRef = doc(txsRef)
+    const docData = {
+      type: tx.type,
+      amount: tx.amount || 0,
+      category: tx.category || '',
+      accountId: tx.accountId || null,
+      fromAccountId: tx.fromAccountId || null,
+      toAccountId: tx.toAccountId || null,
+      fee: tx.fee || 0,
+      date: tx.date || new Date().toISOString().slice(0, 10),
+      time: tx.time || new Date().toTimeString().slice(0, 5),
+      notes: tx.notes || '',
+      createdAt: Date.now(),
+    }
+
+    // Optimistic update for instant UI feedback
+    const tempId = `temp_${Date.now()}`
+    transactions.value.unshift({ id: tempId, ...docData })
+
+    const batch = writeBatch(firestore)
+    batch.set(newTxRef, docData)
+
+    if (tx.accountId) {
+      const sign = tx.type === 'income' ? 1 : -1
+      const accountRef = doc(firestore, `users/${uid}/accounts/${tx.accountId}`)
+      batch.update(accountRef, { balance: increment(sign * (tx.amount || 0)) })
+    }
+
+    batch
+      .commit()
+      .then(() => {
+        const idx = transactions.value.findIndex((t) => t.id === tempId)
+        if (idx >= 0) transactions.value[idx].id = newTxRef.id
+      })
+      .catch((err) => console.warn('[Firestore] Transaction+balance batch queued:', err))
+  }
+
+  // Atomically updates a transaction and adjusts account balances in a single batch.
+  // balanceChanges: array of { accountId, delta } — positive delta = increase balance
+  async function updateTransactionWithBalance(id, data, balanceChanges = []) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+
+    // Optimistic local update
+    const idx = transactions.value.findIndex((t) => t.id === id)
+    if (idx >= 0) Object.assign(transactions.value[idx], data)
+
+    const batch = writeBatch(firestore)
+    batch.update(doc(firestore, `users/${uid}/transactions/${id}`), data)
+
+    for (const { accountId, delta } of balanceChanges) {
+      if (accountId && delta !== 0) {
+        batch.update(doc(firestore, `users/${uid}/accounts/${accountId}`), {
+          balance: increment(delta),
+        })
+      }
+    }
+
+    batch
+      .commit()
+      .catch((err) => console.warn('[Firestore] Transaction update batch queued:', err))
+  }
+
   function searchTransactions(query) {
     const q = query.toLowerCase()
     return transactions.value.filter(
@@ -171,7 +250,9 @@ export const useTransactionStore = defineStore('transactions', () => {
     listenTransactions,
     fetchTransactions,
     addTransaction,
+    addTransactionWithBalance,
     updateTransaction,
+    updateTransactionWithBalance,
     deleteTransaction,
     searchTransactions,
     stopListening,

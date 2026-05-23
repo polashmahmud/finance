@@ -710,7 +710,7 @@ async function saveQuickEntry() {
   saving.value = true
   try {
     const now = new Date()
-    await transactions.addTransaction({
+    await transactions.addTransactionWithBalance({
       type: 'expense',
       amount: quickEntryForm.amount,
       category: quickEntryForm.category,
@@ -719,7 +719,6 @@ async function saveQuickEntry() {
       time: now.toTimeString().slice(0, 5),
       notes: quickEntryForm.notes || '',
     })
-    await accounts.updateBalance(quickEntryForm.accountId, -quickEntryForm.amount)
     $q.notify({ type: 'positive', message: t('addExpense.expenseAdded'), position: 'top' })
     quickEntryModalOpen.value = false
   } catch (err) {
@@ -854,16 +853,17 @@ async function saveEdit() {
       time: editForm.time,
       notes: editForm.notes,
     }
+    const balanceChanges = []
     if (editForm.type === 'income' || editForm.type === 'expense') {
       const sign = editForm.type === 'income' ? 1 : -1
       if (editForm.originalAccountId) {
-        await accounts.updateBalance(editForm.originalAccountId, -sign * editForm.originalAmount)
+        balanceChanges.push({ accountId: editForm.originalAccountId, delta: -sign * editForm.originalAmount })
       }
       if (editForm.accountId) {
-        await accounts.updateBalance(editForm.accountId, sign * editForm.amount)
+        balanceChanges.push({ accountId: editForm.accountId, delta: sign * editForm.amount })
       }
     }
-    await transactions.updateTransaction(editForm.id, updateData)
+    await transactions.updateTransactionWithBalance(editForm.id, updateData, balanceChanges)
     $q.notify({ type: 'positive', message: t('allTransactions.transactionUpdated'), position: 'top' })
     editDialogOpen.value = false
   } catch (err) {

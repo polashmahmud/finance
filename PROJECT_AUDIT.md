@@ -16,10 +16,10 @@
 ### 🟠 P1 — High
 
 - [ ] SEC-04 — Add Firestore write validators for amount field
-- [ ] SEC-05 — Replace raw `console.error` with sanitized logger (`src/utils/logger.js`)
+- [x] SEC-05 — Replace raw `console.error` with sanitized logger (`src/utils/logger.js`)
 - [ ] SEC-06 — Move PIN hash to `sessionStorage`, add 10-min inactivity lock
 - [ ] SEC-07 — Move avatar upload to Firebase Storage, store URL not base64
-- [ ] SEC-09 — Fix balance update with Firestore batch write
+- [x] SEC-09 — Fix balance update with Firestore batch write
 - [x] BUG-01 — Add 10s timeout to auth ready promise in `src/router/index.js`
 - [ ] BUG-02 — Cascade delete transactions when category/account deleted
 - [x] BUG-04 — Unsubscribe `onSnapshot` in `onUnmounted` in `ReportsPage.vue`
