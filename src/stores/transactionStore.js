@@ -85,7 +85,11 @@ export const useTransactionStore = defineStore('transactions', () => {
         const idx = transactions.value.findIndex((t) => t.id === tempId)
         if (idx >= 0) transactions.value[idx].id = ref.id
       })
-      .catch((err) => console.warn('[Firestore] Transaction write queued:', err))
+      .catch((err) => {
+        // Remove the optimistic temp item if the write fails (e.g. security rule violation)
+        transactions.value = transactions.value.filter((t) => t.id !== tempId)
+        console.warn('[Firestore] Transaction write failed, rolled back:', err)
+      })
   }
 
   async function updateTransaction(id, data) {
