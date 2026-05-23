@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
+import { logError, logWarn } from 'src/utils/logger'
 
 export const useLoanStore = defineStore('loans', () => {
   const loans = ref([])
@@ -144,7 +145,7 @@ export const useLoanStore = defineStore('loans', () => {
         loading.value = false
       },
       (error) => {
-        console.error('Error fetching loans:', error)
+        logError('loanStore/listenLoans', error)
         loading.value = false
       },
     )
@@ -172,7 +173,7 @@ export const useLoanStore = defineStore('loans', () => {
         const idx = loans.value.findIndex((l) => l.id === tempId)
         if (idx >= 0) loans.value[idx].id = ref.id
       })
-      .catch((err) => console.warn('[Firestore] Loan write queued:', err))
+      .catch((err) => logWarn('loanStore/addLoan', err))
   }
 
   async function addPayment(loanId, payment) {
@@ -204,7 +205,7 @@ export const useLoanStore = defineStore('loans', () => {
       paidAmount: newPaidAmount,
       payments: newPayments,
       settled,
-    }).catch((err) => console.warn('[Firestore] Payment update queued:', err))
+    }).catch((err) => logWarn('loanStore/addPayment', err))
   }
 
   async function updatePayment(loanId, paymentIndex, updatedPayment) {
@@ -226,7 +227,7 @@ export const useLoanStore = defineStore('loans', () => {
 
     const loanRef = doc(firestore, `users/${uid}/loans/${loanId}`)
     updateDoc(loanRef, { payments: newPayments, paidAmount: newPaidAmount, settled }).catch((err) =>
-      console.warn('[Firestore] Payment update queued:', err),
+      logWarn('loanStore/updatePayment', err),
     )
   }
 
@@ -247,7 +248,7 @@ export const useLoanStore = defineStore('loans', () => {
 
     const loanRef = doc(firestore, `users/${uid}/loans/${loanId}`)
     updateDoc(loanRef, { payments: newPayments, paidAmount: newPaidAmount, settled }).catch((err) =>
-      console.warn('[Firestore] Payment delete queued:', err),
+      logWarn('loanStore/deletePayment', err),
     )
   }
 
@@ -258,7 +259,7 @@ export const useLoanStore = defineStore('loans', () => {
     if (idx >= 0) Object.assign(loans.value[idx], data)
 
     const loanRef = doc(firestore, `users/${uid}/loans/${id}`)
-    updateDoc(loanRef, data).catch((err) => console.warn('[Firestore] Loan update queued:', err))
+    updateDoc(loanRef, data).catch((err) => logWarn('loanStore/updateLoan', err))
   }
 
   async function deleteLoan(id) {
@@ -267,7 +268,7 @@ export const useLoanStore = defineStore('loans', () => {
     loans.value = loans.value.filter((l) => l.id !== id)
 
     deleteDoc(doc(firestore, `users/${uid}/loans/${id}`)).catch((err) =>
-      console.warn('[Firestore] Loan delete queued:', err),
+      logWarn('loanStore/deleteLoan', err),
     )
   }
 
@@ -347,7 +348,7 @@ export const useLoanStore = defineStore('loans', () => {
         const idx = loans.value.findIndex((l) => l.id === tempId)
         if (idx >= 0) loans.value[idx].id = ref.id
       })
-      .catch((err) => console.warn('[Firestore] Loan write queued:', err))
+      .catch((err) => logWarn('loanStore/addLoanWithInstallments', err))
   }
 
   function recalculateInstallments(loan) {
@@ -427,7 +428,7 @@ export const useLoanStore = defineStore('loans', () => {
       totalAmount: loan.totalAmount,
       paidAmount: loan.paidAmount,
       settled: loan.settled,
-    }).catch((err) => console.warn('[Firestore] Installment payment queued:', err))
+    }).catch((err) => logWarn('loanStore/payInstallment', err))
   }
 
   // Reset an installment to unpaid state (clear all sub-payments)
@@ -457,7 +458,7 @@ export const useLoanStore = defineStore('loans', () => {
       totalAmount: loan.totalAmount,
       paidAmount: loan.paidAmount,
       settled: loan.settled,
-    }).catch((err) => console.warn('[Firestore] Installment reset queued:', err))
+    }).catch((err) => logWarn('loanStore/resetInstallment', err))
   }
 
   function stopListening() {
@@ -487,7 +488,7 @@ export const useLoanStore = defineStore('loans', () => {
           resolve()
         },
         (error) => {
-          console.error('Error fetching loans:', error)
+          logError('loanStore/fetchLoans', error)
           loading.value = false
           resolve()
         },

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
+import { logError, logWarn } from 'src/utils/logger'
 
 export const useTransactionStore = defineStore('transactions', () => {
   const transactions = ref([])
@@ -49,7 +50,7 @@ export const useTransactionStore = defineStore('transactions', () => {
         loading.value = false
       },
       (error) => {
-        console.error('Error fetching transactions:', error)
+        logError('transactionStore/listenTransactions', error)
         loading.value = false
       },
     )
@@ -85,7 +86,7 @@ export const useTransactionStore = defineStore('transactions', () => {
         const idx = transactions.value.findIndex((t) => t.id === tempId)
         if (idx >= 0) transactions.value[idx].id = ref.id
       })
-      .catch((err) => console.warn('[Firestore] Transaction write queued:', err))
+      .catch((err) => logWarn('transactionStore/addTransaction', err))
   }
 
   async function updateTransaction(id, data) {
@@ -96,9 +97,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     if (idx >= 0) Object.assign(transactions.value[idx], data)
 
     const txRef = doc(firestore, `users/${uid}/transactions/${id}`)
-    updateDoc(txRef, data).catch((err) =>
-      console.warn('[Firestore] Transaction update queued:', err),
-    )
+    updateDoc(txRef, data).catch((err) => logWarn('transactionStore/updateTransaction', err))
   }
 
   async function deleteTransaction(id) {
@@ -107,7 +106,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     // Optimistically remove from local state immediately
     transactions.value = transactions.value.filter((t) => t.id !== id)
     deleteDoc(doc(firestore, `users/${uid}/transactions/${id}`)).catch((err) =>
-      console.warn('[Firestore] Transaction delete queued:', err),
+      logWarn('transactionStore/deleteTransaction', err),
     )
   }
 
@@ -154,7 +153,7 @@ export const useTransactionStore = defineStore('transactions', () => {
           resolve() // Resolve promise when data is loaded
         },
         (error) => {
-          console.error('Error fetching transactions:', error)
+          logError('transactionStore/fetchTransactions', error)
           loading.value = false
           resolve() // Resolve anyway to not block the UI
         },

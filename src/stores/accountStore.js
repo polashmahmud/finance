@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
+import { logError, logWarn } from 'src/utils/logger'
 
 export const useAccountStore = defineStore('accounts', () => {
   const accounts = ref([])
@@ -30,7 +31,7 @@ export const useAccountStore = defineStore('accounts', () => {
         loading.value = false
       },
       (error) => {
-        console.error('Error fetching accounts:', error)
+        logError('accountStore/listenAccounts', error)
         loading.value = false
       },
     )
@@ -56,7 +57,7 @@ export const useAccountStore = defineStore('accounts', () => {
         const idx = accounts.value.findIndex((a) => a.id === tempId)
         if (idx >= 0) accounts.value[idx].id = ref.id
       })
-      .catch((err) => console.warn('[Firestore] Account write queued:', err))
+      .catch((err) => logWarn('accountStore/addAccount', err))
   }
 
   async function updateAccount(id, data) {
@@ -67,7 +68,7 @@ export const useAccountStore = defineStore('accounts', () => {
     if (idx >= 0) Object.assign(accounts.value[idx], data)
 
     const accRef = doc(firestore, `users/${uid}/accounts/${id}`)
-    updateDoc(accRef, data).catch((err) => console.warn('[Firestore] Account update queued:', err))
+    updateDoc(accRef, data).catch((err) => logWarn('accountStore/updateAccount', err))
   }
 
   async function updateBalance(accountId, amount) {
@@ -86,7 +87,7 @@ export const useAccountStore = defineStore('accounts', () => {
 
     // Fire-and-forget: persistentLocalCache queues offline writes automatically
     updateDoc(accRef, { balance: newBalance }).catch((err) =>
-      console.warn('[Firestore] Balance update queued:', err),
+      logWarn('accountStore/updateBalance', err),
     )
   }
 
@@ -97,7 +98,7 @@ export const useAccountStore = defineStore('accounts', () => {
     accounts.value = accounts.value.filter((a) => a.id !== id)
 
     deleteDoc(doc(firestore, `users/${uid}/accounts/${id}`)).catch((err) =>
-      console.warn('[Firestore] Account delete queued:', err),
+      logWarn('accountStore/deleteAccount', err),
     )
   }
 
@@ -131,7 +132,7 @@ export const useAccountStore = defineStore('accounts', () => {
           resolve() // Resolve promise when data is loaded
         },
         (error) => {
-          console.error('Error fetching accounts:', error)
+          logError('accountStore/fetchAccounts', error)
           loading.value = false
           resolve() // Resolve anyway to not block the UI
         },

@@ -10,6 +10,7 @@ import {
   deleteField,
 } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
+import { logError, logWarn } from 'src/utils/logger'
 
 export const useMarketListStore = defineStore('marketLists', () => {
   const lists = ref([])
@@ -70,7 +71,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
         loading.value = false
       },
       (error) => {
-        console.error('Error fetching market lists:', error)
+        logError('marketListStore/listenLists', error)
         loading.value = false
       },
     )
@@ -99,7 +100,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
       items: [],
     })
 
-    setDoc(newDocRef, docData).catch((err) => console.warn('[Firestore] List write queued:', err))
+    setDoc(newDocRef, docData).catch((err) => logWarn('marketListStore/addList', err))
     return newDocRef.id
   }
 
@@ -110,7 +111,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
     lists.value = lists.value.filter((l) => l.id !== id)
 
     deleteDoc(doc(firestore, `users/${uid}/marketLists/${id}`)).catch((err) =>
-      console.warn('[Firestore] List delete queued:', err),
+      logWarn('marketListStore/deleteList', err),
     )
   }
 
@@ -122,7 +123,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
     if (idx >= 0) Object.assign(lists.value[idx], data)
 
     updateDoc(doc(firestore, `users/${uid}/marketLists/${id}`), data).catch((err) =>
-      console.warn('[Firestore] List update queued:', err),
+      logWarn('marketListStore/updateList', err),
     )
   }
 
@@ -143,7 +144,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
     }
 
     updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), updates).catch((err) =>
-      console.warn('[Firestore] Item update queued:', err),
+      logWarn('marketListStore/updateItem', err),
     )
   }
 
@@ -169,7 +170,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
 
     const updates = { [`items.${itemId}`]: itemData }
     updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), updates).catch((err) =>
-      console.warn('[Firestore] Item add queued:', err),
+      logWarn('marketListStore/addItem', err),
     )
   }
 
@@ -185,7 +186,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
 
     updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), {
       [`items.${itemId}.bought`]: !currentValue,
-    }).catch((err) => console.warn('[Firestore] Toggle bought queued:', err))
+    }).catch((err) => logWarn('marketListStore/toggleBought', err))
   }
 
   async function removeItem(listId, itemId) {
@@ -199,7 +200,7 @@ export const useMarketListStore = defineStore('marketLists', () => {
 
     updateDoc(doc(firestore, `users/${uid}/marketLists/${listId}`), {
       [`items.${itemId}`]: deleteField(),
-    }).catch((err) => console.warn('[Firestore] Item remove queued:', err))
+    }).catch((err) => logWarn('marketListStore/removeItem', err))
   }
 
   function getListTotal(listId) {

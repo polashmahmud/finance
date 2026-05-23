@@ -436,6 +436,7 @@ import { ref, reactive, computed, onMounted, onUnmounted, watch, nextTick } from
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { useMarketListStore } from 'stores/marketListStore'
+import { logError } from 'src/utils/logger'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useAccountStore } from 'stores/accountStore'
 import { useCategoryStore } from 'stores/categoryStore'
@@ -721,7 +722,7 @@ async function shareList(list) {
       $q.notify({ type: 'positive', message: t('marketLists.shareSuccess'), position: 'top' })
     } catch (err) {
       // User cancelled share or it failed
-      console.error('Error sharing:', err)
+      logError('MarketListsPage/share', err)
     }
   } else {
     // Fallback to clipboard

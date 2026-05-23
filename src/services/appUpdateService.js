@@ -8,6 +8,7 @@ import {
 } from '@capawesome/capacitor-app-update'
 import { Dialog, Notify } from 'quasar'
 import i18n from 'src/i18n'
+import { logError } from 'src/utils/logger'
 
 const UPDATE_CHECK_INTERVAL_MS = 5 * 60 * 1000
 const RESUME_CHECK_DELAY_MS = 1200
@@ -112,7 +113,7 @@ async function openPlayStoreFallback() {
   try {
     await AppUpdate.openAppStore()
   } catch (error) {
-    console.error('[AppUpdate] Failed to open Play Store', error)
+    logError('appUpdateService/openPlayStore', error)
   }
 }
 
@@ -145,7 +146,7 @@ async function performImmediateUpdateFlow() {
 
     return result
   } catch (error) {
-    console.error('[AppUpdate] Immediate update failed', error)
+    logError('appUpdateService/immediateUpdate', error)
     Notify.create({ type: 'negative', message: t('appUpdate.failed') })
     return null
   }
@@ -170,7 +171,7 @@ async function startFlexibleUpdateFlow(info) {
           notifyUpdateResult(result.code)
           resolve(result)
         } catch (error) {
-          console.error('[AppUpdate] Flexible update failed', error)
+          logError('appUpdateService/flexibleUpdate', error)
           Notify.create({ type: 'negative', message: t('appUpdate.failed') })
           resolve(null)
         }
@@ -215,7 +216,7 @@ export async function completeFlexibleUpdate() {
   try {
     await AppUpdate.completeFlexibleUpdate()
   } catch (error) {
-    console.error('[AppUpdate] Failed to complete flexible update', error)
+    logError('appUpdateService/completeFlexibleUpdate', error)
     Notify.create({ type: 'negative', message: t('appUpdate.failed') })
   }
 }
@@ -281,7 +282,7 @@ export async function checkForAppUpdate({
 
       return info
     } catch (error) {
-      console.error(`[AppUpdate] Failed to check for update on ${source}`, error)
+      logError(`appUpdateService/checkUpdate/${source}`, error)
       return null
     } finally {
       checkInFlight = null
@@ -300,6 +301,6 @@ export async function initAppUpdate({ mode = APP_UPDATE_MODES.SMART } = {}) {
     await ensureListeners(mode)
     await checkForAppUpdate({ mode, force: true, source: 'launch' })
   } catch (error) {
-    console.error('[AppUpdate] Failed to initialize app updates', error)
+    logError('appUpdateService/initialize', error)
   }
 }

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
+import { logError, logWarn } from 'src/utils/logger'
 
 export const useNoteStore = defineStore('notes', () => {
   const notes = ref([])
@@ -30,7 +31,7 @@ export const useNoteStore = defineStore('notes', () => {
         loading.value = false
       },
       (error) => {
-        console.error('Error fetching notes:', error)
+        logError('noteStore/listenNotes', error)
         loading.value = false
       },
     )
@@ -54,7 +55,7 @@ export const useNoteStore = defineStore('notes', () => {
         const idx = notes.value.findIndex((n) => n.id === tempId)
         if (idx >= 0) notes.value[idx].id = ref.id
       })
-      .catch((err) => console.warn('[Firestore] Note write queued:', err))
+      .catch((err) => logWarn('noteStore/addNote', err))
   }
 
   async function updateNote(id, data) {
@@ -71,7 +72,7 @@ export const useNoteStore = defineStore('notes', () => {
     updateDoc(noteRef, {
       title: data.title,
       description: data.description || '',
-    }).catch((err) => console.warn('[Firestore] Note update queued:', err))
+    }).catch((err) => logWarn('noteStore/updateNote', err))
   }
 
   async function deleteNote(id) {
@@ -81,7 +82,7 @@ export const useNoteStore = defineStore('notes', () => {
     notes.value = notes.value.filter((n) => n.id !== id)
 
     deleteDoc(doc(firestore, `users/${uid}/notes/${id}`)).catch((err) =>
-      console.warn('[Firestore] Note delete queued:', err),
+      logWarn('noteStore/deleteNote', err),
     )
   }
 
@@ -94,7 +95,7 @@ export const useNoteStore = defineStore('notes', () => {
 
     const noteRef = doc(firestore, `users/${uid}/notes/${id}`)
     updateDoc(noteRef, { pinned: !currentValue }).catch((err) =>
-      console.warn('[Firestore] Pin toggle queued:', err),
+      logWarn('noteStore/togglePin', err),
     )
   }
 
