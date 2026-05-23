@@ -1,0 +1,129 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: request is from an authenticated user
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Helper: authenticated user owns this userId path
+    function isOwner(userId) {
+      return isAuth() && request.auth.uid == userId;
+    }
+
+    // Helper: validate transaction write data
+    function validTransaction() {
+      let d = request.resource.data;
+      return d.amount is number
+          && d.amount > 0
+          && d.amount < 10000000
+          && d.type in ['income', 'expense', 'transfer']
+          && d.createdAt is number;
+    }
+
+    // Helper: validate account write data
+    function validAccount() {
+      let d = request.resource.data;
+      return d.name is string
+          && d.name.size() > 0
+          && d.name.size() <= 100
+          && d.balance is number;
+    }
+
+    // Helper: validate category write data
+    function validCategory() {
+      let d = request.resource.data;
+      return d.name is string
+          && d.name.size() > 0
+          && d.name.size() <= 100
+          && d.type in ['income', 'expense'];
+    }
+
+    // User profile document: users/{userId}
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+                    && request.resource.data.uid == userId;
+      allow update: if isOwner(userId)
+                    // Prevent changing uid or email via client
+                    && (!request.resource.data.diff(resource.data).affectedKeys()
+                          .hasAny(['uid']));
+      allow delete: if false; // never allow client-side profile delete
+
+      // Transactions subcollection
+      match /transactions/{txId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && validTransaction();
+        allow update: if isOwner(userId) && validTransaction();
+        allow delete: if isOwner(userId);
+      }
+
+      // Accounts subcollection
+      match /accounts/{accountId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && validAccount();
+        allow update: if isOwner(userId) && validAccount();
+        allow delete: if isOwner(userId);
+      }
+
+      // Categories subcollection
+      match /categories/{categoryId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && validCategory();
+        allow update: if isOwner(userId) && validCategory();
+        allow delete: if isOwner(userId);
+      }
+
+      // Notes subcollection
+      match /notes/{noteId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+                      && request.resource.data.keys().hasAll(['content'])
+                      && request.resource.data.content is string
+                      && request.resource.data.content.size() <= 10000;
+        allow update: if isOwner(userId)
+                      && request.resource.data.content is string
+                      && request.resource.data.content.size() <= 10000;
+        allow delete: if isOwner(userId);
+      }
+
+      // Market lists subcollection
+      match /marketLists/{listId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+                      && request.resource.data.name is string
+                      && request.resource.data.name.size() > 0
+                      && request.resource.data.name.size() <= 100;
+        allow update: if isOwner(userId);
+        allow delete: if isOwner(userId);
+      }
+
+      // Loans subcollection
+      match /loans/{loanId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+                      && request.resource.data.amount is number
+                      && request.resource.data.amount > 0
+                      && request.resource.data.amount < 10000000;
+        allow update: if isOwner(userId);
+        allow delete: if isOwner(userId);
+      }
+
+      // Occasion goals subcollection
+      match /occasionGoals/{goalId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+                      && request.resource.data.targetAmount is number
+                      && request.resource.data.targetAmount > 0;
+        allow update: if isOwner(userId);
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
