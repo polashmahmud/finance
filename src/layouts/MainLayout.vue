@@ -355,7 +355,7 @@
 
     <!-- Floating Action Button (mobile only) -->
     <q-btn v-if="showFab && $q.screen.lt.md" class="finance-fab" icon="add" text-color="white"
-      round size="lg" unelevated style="position: fixed; right: 16px; z-index: 100" @click="quickAddOpen = true" />
+      round size="lg" unelevated style="position: fixed; right: 16px; bottom: 72px; z-index: 100" @click="quickAddOpen = true" />
 
     <!-- Quick Add Dialog -->
     <q-dialog v-model="quickAddOpen">
@@ -385,7 +385,7 @@
 
     <!-- Bottom Navigation (mobile only) -->
     <q-footer v-if="showBottomNav && $q.screen.lt.sm" class="bg-white text-grey-8 finance-bottom-nav" bordered>
-      <q-tabs v-model="currentTab" dense active-color="dark" indicator-color="dark" class="text-grey-5"
+      <q-tabs v-model="currentTab" active-color="dark" indicator-color="dark" class="text-grey-5"
         narrow-indicator>
         <q-route-tab name="home" icon="home" :label="$t('nav.home')" to="/dashboard" exact />
         <q-route-tab name="accounts" icon="account_balance_wallet" :label="$t('nav.accounts')"
@@ -717,6 +717,28 @@ async function onLogout() {
 }
 .profile-logout-btn:hover {
   background: #fbeae6;
+}
+
+/* ===== Bottom Navigation ===== */
+.finance-bottom-nav {
+  height: 60px;
+  box-shadow: 0 -1px 8px rgba(22, 22, 26, 0.08);
+}
+
+.finance-bottom-nav .q-tabs {
+  height: 60px;
+}
+
+.finance-bottom-nav .q-tab {
+  padding: 4px 0;
+  min-height: 60px;
+}
+
+.finance-bottom-nav .q-tab__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 2px;
+  line-height: 1.2;
 }
 
 /* ===== Sidebar nav item overrides ===== */

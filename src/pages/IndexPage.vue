@@ -214,6 +214,58 @@
           </q-card>
         </div>
 
+        <!-- Occasion Goals -->
+        <div class="dash-section-header row items-center justify-between q-mb-sm">
+          <div class="dash-section-title">{{ $t('occasionGoals.nav') }}</div>
+          <q-btn flat dense no-caps color="dark" :label="$t('allTransactions.viewAll')" icon-right="chevron_right"
+            @click="$router.push('/dashboard/occasion-goals')" size="sm" />
+        </div>
+
+        <!-- Active goals -->
+        <div v-if="goalStore.activeGoals.length" class="goal-cards-row q-mb-md">
+          <q-card v-for="goal in goalStore.activeGoals.slice(0, 5)" :key="goal.id"
+            class="finance-card goal-dash-card cursor-pointer" @click="$router.push('/dashboard/occasion-goals')" v-ripple>
+            <q-card-section class="goal-card-inner">
+              <div class="row items-center justify-between no-wrap q-mb-xs">
+                <div class="goal-card-name ellipsis">{{ goal.name }}</div>
+                <div class="goal-badge" :class="goalProgress(goal) >= 100 ? 'goal-badge-done' : 'goal-badge-active'">
+                  {{ goalProgress(goal) }}%
+                </div>
+              </div>
+              <q-linear-progress
+                :value="goalProgress(goal) / 100"
+                :color="goalProgress(goal) >= 100 ? 'positive' : 'amber-8'"
+                track-color="grey-3"
+                rounded
+                style="height: 5px; border-radius: 4px;"
+                class="q-mb-sm"
+              />
+              <div class="row items-center justify-between">
+                <div class="goal-card-saved">
+                  {{ settings.currency }}{{ formatShort(goal.currentSaved) }}
+                  <span class="goal-card-target"> / {{ settings.currency }}{{ formatShort(goal.targetAmount) }}</span>
+                </div>
+                <div v-if="goalDaysLeft(goal) !== null" class="goal-days-left">
+                  {{ goalDaysLeft(goal) }}d
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
+
+        <!-- No goals promo -->
+        <q-card v-else class="finance-card cursor-pointer q-mb-md" @click="$router.push('/dashboard/occasion-goals')" v-ripple>
+          <q-card-section class="row items-center q-gutter-md q-pa-md">
+            <q-avatar style="background: #fef3c7;" size="40px">
+              <q-icon name="savings" style="color:#d97706;" size="22px" />
+            </q-avatar>
+            <div>
+              <div style="font-size:0.85rem; font-weight:600; color:#16161a;">{{ $t('occasionGoals.noGoals') }}</div>
+              <div style="font-size:0.75rem; color:#7c7a73;">{{ $t('occasionGoals.addPrompt') }}</div>
+            </div>
+          </q-card-section>
+        </q-card>
+
         <!-- Budget Status -->
         <div class="dash-section-header row items-center justify-between q-mb-sm">
           <div class="dash-section-title">{{ $t('dashboard.budgetStatus') }}</div>
@@ -539,6 +591,7 @@ import { useCategoryStore } from 'stores/categoryStore'
 import { useSettingsStore } from 'stores/settingsStore'
 import { useAuthStore } from 'stores/authStore'
 import { useLoanStore } from 'stores/loanStore'
+import { useOccasionGoalStore } from 'stores/occasionGoalStore'
 
 const { t } = useI18n()
 const $q = useQuasar()
@@ -549,6 +602,7 @@ const categories = useCategoryStore()
 const settings = useSettingsStore()
 const authStore = useAuthStore()
 const loans = useLoanStore()
+const goalStore = useOccasionGoalStore()
 
 const editDialogOpen = ref(false)
 const saving = ref(false)
@@ -699,6 +753,7 @@ onMounted(() => {
   categories.listenCategories()
   transactions.listenTransactions()
   loans.listenLoans()
+  goalStore.listenGoals()
 })
 
 onUnmounted(() => {
@@ -706,6 +761,7 @@ onUnmounted(() => {
   categories.stopListening()
   transactions.stopListening()
   loans.stopListening()
+  goalStore.stopListening()
 })
 
 const hour = new Date().getHours()
@@ -875,6 +931,17 @@ async function confirmDeleteWithBalance() {
   }
   $q.notify({ type: 'positive', message: t('dashboard.transactionDeleted'), position: 'top' })
   deleteTxData.value = null
+}
+
+function goalProgress(goal) {
+  if (!goal.targetAmount) return 0
+  return Math.min(Math.round((goal.currentSaved / goal.targetAmount) * 100), 100)
+}
+
+function goalDaysLeft(goal) {
+  if (!goal.targetDate) return null
+  const diff = new Date(goal.targetDate) - new Date()
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
 }
 
 async function confirmDeleteOnly() {
@@ -1110,6 +1177,66 @@ async function confirmDeleteOnly() {
 
 .loan-due-section .loan-due-header {
   padding: 0 2px;
+}
+
+/* Occasion Goal cards */
+.goal-cards-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.goal-dash-card {
+  border-radius: 10px !important;
+}
+
+.goal-card-inner {
+  padding: 12px 14px !important;
+}
+
+.goal-card-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #16161a;
+  max-width: 70%;
+}
+
+.goal-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.04em;
+}
+
+.goal-badge-active {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.goal-badge-done {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.goal-card-saved {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #16161a;
+}
+
+.goal-card-target {
+  font-weight: 400;
+  color: #7c7a73;
+}
+
+.goal-days-left {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #7c7a73;
+  background: #f5f3ef;
+  padding: 2px 7px;
+  border-radius: 8px;
 }
 
 /* Budget scroll */
