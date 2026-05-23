@@ -860,6 +860,7 @@ export default {
     resetInstallmentConfirm: 'এই কিস্তির সব পেমেন্ট মুছে যাবে। নিশ্চিত করতে চান?',
     installmentReset: 'কিস্তি রিসেট হয়েছে',
     installmentConfirmed: 'কিস্তি পরিশোধ সফল হয়েছে',
+    undo: 'আনডো',
     loanSummary: 'লোন সারসংক্ষেপ',
     totalInterest: 'মোট সুদ',
     totalWithInterest: 'সুদসহ মোট',

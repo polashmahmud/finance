@@ -862,6 +862,7 @@ export default {
     resetInstallmentConfirm: 'All payments for this installment will be removed. Are you sure?',
     installmentReset: 'Installment reset',
     installmentConfirmed: 'Installment payment confirmed',
+    undo: 'Undo',
     loanSummary: 'Loan Summary',
     totalInterest: 'Total Interest',
     totalWithInterest: 'Total with Interest',

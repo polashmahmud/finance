@@ -489,6 +489,11 @@
                               icon="check_circle_outline" :label="$t('loans.alreadyPaid')"
                               @click.stop="openAlreadyPaidDialog(inst, idx)" style="border-radius: 8px;" />
                           </div>
+                          <div v-else-if="inst.paid" class="column q-gutter-xs items-end">
+                            <q-btn flat dense size="sm" color="warning"
+                              icon="undo" :label="$t('loans.undo')"
+                              @click.stop="confirmResetInstallment(inst, idx)" style="border-radius: 8px;" />
+                          </div>
                         </q-item-section>
                       </div>
                       <!-- Sub-payment history -->
@@ -697,6 +702,9 @@
             <q-input v-model.number="confirmInstallmentAmount" :label="$t('loans.actualPaidAmount')" type="number"
               outlined dense color="dark" :prefix="settings.currency"
               :rules="[val => val > 0 || $t('common.validAmount')]" style="margin-bottom: 10px;" />
+            <q-select v-model="confirmInstallmentAccountId" :options="accountOptions" :label="$t('common.account')"
+              outlined dense color="dark" emit-value map-options
+              :rules="[val => !!val || $t('common.accountRequired')]" style="margin-bottom: 10px;" />
             <q-checkbox v-model="confirmMarkAsPaid" :label="$t('loans.markAsPaid')" color="positive" class="q-mb-md" />
             <q-btn type="submit" class="full-width bg-primary-gradient" text-color="white" rounded unelevated
               :label="$t('loans.confirmPay')" :loading="confirmingInstallmentSaving" />
@@ -746,6 +754,7 @@ const showConfirmInstallmentDialog = ref(false)
 const confirmingInstallment = ref(null)
 const confirmingInstallmentIndex = ref(null)
 const confirmInstallmentAmount = ref(null)
+const confirmInstallmentAccountId = ref(null)
 const confirmMarkAsPaid = ref(true)
 const confirmingInstallmentSaving = ref(false)
 const showAlreadyPaidDialog = ref(false)
@@ -938,8 +947,24 @@ async function doMarkAlreadyPaid() {
       true, // always mark as paid
     )
     detailLoan.value = loanStore.loans.find((l) => l.id === loan.id)
-    $q.notify({ type: 'positive', message: t('loans.installmentConfirmed'), position: 'top' })
     showAlreadyPaidDialog.value = false
+    $q.notify({
+      type: 'positive',
+      message: t('loans.installmentConfirmed'),
+      position: 'top',
+      timeout: 5000,
+      actions: [
+        {
+          label: t('loans.undo'),
+          color: 'white',
+          handler: async () => {
+            await loanStore.resetInstallment(loan.id, idx)
+            detailLoan.value = loanStore.loans.find((l) => l.id === loan.id)
+            $q.notify({ type: 'info', message: t('loans.installmentReset'), position: 'top' })
+          },
+        },
+      ],
+    })
   } catch (err) {
     $q.notify({ type: 'negative', message: t('common.error') + err.message, position: 'top' })
   }
@@ -952,6 +977,7 @@ function openConfirmInstallment(inst, idx) {
   const alreadyPaid = inst.paidAmount || 0
   const remaining = Math.max(0, inst.amount - alreadyPaid)
   confirmInstallmentAmount.value = remaining > 0 ? remaining : inst.amount
+  confirmInstallmentAccountId.value = detailLoan.value?.accountId || accountStore.accounts[0]?.id || null
   confirmMarkAsPaid.value = true
   showConfirmInstallmentDialog.value = true
 }
@@ -968,12 +994,14 @@ async function doConfirmInstallment() {
     const newTotal = alreadyPaid + amount
     const markAsPaid = confirmMarkAsPaid.value || newTotal >= inst.amount
 
+    const selectedAccountId = confirmInstallmentAccountId.value
+
     await loanStore.addInstallmentPayment(
       loan.id,
       confirmingInstallmentIndex.value,
       {
         amount,
-        accountId: loan.accountId,
+        accountId: selectedAccountId,
         date: new Date().toISOString().slice(0, 10),
         notes: '',
       },
@@ -981,14 +1009,14 @@ async function doConfirmInstallment() {
     )
 
     // Deduct from account
-    await accountStore.updateBalance(loan.accountId, -amount)
+    if (selectedAccountId) await accountStore.updateBalance(selectedAccountId, -amount)
 
     // Create expense transaction
     const txData = {
       type: 'expense',
       amount,
       category: t('loans.installmentPayment'),
-      accountId: loan.accountId,
+      accountId: selectedAccountId,
       date: new Date().toISOString().slice(0, 10),
       time: new Date().toTimeString().slice(0, 5),
       notes: `${t('loans.installment')} #${inst.number} - ${loan.personName}`,
@@ -1038,7 +1066,7 @@ async function updateLoan() {
 function openPaymentDialog(loan) {
   payingLoan.value = loan
   payForm.amount = null
-  payForm.accountId = null
+  payForm.accountId = accountStore.accounts[0]?.id || null
   payForm.date = new Date().toISOString().slice(0, 10)
   payForm.notes = ''
   showPaymentDialog.value = true
@@ -1199,6 +1227,29 @@ function cancelDeletePayment() {
   showDeletePaymentDialog.value = false
   deletingPayment.value = null
   deletingPaymentIndex.value = null
+}
+
+function confirmResetInstallment(inst, idx) {
+  $q.dialog({
+    title: t('loans.resetInstallmentTitle'),
+    message: t('loans.resetInstallmentConfirm'),
+    ok: { label: t('loans.undo'), color: 'warning', flat: true },
+    cancel: { label: t('common.cancel'), flat: true },
+  }).onOk(async () => {
+    const loan = detailLoan.value
+
+    // Reverse account balances for any payments that had an accountId
+    const payments = inst.payments || []
+    for (const p of payments) {
+      if (p.accountId && p.amount) {
+        await accountStore.updateBalance(p.accountId, p.amount)
+      }
+    }
+
+    await loanStore.resetInstallment(loan.id, idx)
+    detailLoan.value = loanStore.loans.find((l) => l.id === loan.id)
+    $q.notify({ type: 'info', message: t('loans.installmentReset'), position: 'top' })
+  })
 }
 
 function confirmDelete(loan) {
