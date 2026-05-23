@@ -42,3 +42,6 @@ GoogleService-Info.plist
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Local audit/analysis files — do not commit
+PROJECT_AUDIT.md
