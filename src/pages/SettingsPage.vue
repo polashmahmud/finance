@@ -631,7 +631,7 @@ import { Notify } from 'quasar'
 import { collection, getDocs, deleteDoc, addDoc, setDoc, doc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
 
-const ALLOWED_COLLECTIONS = ['transactions', 'accounts', 'categories', 'notes', 'marketLists', 'loans']
+const ALLOWED_COLLECTIONS = ['transactions', 'accounts', 'categories', 'notes', 'marketLists', 'loans', 'occasionGoals']
 
 const { t } = useI18n()
 const settings = useSettingsStore()

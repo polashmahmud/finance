@@ -80,6 +80,10 @@
                 <q-item-section avatar><q-icon name="account_balance" size="20px" color="grey-8" /></q-item-section>
                 <q-item-section>{{ $t('nav.loans') }}</q-item-section>
               </q-item>
+              <q-item clickable v-close-popup @click="$router.push('/dashboard/occasion-goals')" class="profile-menu-item">
+                <q-item-section avatar><q-icon name="savings" size="20px" color="grey-8" /></q-item-section>
+                <q-item-section>{{ $t('occasionGoals.nav') }}</q-item-section>
+              </q-item>
 
               <q-separator class="q-my-xs" />
 
@@ -160,6 +164,10 @@
                 <div class="panel-nav-item" v-ripple @click="profileMenuNav('/dashboard/loans')">
                   <div class="panel-nav-icon" style="background: rgba(22,22,26,0.06);"><q-icon name="account_balance" size="22px" style="color:#5e5b54" /></div>
                   <span>{{ $t('nav.loans') }}</span>
+                </div>
+                <div class="panel-nav-item" v-ripple @click="profileMenuNav('/dashboard/occasion-goals')">
+                  <div class="panel-nav-icon" style="background: #fef3c7;"><q-icon name="savings" size="22px" style="color:#d97706" /></div>
+                  <span>{{ $t('occasionGoals.nav') }}</span>
                 </div>
               </div>
 
@@ -283,6 +291,15 @@
               </div>
             </q-item-section>
             <q-item-section class="sidebar-nav-label">{{ $t('nav.loans') }}</q-item-section>
+          </q-item>
+
+          <q-item clickable v-ripple to="/dashboard/occasion-goals" active-class="sidebar-item-active" class="sidebar-nav-item">
+            <q-item-section avatar style="min-width: 40px;">
+              <div class="sidebar-icon-wrap">
+                <q-icon name="savings" size="17px" style="color: rgba(255,255,255,0.55);" />
+              </div>
+            </q-item-section>
+            <q-item-section class="sidebar-nav-label">{{ $t('occasionGoals.nav') }}</q-item-section>
           </q-item>
 
           <div class="sidebar-sep"></div>
