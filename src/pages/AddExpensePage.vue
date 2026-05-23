@@ -133,8 +133,7 @@ async function saveExpense() {
   if (!form.amount || form.amount <= 0) return
   saving.value = true
   try {
-    await transactions.addTransaction({ ...form, type: 'expense' })
-    await accounts.updateBalance(form.accountId, -form.amount)
+    await transactions.addTransactionWithBalance({ ...form, type: 'expense' })
     $q.notify({ type: 'positive', message: t('addExpense.expenseAdded'), position: 'top' })
     router.back()
   } catch (err) {

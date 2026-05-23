@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
+import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, increment } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
 
 export const useAccountStore = defineStore('accounts', () => {
@@ -77,15 +77,11 @@ export const useAccountStore = defineStore('accounts', () => {
     if (!uid) return
     const accRef = doc(firestore, `users/${uid}/accounts/${accountId}`)
 
-    const currentBalance = Number(acc.balance || 0)
-    const amountToUpdate = Number(amount || 0)
-    const newBalance = currentBalance + amountToUpdate
+    // Optimistically update pinia state so UI reflects the change immediately
+    acc.balance = Number(acc.balance || 0) + Number(amount || 0)
 
-    // Optimistically update pinia state immediately so UI reflects the change
-    acc.balance = newBalance
-
-    // Fire-and-forget: persistentLocalCache queues offline writes automatically
-    updateDoc(accRef, { balance: newBalance }).catch((err) =>
+    // Use increment() to avoid read-modify-write race conditions on concurrent writes
+    updateDoc(accRef, { balance: increment(Number(amount || 0)) }).catch((err) =>
       console.warn('[Firestore] Balance update queued:', err),
     )
   }
