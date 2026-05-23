@@ -867,5 +867,8 @@ export default {
     totalInterest: 'Total Interest',
     totalWithInterest: 'Total with Interest',
     perInstallment: 'Per Installment',
+    upcomingSchedule: 'Upcoming Repayment Schedule',
+    thisMonthBadge: 'This Month',
+    scheduleTotal: 'Total Remaining',
   },
 }

@@ -77,6 +77,27 @@ export const useLoanStore = defineStore('loans', () => {
     return count
   })
 
+  const upcomingMonthlySchedule = computed(() => {
+    const now = new Date()
+    const currentYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    const monthMap = {}
+
+    for (const loan of loanEntries.value) {
+      if (loan.settled || !loan.installments) continue
+      for (const inst of loan.installments) {
+        if (inst.paid) continue
+        const d = new Date(inst.dueDate)
+        const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        if (ym < currentYM) continue
+        if (!monthMap[ym]) monthMap[ym] = { month: ym, total: 0, count: 0 }
+        monthMap[ym].total += (inst.amount || 0) - (inst.paidAmount || 0)
+        monthMap[ym].count++
+      }
+    }
+
+    return Object.values(monthMap).sort((a, b) => a.month.localeCompare(b.month))
+  })
+
   const thisMonthDueList = computed(() => {
     const now = new Date()
     const y = now.getFullYear()
@@ -486,6 +507,7 @@ export const useLoanStore = defineStore('loans', () => {
     thisMonthDue,
     thisMonthDueCount,
     thisMonthDueList,
+    upcomingMonthlySchedule,
     listenLoans,
     fetchLoans,
     addLoan,

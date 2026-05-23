@@ -149,6 +149,52 @@
         </q-tab-panel>
 
         <q-tab-panel name="loan" class="q-pa-none">
+          <!-- Monthly Repayment Schedule -->
+          <div v-if="loanStore.upcomingMonthlySchedule.length" class="q-mb-md">
+            <div class="page-section-title">{{ $t('loans.upcomingSchedule') }}</div>
+            <q-card class="finance-card" style="overflow: hidden;">
+              <q-list separator dense>
+                <q-item v-for="item in loanStore.upcomingMonthlySchedule" :key="item.month"
+                  :style="isCurrentMonth(item.month) ? 'background: #fff8ec;' : ''">
+                  <q-item-section avatar>
+                    <q-avatar size="38px"
+                      :style="{ background: isCurrentMonth(item.month) ? '#f59e0b22' : 'var(--card-cream)' }">
+                      <q-icon name="calendar_month" size="18px"
+                        :style="{ color: isCurrentMonth(item.month) ? '#f59e0b' : '#888' }" />
+                    </q-avatar>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label class="text-weight-medium" style="font-size: 0.9rem;">
+                      {{ formatMonth(item.month) }}
+                      <q-badge v-if="isCurrentMonth(item.month)" color="amber-7" text-color="white"
+                        :label="$t('loans.thisMonthBadge')" class="q-ml-xs" style="font-size: 10px;" />
+                    </q-item-label>
+                    <q-item-label caption>{{ $t('loans.installmentsDue', { count: item.count }) }}</q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <div class="text-weight-bold"
+                      :style="{ color: isCurrentMonth(item.month) ? '#f59e0b' : 'var(--text-primary)', fontSize: '0.95rem' }">
+                      {{ settings.currency }}{{ settings.formatNumber(item.total) }}
+                    </div>
+                  </q-item-section>
+                </q-item>
+                <!-- Total row -->
+                <q-item style="background: var(--card-cream);">
+                  <q-item-section>
+                    <q-item-label class="text-weight-bold" style="font-size: 0.9rem;">
+                      {{ $t('loans.scheduleTotal') }}
+                    </q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <div class="text-weight-bold" style="color: #f59e0b; font-size: 0.95rem;">
+                      {{ settings.currency }}{{ settings.formatNumber(loanStore.upcomingMonthlySchedule.reduce((s, i) => s + i.total, 0)) }}
+                    </div>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-card>
+          </div>
+
           <div v-if="activeLoans(loanStore.loanEntries).length" class="q-mb-md">
             <div class="page-section-title">{{ $t('loans.activeLoans') }}</div>
             <div class="row q-col-gutter-sm">
@@ -864,6 +910,17 @@ function formatDate(dateStr) {
   if (!dateStr) return ''
   const locale = settings.language === 'bn' ? 'bn-BD' : 'en-US'
   return new Date(dateStr).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+function formatMonth(ym) {
+  const [y, m] = ym.split('-')
+  const locale = settings.language === 'bn' ? 'bn-BD' : 'en-US'
+  return new Date(parseInt(y), parseInt(m) - 1, 1).toLocaleDateString(locale, { year: 'numeric', month: 'long' })
+}
+
+function isCurrentMonth(ym) {
+  const now = new Date()
+  return ym === `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 }
 
 function openAddDialog() {

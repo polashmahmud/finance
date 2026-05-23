@@ -865,5 +865,8 @@ export default {
     totalInterest: 'মোট সুদ',
     totalWithInterest: 'সুদসহ মোট',
     perInstallment: 'প্রতি কিস্তি',
+    upcomingSchedule: 'আগামী কিস্তির সারসংক্ষেপ',
+    thisMonthBadge: 'এই মাস',
+    scheduleTotal: 'মোট বাকি',
   },
 }
