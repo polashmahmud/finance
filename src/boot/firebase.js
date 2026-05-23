@@ -2,6 +2,7 @@ import { boot } from 'quasar/wrappers'
 import { initializeApp } from 'firebase/app'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { initializeFirestore, persistentLocalCache } from 'firebase/firestore'
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -17,6 +18,19 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
+
+// App Check — blocks unauthorized clients from accessing Firebase backend.
+// In dev, expose debug token via self.FIREBASE_APPCHECK_DEBUG_TOKEN = true in console.
+if (import.meta.env.DEV) {
+  // eslint-disable-next-line no-restricted-globals
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true
+}
+
+initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+  isTokenAutoRefreshEnabled: true,
+})
+
 const auth = getAuth(app)
 
 // Initialize Firestore with offline persistence (single-tab — avoids slow IndexedDB lock acquisition)
