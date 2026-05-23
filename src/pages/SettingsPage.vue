@@ -630,6 +630,7 @@ import { useAuthStore } from 'stores/authStore'
 import { Notify } from 'quasar'
 import { collection, getDocs, deleteDoc, addDoc, setDoc, doc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
+import { logError } from 'src/utils/logger'
 
 const ALLOWED_COLLECTIONS = ['transactions', 'accounts', 'categories', 'notes', 'marketLists', 'loans', 'occasionGoals']
 
@@ -1065,7 +1066,7 @@ async function saveUserProfile() {
     showUserProfileModal.value = false
     resetForm()
   } catch (error) {
-    console.error('Error saving profile:', error)
+    logError('SettingsPage/saveProfile', error)
     Notify.create({ type: 'negative', message: t('settings.errorSavingProfile') })
   } finally {
     saving.value = false
@@ -1149,7 +1150,7 @@ async function onResetDatabase() {
     showResetDbDialog.value = false
     Notify.create({ type: 'positive', message: t('settings.resetDatabaseSuccess') })
   } catch (err) {
-    console.error('Reset database error:', err)
+    logError('SettingsPage/resetDatabase', err)
     Notify.create({ type: 'negative', message: t('settings.resetDatabaseError') })
   } finally {
     resettingDb.value = false
@@ -1357,7 +1358,7 @@ async function changePassword() {
       }
     }
   } catch (error) {
-    console.error('Password change error:', error)
+    logError('SettingsPage/changePassword', error)
     Notify.create({ type: 'negative', message: t('common.error') + error.message })
   } finally {
     changingPassword.value = false

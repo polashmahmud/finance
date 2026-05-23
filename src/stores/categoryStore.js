@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
+import { logError, logWarn } from 'src/utils/logger'
 
 export const useCategoryStore = defineStore('categories', () => {
   const categories = ref([])
@@ -33,7 +34,7 @@ export const useCategoryStore = defineStore('categories', () => {
         loading.value = false
       },
       (error) => {
-        console.error('Error fetching categories:', error)
+        logError('categoryStore/listenCategories', error)
         loading.value = false
       },
     )
@@ -58,7 +59,7 @@ export const useCategoryStore = defineStore('categories', () => {
         const idx = categories.value.findIndex((c) => c.id === tempId)
         if (idx >= 0) categories.value[idx].id = ref.id
       })
-      .catch((err) => console.warn('[Firestore] Category write queued:', err))
+      .catch((err) => logWarn('categoryStore/addCategory', err))
   }
 
   async function updateCategory(id, cat) {
@@ -83,7 +84,7 @@ export const useCategoryStore = defineStore('categories', () => {
       icon: cat.icon,
       color: cat.color,
       budget: cat.budget || 0,
-    }).catch((err) => console.warn('[Firestore] Category update queued:', err))
+    }).catch((err) => logWarn('categoryStore/updateCategory', err))
   }
 
   async function deleteCategory(id) {
@@ -93,7 +94,7 @@ export const useCategoryStore = defineStore('categories', () => {
     categories.value = categories.value.filter((c) => c.id !== id)
 
     const catRef = doc(firestore, `users/${uid}/categories/${id}`)
-    deleteDoc(catRef).catch((err) => console.warn('[Firestore] Category delete queued:', err))
+    deleteDoc(catRef).catch((err) => logWarn('categoryStore/deleteCategory', err))
   }
 
   async function setMonthlyBudget(categoryId, yearMonth, amount) {
@@ -109,7 +110,7 @@ export const useCategoryStore = defineStore('categories', () => {
     const catRef = doc(firestore, `users/${uid}/categories/${categoryId}`)
     updateDoc(catRef, {
       [`budgets.${yearMonth}`]: amount,
-    }).catch((err) => console.warn('[Firestore] Budget update queued:', err))
+    }).catch((err) => logWarn('categoryStore/setMonthlyBudget', err))
   }
 
   function getMonthlyBudget(category, yearMonth) {
@@ -147,7 +148,7 @@ export const useCategoryStore = defineStore('categories', () => {
           resolve() // Resolve promise when data is loaded
         },
         (error) => {
-          console.error('Error fetching categories:', error)
+          logError('categoryStore/fetchCategories', error)
           loading.value = false
           resolve() // Resolve anyway to not block the UI
         },

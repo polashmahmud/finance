@@ -412,6 +412,7 @@ import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from 'stores/authStore'
 import { useSettingsStore } from 'stores/settingsStore'
+import { logError } from 'src/utils/logger'
 import { useAccountStore } from 'stores/accountStore'
 import { useTransactionStore } from 'stores/transactionStore'
 import { useCategoryStore } from 'stores/categoryStore'
@@ -467,7 +468,7 @@ async function onRefresh(done) {
       timeout: 1500
     })
   } catch (error) {
-    console.error('Refresh error:', error)
+    logError('MainLayout/refresh', error)
     $q.notify({
       type: 'negative',
       icon: 'error_outline',

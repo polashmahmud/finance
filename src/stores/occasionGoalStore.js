@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
+import { logError, logWarn } from 'src/utils/logger'
 
 export const useOccasionGoalStore = defineStore('occasionGoals', () => {
   const goals = ref([])
@@ -67,7 +68,7 @@ export const useOccasionGoalStore = defineStore('occasionGoals', () => {
         loading.value = false
       },
       (error) => {
-        console.error('Error fetching goals:', error)
+        logError('occasionGoalStore/listenGoals', error)
         loading.value = false
       },
     )
@@ -94,7 +95,7 @@ export const useOccasionGoalStore = defineStore('occasionGoals', () => {
         const idx = goals.value.findIndex((g) => g.id === tempId)
         if (idx >= 0) goals.value[idx].id = ref.id
       })
-      .catch((err) => console.warn('[Firestore] Goal write queued:', err))
+      .catch((err) => logWarn('occasionGoalStore/addGoal', err))
   }
 
   async function updateGoal(id, data) {
@@ -104,7 +105,7 @@ export const useOccasionGoalStore = defineStore('occasionGoals', () => {
     if (idx >= 0) Object.assign(goals.value[idx], data)
 
     const goalRef = doc(firestore, `users/${uid}/occasionGoals/${id}`)
-    updateDoc(goalRef, data).catch((err) => console.warn('[Firestore] Goal update queued:', err))
+    updateDoc(goalRef, data).catch((err) => logWarn('occasionGoalStore/updateGoal', err))
   }
 
   async function deleteGoal(id) {
@@ -113,7 +114,7 @@ export const useOccasionGoalStore = defineStore('occasionGoals', () => {
     goals.value = goals.value.filter((g) => g.id !== id)
 
     deleteDoc(doc(firestore, `users/${uid}/occasionGoals/${id}`)).catch((err) =>
-      console.warn('[Firestore] Goal delete queued:', err),
+      logWarn('occasionGoalStore/deleteGoal', err),
     )
   }
 
@@ -143,7 +144,7 @@ export const useOccasionGoalStore = defineStore('occasionGoals', () => {
       currentSaved: newSaved,
       contributions: newContributions,
       completed,
-    }).catch((err) => console.warn('[Firestore] Contribution update queued:', err))
+    }).catch((err) => logWarn('occasionGoalStore/addContribution', err))
   }
 
   async function deleteContribution(goalId, contribIndex) {
@@ -166,7 +167,7 @@ export const useOccasionGoalStore = defineStore('occasionGoals', () => {
       currentSaved: newSaved,
       contributions: newContributions,
       completed,
-    }).catch((err) => console.warn('[Firestore] Contribution delete queued:', err))
+    }).catch((err) => logWarn('occasionGoalStore/deleteContribution', err))
   }
 
   function stopListening() {
@@ -196,7 +197,7 @@ export const useOccasionGoalStore = defineStore('occasionGoals', () => {
           resolve()
         },
         (error) => {
-          console.error('Error fetching goals:', error)
+          logError('occasionGoalStore/fetchGoals', error)
           loading.value = false
           resolve()
         },

@@ -11,6 +11,7 @@ import {
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc } from 'firebase/firestore'
 import { auth, firestore } from 'boot/firebase'
+import { logError } from 'src/utils/logger'
 
 // Map Firebase auth error codes to user-friendly messages, preventing
 // implementation details (e.g. "auth/user-not-found") from reaching the UI.
@@ -97,7 +98,7 @@ export const useAuthStore = defineStore('auth', () => {
         }
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error)
+      logError('authStore/fetchUserProfile', error)
       userProfile.value = null
     }
   }
@@ -126,7 +127,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       return { success: true }
     } catch (error) {
-      console.error('Error updating user profile:', error)
+      logError('authStore/updateUserProfile', error)
       return { success: false, error: error.message }
     }
   }
@@ -229,7 +230,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       await fetchUserProfile(uid)
     } catch (error) {
-      console.error('Error setting up new user data:', error)
+      logError('authStore/setupNewUserData', error)
     }
   }
 
@@ -260,7 +261,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       return { success: true }
     } catch (error) {
-      console.error('Error changing password:', error)
+      logError('authStore/changePassword', error)
       return { success: false, error: sanitizeAuthError(error) }
     }
   }
